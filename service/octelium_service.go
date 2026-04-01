@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/QuantumNous/new-api/common"
+	"github.com/octelium/octelium/apis/main/authv1"
 	"github.com/octelium/octelium/apis/main/corev1"
 	"github.com/octelium/octelium/apis/main/metav1"
 	"google.golang.org/grpc"
@@ -29,6 +30,7 @@ type OcteliumService struct {
 
 	grpcConn *grpc.ClientConn
 	coreC    corev1.MainServiceClient
+	authC    authv1.MainServiceClient
 	// accessToken is the session access token obtained from auth-token
 	accessToken string
 	tokenExpiry time.Time
@@ -98,6 +100,7 @@ func (s *OcteliumService) initGRPC() error {
 	}
 	s.grpcConn = conn
 	s.coreC = corev1.NewMainServiceClient(conn)
+	s.authC = authv1.NewMainServiceClient(conn)
 	common.SysLog(fmt.Sprintf("Octelium gRPC connected to %s", addr))
 	return nil
 }
@@ -118,16 +121,52 @@ func (s *OcteliumService) GetDefaultDomain() string {
 	return s.domain
 }
 
-// authenticatedCtx returns a context with the Octelium access token set
+// authenticatedCtx returns a context with a valid Octelium access token.
+// It exchanges the auth-token for a session access token via authv1, caching it until expiry.
 func (s *OcteliumService) authenticatedCtx(ctx context.Context) (context.Context, error) {
 	s.mu.RLock()
-	token := s.authToken
+	token := s.accessToken
+	expiry := s.tokenExpiry
 	s.mu.RUnlock()
-	if token == "" {
+
+	// If we have a valid cached access token, use it
+	if token != "" && time.Now().Before(expiry) {
+		md := grpcmetadata.Pairs("authorization", "Bearer "+token)
+		return grpcmetadata.NewOutgoingContext(ctx, md), nil
+	}
+
+	// Exchange auth-token for access token
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// Double-check after acquiring write lock
+	if s.accessToken != "" && time.Now().Before(s.tokenExpiry) {
+		md := grpcmetadata.Pairs("authorization", "Bearer "+s.accessToken)
+		return grpcmetadata.NewOutgoingContext(ctx, md), nil
+	}
+
+	if s.authToken == "" {
 		return nil, errors.New("octelium auth token not configured")
 	}
-	// Use auth-token directly as bearer for admin operations
-	md := grpcmetadata.Pairs("authorization", "Bearer "+token)
+
+	resp, err := s.authC.AuthenticateWithAuthenticationToken(ctx, &authv1.AuthenticateWithAuthenticationTokenRequest{
+		AuthenticationToken: s.authToken,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("authenticate with auth token: %w", err)
+	}
+
+	s.accessToken = resp.GetAccessToken()
+	if resp.GetExpiresIn() > 0 {
+		// Refresh 60s before actual expiry
+		s.tokenExpiry = time.Now().Add(time.Duration(resp.GetExpiresIn())*time.Second - 60*time.Second)
+	} else {
+		// Default: cache for 30 minutes
+		s.tokenExpiry = time.Now().Add(30 * time.Minute)
+	}
+
+	common.SysLog("Octelium access token obtained successfully")
+	md := grpcmetadata.Pairs("authorization", "Bearer "+s.accessToken)
 	return grpcmetadata.NewOutgoingContext(ctx, md), nil
 }
 

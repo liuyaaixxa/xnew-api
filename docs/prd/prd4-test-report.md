@@ -55,10 +55,14 @@
   - 创建设备令牌时返回 `Unauthenticated` 错误
   - 错误信息清晰：`ensure octelium user: get octelium user: rpc error: code = Unauthenticated`
 
-### 5. 功能验证（需有效 Octelium 环境）
-- [ ] 配置有效 `OCTELIUM_AUTH_TOKEN` 环境变量
-- [ ] 创建设备令牌，验证返回真实 auth-token
-- [ ] 复制令牌，验证为明文
+### 5. 功能验证（真实 Octelium 环境）
+- [x] 配置有效 `OCTELIUM_AUTH_TOKEN` 环境变量
+- [x] 创建设备令牌 test-device-1，返回真实 auth-token（mask: `AQpA****4sjs`）
+- [x] 获取明文 token 成功（`/api/device-token/4/key`）
+- [x] 创建设备令牌 test-device-2，返回真实 auth-token（mask: `AQpA****aFIQ`）
+- [x] 获取明文 token 成功（`/api/device-token/5/key`）
+- [x] 日志验证完整流程：gRPC连接 → access token获取 → 用户创建 → token生成
+- [x] 第二次请求复用缓存的 access token（无重复认证）
 
 ## 测试结果
 
@@ -68,6 +72,6 @@
 | 单元测试 | ✅ 通过 | 38 个测试全部通过，含 17 个 Octelium 专项测试 |
 | 降级验证 | ✅ 通过 | 未配置 token 时服务正确禁用，API 返回友好错误 |
 | 认证验证 | ✅ 通过 | 无效 token 时返回 Unauthenticated，错误链路清晰 |
-| 端到端功能 | ⏳ 待测 | 需配置有效 `OCTELIUM_AUTH_TOKEN` 后手动执行 |
+| 端到端功能 | ✅ 通过 | 2 轮测试均成功生成真实 Octelium auth-token |
 
-编译、单元测试、降级和认证流程验证全部通过。端到端功能测试需要配置有效的 Octelium 管理员 auth-token 后执行。
+所有测试全部通过。
