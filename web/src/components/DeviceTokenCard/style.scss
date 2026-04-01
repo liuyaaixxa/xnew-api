@@ -1,0 +1,90 @@
+/*
+Copyright (C) 2025 QuantumNous
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+For commercial licensing, please contact support@quantumnous.com
+*/
+
+.device-token-card {
+  margin-bottom: 20px;
+}
+
+.device-token-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+}
+
+.device-token-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.device-token-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.add-token-modal-content {
+  padding: 16px 0;
+}
+
+.token-info-card {
+  background: var(--semi-color-fill-0);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.token-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.token-info-label {
+  font-size: 12px;
+}
+
+.token-value {
+  font-family: monospace;
+  background: var(--semi-color-fill-1);
+  padding: 8px 12px;
+  border-radius: 6px;
+  word-break: break-all;
+}
+
+.add-token-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--semi-color-border);
+}
+
+@media (max-width: 768px) {
+  .device-token-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -17,17 +17,33 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 
-import React from 'react';
-import TokensTable from '../../components/table/tokens';
-import DeviceTokenCard from '../../components/DeviceTokenCard';
+import { API } from '../helpers';
 
-const Token = () => {
-  return (
-    <div className='mt-[60px] px-2 flex flex-col gap-4'>
-      <TokensTable />
-      <DeviceTokenCard />
-    </div>
-  );
+/**
+ * Get device tokens list
+ * @returns {Promise} API response
+ */
+export const getDeviceTokens = async () => {
+  const res = await API.get('/api/device-token/');
+  return res.data;
 };
 
-export default Token;
+/**
+ * Create a new device token
+ * @param {Object} data - Token data { name, domain }
+ * @returns {Promise} API response
+ */
+export const createDeviceToken = async (data) => {
+  const res = await API.post('/api/device-token/', data);
+  return res.data;
+};
+
+/**
+ * Delete a device token
+ * @param {number} id - Token ID
+ * @returns {Promise} API response
+ */
+export const deleteDeviceToken = async (id) => {
+  const res = await API.delete(`/api/device-token/${id}`);
+  return res.data;
+};

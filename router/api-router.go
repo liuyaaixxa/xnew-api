@@ -259,6 +259,19 @@ func SetApiRouter(router *gin.Engine) {
 			tokenRoute.POST("/batch", controller.DeleteTokenBatch)
 		}
 
+		// Device token management
+		deviceTokenRoute := apiRouter.Group("/device-token")
+		deviceTokenRoute.Use(middleware.UserAuth())
+		{
+			deviceTokenRoute.GET("/", controller.GetAllDeviceTokens)
+			deviceTokenRoute.GET("/:id", controller.GetDeviceToken)
+			deviceTokenRoute.POST("/", controller.AddDeviceToken)
+			deviceTokenRoute.DELETE("/:id", controller.DeleteDeviceToken)
+			deviceTokenRoute.DELETE("/batch", controller.DeleteDeviceTokenBatch)
+			deviceTokenRoute.PUT("/:id/status", controller.UpdateDeviceTokenStatus)
+			deviceTokenRoute.GET("/:id/key", middleware.CriticalRateLimit(), middleware.DisableCache(), controller.GetDeviceTokenKey)
+		}
+
 		usageRoute := apiRouter.Group("/usage")
 		usageRoute.Use(middleware.CORS(), middleware.CriticalRateLimit())
 		{
