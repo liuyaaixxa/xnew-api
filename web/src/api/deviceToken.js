@@ -39,6 +39,16 @@ export const createDeviceToken = async (data) => {
 };
 
 /**
+ * Get plaintext token key by ID
+ * @param {number} id - Token ID
+ * @returns {Promise} API response with plaintext token
+ */
+export const getDeviceTokenKey = async (id) => {
+  const res = await API.get(`/api/device-token/${id}/key`);
+  return res.data;
+};
+
+/**
  * Delete a device token
  * @param {number} id - Token ID
  * @returns {Promise} API response

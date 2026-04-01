@@ -43,6 +43,7 @@ import {
 import {
   getDeviceTokens,
   deleteDeviceToken,
+  getDeviceTokenKey,
 } from '../../api/deviceToken';
 import AddTokenModal from './AddTokenModal';
 import './style.scss';
@@ -106,10 +107,20 @@ const DeviceTokenCard = () => {
   };
 
   // Handle add success
-  const handleAddSuccess = (token) => {
-    setNewToken(token);
+  const handleAddSuccess = async (token) => {
     setShowAddModal(false);
     loadTokens();
+    // Fetch plaintext token for copy
+    try {
+      const { success, data } = await getDeviceTokenKey(token.id);
+      if (success && data?.token) {
+        setNewToken({ ...token, plaintext_token: data.token });
+        return;
+      }
+    } catch (e) {
+      // fallback to masked token
+    }
+    setNewToken(token);
   };
 
   // Close new token display

@@ -98,7 +98,7 @@ const AddTokenModal = ({ visible, onClose, onSuccess, newToken, t = (key) => key
                 theme="solid"
                 type="primary"
                 icon={<IconCopy />}
-                onClick={() => handleCopyToken(newToken.token || newToken.token_mask)}
+                onClick={() => handleCopyToken(newToken.plaintext_token || newToken.token_mask)}
               >
                 {t('复制令牌')}
               </Button>
@@ -141,7 +141,7 @@ const AddTokenModal = ({ visible, onClose, onSuccess, newToken, t = (key) => key
                 {t('令牌')}
               </Text>
               <Text strong className="token-value">
-                {newToken.token || newToken.token_mask}
+                {newToken.token_mask}
               </Text>
             </div>
           </div>
