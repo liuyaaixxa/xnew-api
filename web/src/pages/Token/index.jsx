@@ -17,15 +17,69 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { TabPane, Tabs } from '@douyinfe/semi-ui';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { KeyRound, Smartphone } from 'lucide-react';
 import TokensTable from '../../components/table/tokens';
 import DeviceTokenCard from '../../components/DeviceTokenCard';
 
 const Token = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [tabActiveKey, setTabActiveKey] = useState('llm');
+
+  const onChangeTab = (key) => {
+    setTabActiveKey(key);
+    navigate(`?tab=${key}`);
+  };
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const tab = searchParams.get('tab');
+    if (tab) {
+      setTabActiveKey(tab);
+    }
+  }, [location.search]);
+
+  const panes = [
+    {
+      tab: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <KeyRound size={18} />
+          {t('LLM令牌管理')}
+        </span>
+      ),
+      content: <TokensTable />,
+      itemKey: 'llm',
+    },
+    {
+      tab: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <Smartphone size={18} />
+          {t('设备令牌管理')}
+        </span>
+      ),
+      content: <DeviceTokenCard />,
+      itemKey: 'device',
+    },
+  ];
+
   return (
-    <div className='mt-[60px] px-2 flex flex-col gap-4'>
-      <TokensTable />
-      <DeviceTokenCard />
+    <div className='mt-[60px] px-2'>
+      <Tabs
+        type='line'
+        activeKey={tabActiveKey}
+        onChange={(key) => onChangeTab(key)}
+      >
+        {panes.map((pane) => (
+          <TabPane itemKey={pane.itemKey} tab={pane.tab} key={pane.itemKey}>
+            {tabActiveKey === pane.itemKey && pane.content}
+          </TabPane>
+        ))}
+      </Tabs>
     </div>
   );
 };

@@ -3362,6 +3362,7 @@
     "剪贴板中未检测到连接信息": "No connection info found in clipboard",
     "连接信息已填入": "Connection info applied",
     "无法读取剪贴板": "Cannot read clipboard",
+    "LLM令牌管理": "LLM Token Management",
     "设备令牌管理": "Device Token Management",
     "添加设备令牌": "Add Device Token",
     "设备名称": "Device Name",

@@ -3318,6 +3318,7 @@
     "剪贴板中未检测到连接信息": "Aucune info de connexion trouvée dans le presse-papiers",
     "连接信息已填入": "Informations de connexion appliquées",
     "无法读取剪贴板": "Impossible de lire le presse-papiers",
+    "LLM令牌管理": "Gestion des jetons LLM",
     "设备令牌管理": "Gestion des jetons de périphérique",
     "添加设备令牌": "Ajouter un jeton de périphérique",
     "设备名称": "Nom du périphérique",

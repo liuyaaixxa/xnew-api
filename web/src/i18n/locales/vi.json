@@ -3869,6 +3869,7 @@
     "剪贴板中未检测到连接信息": "Không tìm thấy thông tin kết nối trong bộ nhớ tạm",
     "连接信息已填入": "Đã áp dụng thông tin kết nối",
     "无法读取剪贴板": "Không thể đọc bộ nhớ tạm",
+    "LLM令牌管理": "Quản lý token LLM",
     "设备令牌管理": "Quản lý token thiết bị",
     "添加设备令牌": "Thêm token thiết bị",
     "设备名称": "Tên thiết bị",
