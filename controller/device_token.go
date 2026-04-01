@@ -114,9 +114,11 @@ func AddDeviceToken(c *gin.Context) {
 	}
 
 	// Generate auth token from octelium
+	username := c.GetString("username")
 	tokenResp, err := octeliumSvc.GenerateAuthToken(context.Background(), &service.GenerateTokenRequest{
-		Name:   req.Name,
-		Domain: req.Domain,
+		Name:     req.Name,
+		Domain:   req.Domain,
+		Username: username,
 	})
 	if err != nil {
 		common.ApiError(c, err)

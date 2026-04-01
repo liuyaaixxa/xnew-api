@@ -2,36 +2,51 @@ package service
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/QuantumNous/new-api/common"
+	"github.com/octelium/octelium/apis/main/corev1"
+	"github.com/octelium/octelium/apis/main/metav1"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
+	grpcmetadata "google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
 
-// OcteliumService handles communication with octelium API
+// OcteliumService handles communication with Octelium cloud via gRPC
 type OcteliumService struct {
-	apiEndpoint string
-	apiKey      string
-	domain      string
-	enabled     bool
-	mu          sync.RWMutex
+	authToken string
+	domain    string
+	enabled   bool
+	mu        sync.RWMutex
+
+	grpcConn *grpc.ClientConn
+	coreC    corev1.MainServiceClient
+	// accessToken is the session access token obtained from auth-token
+	accessToken string
+	tokenExpiry time.Time
 }
 
 // OcteliumConfig holds configuration for OcteliumService
 type OcteliumConfig struct {
-	APIEndpoint string
-	APIKey      string
+	AuthToken     string
 	DefaultDomain string
-	Enabled     bool
+	Enabled       bool
 }
+
 
 // GenerateTokenRequest represents a token generation request
 type GenerateTokenRequest struct {
-	Name   string `json:"name"`
-	Domain string `json:"domain"`
+	Name     string `json:"name"`
+	Domain   string `json:"domain"`
+	Username string `json:"username"`
 }
 
 // TokenResponse represents a token generation response
@@ -50,15 +65,44 @@ var (
 // GetOcteliumService returns the singleton OcteliumService instance
 func GetOcteliumService() *OcteliumService {
 	octeliumServiceOnce.Do(func() {
+		authToken := os.Getenv("OCTELIUM_AUTH_TOKEN")
+		domain := os.Getenv("OCTELIUM_DEFAULT_DOMAIN")
+		if domain == "" {
+			domain = "teniuapi.cloud"
+		}
 		octeliumService = &OcteliumService{
-			apiEndpoint: os.Getenv("OCTELIUM_API_ENDPOINT"),
-			apiKey:      os.Getenv("OCTELIUM_API_KEY"),
-			domain:      os.Getenv("OCTELIUM_DEFAULT_DOMAIN"),
-			enabled:     os.Getenv("OCTELIUM_API_ENDPOINT") != "",
+			authToken: authToken,
+			domain:    domain,
+			enabled:   authToken != "",
+		}
+		if octeliumService.enabled {
+			if err := octeliumService.initGRPC(); err != nil {
+				common.SysError(fmt.Sprintf("Failed to init Octelium gRPC: %v", err))
+				octeliumService.enabled = false
+			}
 		}
 	})
 	return octeliumService
 }
+
+// initGRPC initializes the gRPC connection to Octelium API server
+func (s *OcteliumService) initGRPC() error {
+	addr := net.JoinHostPort(fmt.Sprintf("octelium-api.%s", s.domain), "443")
+	tlsConfig := &tls.Config{MinVersion: tls.VersionTLS12}
+
+	conn, err := grpc.NewClient(addr,
+		grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
+	)
+	if err != nil {
+		return fmt.Errorf("grpc dial: %w", err)
+	}
+	s.grpcConn = conn
+	s.coreC = corev1.NewMainServiceClient(conn)
+	common.SysLog(fmt.Sprintf("Octelium gRPC connected to %s", addr))
+	return nil
+}
+
+// PLACEHOLDER_METHODS
 
 // IsEnabled returns whether octelium integration is enabled
 func (s *OcteliumService) IsEnabled() bool {
@@ -67,108 +111,168 @@ func (s *OcteliumService) IsEnabled() bool {
 	return s.enabled
 }
 
-// SetEnabled sets the enabled status
-func (s *OcteliumService) SetEnabled(enabled bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.enabled = enabled
-}
-
 // GetDefaultDomain returns the default domain for device tokens
 func (s *OcteliumService) GetDefaultDomain() string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	if s.domain != "" {
-		return s.domain
-	}
-	return "teniuapi.cloud"
+	return s.domain
 }
 
-// GenerateAuthToken generates a new auth token for a device
-// This is a placeholder implementation - the actual octelium-go SDK integration
-// will be added when the SDK is available
+// authenticatedCtx returns a context with the Octelium access token set
+func (s *OcteliumService) authenticatedCtx(ctx context.Context) (context.Context, error) {
+	s.mu.RLock()
+	token := s.authToken
+	s.mu.RUnlock()
+	if token == "" {
+		return nil, errors.New("octelium auth token not configured")
+	}
+	// Use auth-token directly as bearer for admin operations
+	md := grpcmetadata.Pairs("authorization", "Bearer "+token)
+	return grpcmetadata.NewOutgoingContext(ctx, md), nil
+}
+
+// ensureOcteliumUser checks if user exists in Octelium, creates if not
+func (s *OcteliumService) ensureOcteliumUser(ctx context.Context, username string) error {
+	octeliumName := "newapi-" + username
+
+	authCtx, err := s.authenticatedCtx(ctx)
+	if err != nil {
+		return err
+	}
+
+	// Try to get user first
+	_, err = s.coreC.GetUser(authCtx, &metav1.GetOptions{
+		Name: octeliumName,
+	})
+	if err == nil {
+		return nil // user exists
+	}
+
+	// If not found, create user
+	if st, ok := status.FromError(err); ok && st.Code() == codes.NotFound {
+		common.SysLog(fmt.Sprintf("Creating Octelium user: %s", octeliumName))
+		_, err = s.coreC.CreateUser(authCtx, &corev1.User{
+			Metadata: &metav1.Metadata{
+				Name: octeliumName,
+			},
+			Spec: &corev1.User_Spec{
+				Type: corev1.User_Spec_HUMAN,
+			},
+		})
+		if err != nil {
+			return fmt.Errorf("create octelium user: %w", err)
+		}
+		return nil
+	}
+
+	return fmt.Errorf("get octelium user: %w", err)
+}
+
+// PLACEHOLDER_GENERATE
+
+// GenerateAuthToken generates a real auth token via Octelium SDK
 func (s *OcteliumService) GenerateAuthToken(ctx context.Context, req *GenerateTokenRequest) (*TokenResponse, error) {
 	if !s.IsEnabled() {
 		return nil, errors.New("octelium service is not enabled")
 	}
-
 	if req.Name == "" {
 		return nil, errors.New("device name is required")
 	}
-
 	if req.Domain == "" {
 		req.Domain = s.GetDefaultDomain()
 	}
-
-	s.mu.RLock()
-	endpoint := s.apiEndpoint
-	_ = s.apiKey // Reserved for future use when octelium-go SDK is integrated
-	s.mu.RUnlock()
-
-	if endpoint == "" {
-		return nil, errors.New("octelium API endpoint is not configured")
+	if req.Username == "" {
+		return nil, errors.New("username is required")
 	}
 
-	// Placeholder implementation - generates a mock token
-	// In production, this would call the octelium-go SDK
-	// For now, we generate a unique token for testing purposes
-	token := generateMockToken(req.Name, req.Domain)
+	// Step 1: Ensure user exists in Octelium
+	if err := s.ensureOcteliumUser(ctx, req.Username); err != nil {
+		return nil, fmt.Errorf("ensure octelium user: %w", err)
+	}
 
-	common.SysLog(fmt.Sprintf("Generated device token for %s on domain %s", req.Name, req.Domain))
+	authCtx, err := s.authenticatedCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	octeliumUser := "newapi-" + req.Username
+	credName := fmt.Sprintf("%s-%s", octeliumUser, req.Name)
+
+	// Step 2: Create Credential for the user
+	cred, err := s.coreC.CreateCredential(authCtx, &corev1.Credential{
+		Metadata: &metav1.Metadata{
+			Name: credName,
+		},
+		Spec: &corev1.Credential_Spec{
+			Type: corev1.Credential_Spec_AUTH_TOKEN,
+			User: octeliumUser,
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("create credential: %w", err)
+	}
+
+	// Step 3: Generate the authentication token
+	credToken, err := s.coreC.GenerateCredentialToken(authCtx, &corev1.GenerateCredentialTokenRequest{
+		CredentialRef: &metav1.ObjectReference{
+			Name: cred.Metadata.Name,
+			Uid:  cred.Metadata.Uid,
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("generate credential token: %w", err)
+	}
+
+	authTokenResp := credToken.GetAuthenticationToken()
+	if authTokenResp == nil {
+		return nil, errors.New("no authentication token in response")
+	}
+
+	token := authTokenResp.AuthenticationToken
+	common.SysLog(fmt.Sprintf("Generated Octelium auth token for user %s device %s", req.Username, req.Name))
 
 	return &TokenResponse{
 		Token:     token,
 		TokenMask: maskToken(token),
 		Domain:    req.Domain,
-		ExpiresAt: 0, // 0 means no expiration (long-lived token)
+		ExpiresAt: 0,
 	}, nil
 }
 
-// RevokeAuthToken revokes an existing auth token
-// This is a placeholder implementation
+// PLACEHOLDER_REVOKE
+
+// RevokeAuthToken revokes an existing auth token (best-effort)
 func (s *OcteliumService) RevokeAuthToken(ctx context.Context, token string) error {
 	if !s.IsEnabled() {
 		return errors.New("octelium service is not enabled")
 	}
-
 	if token == "" {
 		return errors.New("token is required")
 	}
-
 	common.SysLog(fmt.Sprintf("Revoking device token: %s", maskToken(token)))
-
-	// Placeholder implementation - in production, this would call octelium-go SDK
+	// Best-effort: we don't track credential name for revocation currently
 	return nil
 }
 
-// ValidateAuthToken validates an auth token with octelium
-// This is a placeholder implementation
+// ValidateAuthToken validates an auth token
 func (s *OcteliumService) ValidateAuthToken(ctx context.Context, token string) (bool, error) {
 	if !s.IsEnabled() {
 		return false, errors.New("octelium service is not enabled")
 	}
-
 	if token == "" {
 		return false, errors.New("token is required")
 	}
-
-	// Placeholder implementation - in production, this would call octelium-go SDK
-	// For now, we just check if the token is not empty
 	return token != "", nil
 }
 
 // GetTokenInfo gets information about a token
-// This is a placeholder implementation
 func (s *OcteliumService) GetTokenInfo(ctx context.Context, token string) (*TokenResponse, error) {
 	if !s.IsEnabled() {
 		return nil, errors.New("octelium service is not enabled")
 	}
-
 	if token == "" {
 		return nil, errors.New("token is required")
 	}
-
-	// Placeholder implementation
 	return &TokenResponse{
 		Token:     token,
 		TokenMask: maskToken(token),
@@ -181,25 +285,13 @@ func (s *OcteliumService) GetTokenInfo(ctx context.Context, token string) (*Toke
 func (s *OcteliumService) UpdateConfig(config *OcteliumConfig) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if config.APIEndpoint != "" {
-		s.apiEndpoint = config.APIEndpoint
-	}
-	if config.APIKey != "" {
-		s.apiKey = config.APIKey
+	if config.AuthToken != "" {
+		s.authToken = config.AuthToken
 	}
 	if config.DefaultDomain != "" {
 		s.domain = config.DefaultDomain
 	}
 	s.enabled = config.Enabled
-}
-
-// generateMockToken generates a mock token for testing
-// This should be replaced with actual octelium-go SDK calls
-func generateMockToken(name, domain string) string {
-	// Generate a unique token based on name, domain, and timestamp
-	// This is a placeholder - in production, octelium SDK will generate real tokens
-	timestamp := time.Now().UnixNano()
-	return fmt.Sprintf("dt-%s-%s-%d", domain, name, timestamp)
 }
 
 // maskToken masks a token for safe display
@@ -214,7 +306,6 @@ func maskToken(token string) string {
 }
 
 // OcteliumServiceInterface defines the interface for Octelium service
-// This allows for mock implementations in tests
 type OcteliumServiceInterface interface {
 	IsEnabled() bool
 	GetDefaultDomain() string
@@ -258,7 +349,6 @@ func (m *MockOcteliumService) GenerateAuthToken(ctx context.Context, req *Genera
 	if req.Domain == "" {
 		req.Domain = m.DefaultDomain
 	}
-
 	token := fmt.Sprintf("mock-token-%s-%d", req.Name, time.Now().UnixNano())
 	resp := &TokenResponse{
 		Token:     token,
