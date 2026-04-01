@@ -1,7 +1,5 @@
 <div align="center">
 
-![Teniu Cloud](/web/public/logo.png)
-
 # Teniu Cloud
 
 **统一的大模型接口网关 · Unified LLM API Gateway**
