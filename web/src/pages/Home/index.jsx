@@ -18,52 +18,15 @@ For commercial licensing, please contact support@quantumnous.com
 */
 
 import React, { useContext, useEffect, useState } from 'react';
-import {
-  Button,
-  Typography,
-  Input,
-  ScrollList,
-  ScrollItem,
-} from '@douyinfe/semi-ui';
-import { API, showError, copy, showSuccess } from '../../helpers';
+import { API, showError } from '../../helpers';
 import { useIsMobile } from '../../hooks/common/useIsMobile';
-import { API_ENDPOINTS } from '../../constants/common.constant';
 import { StatusContext } from '../../context/Status';
 import { useActualTheme } from '../../context/Theme';
 import { marked } from 'marked';
 import { useTranslation } from 'react-i18next';
-import {
-  IconGithubLogo,
-  IconPlay,
-  IconFile,
-  IconCopy,
-} from '@douyinfe/semi-icons';
 import { Link } from 'react-router-dom';
 import NoticeModal from '../../components/layout/NoticeModal';
-import {
-  Moonshot,
-  OpenAI,
-  XAI,
-  Zhipu,
-  Volcengine,
-  Cohere,
-  Claude,
-  Gemini,
-  Suno,
-  Minimax,
-  Wenxin,
-  Spark,
-  Qingyan,
-  DeepSeek,
-  Qwen,
-  Midjourney,
-  Grok,
-  AzureAI,
-  Hunyuan,
-  Xinference,
-} from '@lobehub/icons';
-
-const { Text } = Typography;
+import './landing.css';
 
 const Home = () => {
   const { t, i18n } = useTranslation();
@@ -73,13 +36,6 @@ const Home = () => {
   const [homePageContent, setHomePageContent] = useState('');
   const [noticeVisible, setNoticeVisible] = useState(false);
   const isMobile = useIsMobile();
-  const isDemoSiteMode = statusState?.status?.demo_site_enabled || false;
-  const docsLink = statusState?.status?.docs_link || '';
-  const serverAddress =
-    statusState?.status?.server_address || `${window.location.origin}`;
-  const endpointItems = API_ENDPOINTS.map((e) => ({ value: e }));
-  const [endpointIndex, setEndpointIndex] = useState(0);
-  const isChinese = i18n.language.startsWith('zh');
 
   const displayHomePageContent = async () => {
     setHomePageContent(localStorage.getItem('home_page_content') || '');
@@ -93,7 +49,6 @@ const Home = () => {
       setHomePageContent(content);
       localStorage.setItem('home_page_content', content);
 
-      // 如果内容是 URL，则发送主题模式
       if (data.startsWith('https://')) {
         const iframe = document.querySelector('iframe');
         if (iframe) {
@@ -108,13 +63,6 @@ const Home = () => {
       setHomePageContent('加载首页内容失败...');
     }
     setHomePageContentLoaded(true);
-  };
-
-  const handleCopyBaseURL = async () => {
-    const ok = await copy(serverAddress);
-    if (ok) {
-      showSuccess(t('已复制到剪切板'));
-    }
   };
 
   useEffect(() => {
@@ -133,7 +81,6 @@ const Home = () => {
         }
       }
     };
-
     checkNoticeAndShow();
   }, []);
 
@@ -141,12 +88,7 @@ const Home = () => {
     displayHomePageContent().then();
   }, []);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setEndpointIndex((prev) => (prev + 1) % endpointItems.length);
-    }, 3000);
-    return () => clearInterval(timer);
-  }, [endpointItems.length]);
+  const docsLink = statusState?.status?.docs_link || '';
 
   return (
     <div className='w-full overflow-x-hidden'>
@@ -156,183 +98,209 @@ const Home = () => {
         isMobile={isMobile}
       />
       {homePageContentLoaded && homePageContent === '' ? (
-        <div className='w-full overflow-x-hidden'>
-          {/* Banner 部分 */}
-          <div className='w-full border-b border-semi-color-border min-h-[500px] md:min-h-[600px] lg:min-h-[700px] relative overflow-x-hidden'>
-            {/* 背景模糊晕染球 */}
-            <div className='blur-ball blur-ball-indigo' />
-            <div className='blur-ball blur-ball-teal' />
-            <div className='flex items-center justify-center h-full px-4 py-20 md:py-24 lg:py-32 mt-10'>
-              {/* 居中内容区 */}
-              <div className='flex flex-col items-center justify-center text-center max-w-4xl mx-auto'>
-                <div className='flex flex-col items-center justify-center mb-6 md:mb-8'>
-                  <h1
-                    className={`text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-semi-color-text-0 leading-tight ${isChinese ? 'tracking-wide md:tracking-wider' : ''}`}
-                  >
-                    <>
-                      {t('统一的')}
-                      <br />
-                      <span className='shine-text'>{t('大模型接口网关')}</span>
-                    </>
-                  </h1>
-                  <p className='text-base md:text-lg lg:text-xl text-semi-color-text-1 mt-4 md:mt-6 max-w-xl'>
-                    {t('更好的价格，更好的稳定性，只需要将模型基址替换为：')}
-                  </p>
-                  {/* BASE URL 与端点选择 */}
-                  <div className='flex flex-col md:flex-row items-center justify-center gap-4 w-full mt-4 md:mt-6 max-w-md'>
-                    <Input
-                      readonly
-                      value={serverAddress}
-                      className='flex-1 !rounded-full'
-                      size={isMobile ? 'default' : 'large'}
-                      suffix={
-                        <div className='flex items-center gap-2'>
-                          <ScrollList
-                            bodyHeight={32}
-                            style={{ border: 'unset', boxShadow: 'unset' }}
-                          >
-                            <ScrollItem
-                              mode='wheel'
-                              cycled={true}
-                              list={endpointItems}
-                              selectedIndex={endpointIndex}
-                              onSelect={({ index }) => setEndpointIndex(index)}
-                            />
-                          </ScrollList>
-                          <Button
-                            type='primary'
-                            onClick={handleCopyBaseURL}
-                            icon={<IconCopy />}
-                            className='!rounded-full'
-                          />
-                        </div>
-                      }
-                    />
-                  </div>
-                </div>
+        <div className='landing-page'>
+          {/* Header */}
+          <header className='lp-header'>
+            <div className='lp-header-content'>
+              <div className='lp-logo'>Teniu Cloud</div>
+              <nav className='lp-nav'>
+                <a href='#features'>{t('功能特性')}</a>
+                <a href='#how-it-works'>{t('使用流程')}</a>
+                <a href='#pricing'>{t('价格方案')}</a>
+                <Link to='/login' className='lp-nav-btn'>{t('开始使用')}</Link>
+              </nav>
+            </div>
+          </header>
 
-                {/* 操作按钮 */}
-                <div className='flex flex-row gap-4 justify-center items-center'>
-                  <Link to='/console'>
-                    <Button
-                      theme='solid'
-                      type='primary'
-                      size={isMobile ? 'default' : 'large'}
-                      className='!rounded-3xl px-8 py-2'
-                      icon={<IconPlay />}
-                    >
-                      {t('获取密钥')}
-                    </Button>
-                  </Link>
-                  {isDemoSiteMode && statusState?.status?.version ? (
-                    <Button
-                      size={isMobile ? 'default' : 'large'}
-                      className='flex items-center !rounded-3xl px-6 py-2'
-                      icon={<IconGithubLogo />}
-                      onClick={() =>
-                        window.open(
-                          'https://github.com/QuantumNous/new-api',
-                          '_blank',
-                        )
-                      }
-                    >
-                      {statusState.status.version}
-                    </Button>
-                  ) : (
-                    docsLink && (
-                      <Button
-                        size={isMobile ? 'default' : 'large'}
-                        className='flex items-center !rounded-3xl px-6 py-2'
-                        icon={<IconFile />}
-                        onClick={() => window.open(docsLink, '_blank')}
-                      >
-                        {t('文档')}
-                      </Button>
-                    )
-                  )}
+          {/* Hero */}
+          <section className='lp-hero'>
+            <div className='lp-hero-bg' />
+            <div className='lp-hero-content'>
+              <div className='lp-hero-badge'>
+                <span>Global DePIN AI Network</span>
+              </div>
+              <h1>
+                {t('将闲置 GPU')}{' '}
+                <span className='lp-highlight'>{t('转化为')}</span>
+                <br />
+                {t('稳定收益')}
+              </h1>
+              <p className='lp-hero-desc'>
+                {t('Teniu Cloud 是一个去中心化 GPU 共享网络，让您将闲置算力变现。支持 Ollama 本地模型和 LLM Token 共享。')}
+              </p>
+              <div className='lp-hero-stats'>
+                <div>
+                  <div className='lp-stat-value'>10K+</div>
+                  <div className='lp-stat-label'>{t('活跃节点')}</div>
                 </div>
+                <div>
+                  <div className='lp-stat-value'>$2.5M+</div>
+                  <div className='lp-stat-label'>{t('已分发奖励')}</div>
+                </div>
+                <div>
+                  <div className='lp-stat-value'>99.9%</div>
+                  <div className='lp-stat-label'>{t('在线率')}</div>
+                </div>
+              </div>
+              <div className='lp-hero-buttons'>
+                <Link to='/register' className='lp-btn lp-btn-primary'>
+                  <span>{t('立即开始赚取')}</span>
+                  <span>&rarr;</span>
+                </Link>
+                {docsLink && (
+                  <a href={docsLink} target='_blank' rel='noreferrer' className='lp-btn lp-btn-secondary'>
+                    {t('查看文档')}
+                  </a>
+                )}
+              </div>
+            </div>
+          </section>
 
-                {/* 框架兼容性图标 */}
-                <div className='mt-12 md:mt-16 lg:mt-20 w-full'>
-                  <div className='flex items-center mb-6 md:mb-8 justify-center'>
-                    <Text
-                      type='tertiary'
-                      className='text-lg md:text-xl lg:text-2xl font-light'
-                    >
-                      {t('支持众多的大模型供应商')}
-                    </Text>
-                  </div>
-                  <div className='flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-6 lg:gap-8 max-w-5xl mx-auto px-4'>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Moonshot size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <OpenAI size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <XAI size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Zhipu.Color size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Volcengine.Color size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Cohere.Color size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Claude.Color size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Gemini.Color size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Suno size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Minimax.Color size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Wenxin.Color size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Spark.Color size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Qingyan.Color size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <DeepSeek.Color size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Qwen.Color size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Midjourney size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Grok size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <AzureAI.Color size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Hunyuan.Color size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Xinference.Color size={40} />
-                    </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
-                      <Typography.Text className='!text-lg sm:!text-xl md:!text-2xl lg:!text-3xl font-bold'>
-                        30+
-                      </Typography.Text>
-                    </div>
-                  </div>
+          {/* Features */}
+          <section className='lp-features' id='features'>
+            <div className='lp-section-header'>
+              <div className='lp-section-tag'>Features</div>
+              <h2 className='lp-section-title'>{t('为什么选择 Teniu Cloud？')}</h2>
+              <p className='lp-section-desc'>{t('最强大的去中心化 GPU 共享平台，帮助您轻松将闲置资源变现。')}</p>
+            </div>
+            <div className='lp-features-grid'>
+              <div className='lp-feature-card'>
+                <div className='lp-feature-icon'>&#9889;</div>
+                <h3>{t('一键部署')}</h3>
+                <p>{t('仅需 5 分钟即可安装配置，自动检测环境并优化设置，获得最佳性能。')}</p>
+              </div>
+              <div className='lp-feature-card'>
+                <div className='lp-feature-icon'>&#128274;</div>
+                <h3>{t('安全可靠')}</h3>
+                <p>{t('企业级安全架构，加密传输与隔离保护，确保数据安全。')}</p>
+              </div>
+              <div className='lp-feature-card'>
+                <div className='lp-feature-icon'>&#128176;</div>
+                <h3>{t('实时结算')}</h3>
+                <p>{t('智能合约自动结算，实时查看收益，支持多种提现方式。')}</p>
+              </div>
+              <div className='lp-feature-card'>
+                <div className='lp-feature-icon'>&#127760;</div>
+                <h3>{t('全球网络')}</h3>
+                <p>{t('节点遍布全球，确保低延迟和高可用性，提供最佳用户体验。')}</p>
+              </div>
+              <div className='lp-feature-card'>
+                <div className='lp-feature-icon'>&#129302;</div>
+                <h3>{t('Ollama 支持')}</h3>
+                <p>{t('原生支持 Ollama 本地模型，轻松共享您的 AI 模型并赚取额外收益。')}</p>
+              </div>
+              <div className='lp-feature-card'>
+                <div className='lp-feature-icon'>&#128202;</div>
+                <h3>{t('智能调度')}</h3>
+                <p>{t('智能任务调度系统，自动匹配最优节点，最大化效率和收益。')}</p>
+              </div>
+            </div>
+          </section>
+
+          {/* How It Works */}
+          <section className='lp-how-it-works' id='how-it-works'>
+            <div className='lp-section-header'>
+              <div className='lp-section-tag'>How It Works</div>
+              <h2 className='lp-section-title'>{t('简单 3 步，开始赚取')}</h2>
+              <p className='lp-section-desc'>{t('流程简单，即刻开始赚取收益。')}</p>
+            </div>
+            <div className='lp-steps'>
+              <div className='lp-step'>
+                <div className='lp-step-number'>01</div>
+                <div className='lp-step-content'>
+                  <h3>{t('注册账户')}</h3>
+                  <p>{t('创建您的 Teniu Cloud 账户并完成身份验证，开启您的赚取之旅。')}</p>
+                </div>
+              </div>
+              <div className='lp-step'>
+                <div className='lp-step-number'>02</div>
+                <div className='lp-step-content'>
+                  <h3>{t('连接设备')}</h3>
+                  <p>{t('下载安装我们的轻量级客户端，自动检测您的 GPU 配置并优化设置。')}</p>
+                </div>
+              </div>
+              <div className='lp-step'>
+                <div className='lp-step-number'>03</div>
+                <div className='lp-step-content'>
+                  <h3>{t('开始赚取')}</h3>
+                  <p>{t('您的设备将自动接收计算任务，实时监控收益，随时提现。')}</p>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
+
+          {/* Pricing */}
+          <section className='lp-pricing' id='pricing'>
+            <div className='lp-section-header'>
+              <div className='lp-section-tag'>Pricing</div>
+              <h2 className='lp-section-title'>{t('灵活的价格方案')}</h2>
+              <p className='lp-section-desc'>{t('选择最适合您的方案，随时升级。')}</p>
+            </div>
+            <div className='lp-pricing-cards'>
+              <div className='lp-pricing-card'>
+                <h3>{t('免费版')}</h3>
+                <div className='lp-pricing-value'><span className='lp-currency'>$</span>0</div>
+                <div className='lp-pricing-period'>{t('永久免费')}</div>
+                <ul className='lp-pricing-features'>
+                  <li>{t('1 个 GPU 节点')}</li>
+                  <li>{t('基础收益分成')}</li>
+                  <li>{t('社区支持')}</li>
+                  <li>{t('标准结算')}</li>
+                </ul>
+                <Link to='/register' className='lp-btn lp-btn-secondary'>{t('开始使用')}</Link>
+              </div>
+              <div className='lp-pricing-card lp-featured'>
+                <h3>Pro</h3>
+                <div className='lp-pricing-value'><span className='lp-currency'>$</span>29</div>
+                <div className='lp-pricing-period'>{t('每月')}</div>
+                <ul className='lp-pricing-features'>
+                  <li>{t('无限 GPU 节点')}</li>
+                  <li>{t('优先任务分配')}</li>
+                  <li>{t('7×24 优先支持')}</li>
+                  <li>{t('实时结算')}</li>
+                  <li>{t('高级数据分析')}</li>
+                </ul>
+                <Link to='/register' className='lp-btn lp-btn-primary'>{t('选择 Pro')}</Link>
+              </div>
+              <div className='lp-pricing-card'>
+                <h3>{t('企业版')}</h3>
+                <div className='lp-pricing-value'>{t('定制')}</div>
+                <div className='lp-pricing-period'>{t('专属方案')}</div>
+                <ul className='lp-pricing-features'>
+                  <li>{t('专属基础设施')}</li>
+                  <li>{t('定制集成')}</li>
+                  <li>{t('SLA 保障')}</li>
+                  <li>{t('专属客户经理')}</li>
+                </ul>
+                <Link to='/register' className='lp-btn lp-btn-secondary'>{t('联系销售')}</Link>
+              </div>
+            </div>
+          </section>
+
+          {/* CTA */}
+          <section className='lp-cta'>
+            <div className='lp-cta-box'>
+              <h2>{t('准备好开始赚取了吗？')}</h2>
+              <p>{t('加入数千名已通过 Teniu Cloud 赚取收益的用户，今天就开始您的旅程！')}</p>
+              <Link to='/register' className='lp-btn lp-btn-primary'>
+                <span>{t('立即开始')}</span>
+                <span>&rarr;</span>
+              </Link>
+            </div>
+          </section>
+
+          {/* Footer */}
+          <footer className='lp-footer'>
+            <div className='lp-footer-content'>
+              <div className='lp-footer-links'>
+                <Link to='/about'>{t('关于我们')}</Link>
+                {docsLink && <a href={docsLink} target='_blank' rel='noreferrer'>{t('文档')}</a>}
+                <Link to='/privacy'>{t('隐私政策')}</Link>
+                <Link to='/tos'>{t('服务条款')}</Link>
+              </div>
+              <p className='lp-footer-copy'>&copy; 2025 Teniu Cloud. All rights reserved.</p>
+            </div>
+          </footer>
         </div>
       ) : (
         <div className='overflow-x-hidden w-full'>
