@@ -31,19 +31,43 @@
 ### 1. 编译验证
 - [x] `go build ./...` 编译通过，无错误
 
-### 2. 单元测试
-- [x] `go test ./service/...` 全部通过（3.651s）
+### 2. 单元测试（第1轮）
+- [x] `go test ./service/... -v` 全部通过（1.045s），共 38 个测试
+- [x] Octelium 专项测试通过：
+  - `TestOcteliumServiceGenerateAuthToken` — 5 子用例全部通过
+  - `TestOcteliumServiceRevokeAuthToken` — 3 子用例全部通过
+  - `TestMaskDeviceToken` — 4 子用例全部通过
+  - `TestValidateDeviceName` — 5 子用例全部通过
 - [x] Mock 实现仍然可用于测试
 
-### 3. 功能验证（需手动）
-- [ ] 配置 `OCTELIUM_AUTH_TOKEN` 环境变量
+### 3. 降级验证（第2轮 — 集成测试）
+- [x] 未配置 `OCTELIUM_AUTH_TOKEN` 启动后端：
+  - 日志中无 "Octelium gRPC connected" 输出，服务正确跳过初始化
+  - `IsEnabled()` 返回 false
+- [x] 调用 `POST /api/device-token/` 创建设备令牌：
+  - 返回 `{"message":"Device token service is not enabled","success":false}`
+  - 正确拒绝请求，无异常或 panic
+- [x] gRPC 初始化失败时，服务自动禁用并记录错误日志
+
+### 4. 认证流程验证
+- [x] 配置无效 `OCTELIUM_AUTH_TOKEN` 启动后端：
+  - gRPC 连接建立成功（延迟连接，不立即验证 token）
+  - 创建设备令牌时返回 `Unauthenticated` 错误
+  - 错误信息清晰：`ensure octelium user: get octelium user: rpc error: code = Unauthenticated`
+
+### 5. 功能验证（需有效 Octelium 环境）
+- [ ] 配置有效 `OCTELIUM_AUTH_TOKEN` 环境变量
 - [ ] 创建设备令牌，验证返回真实 auth-token
 - [ ] 复制令牌，验证为明文
 
-### 4. 降级验证
-- [x] 未配置 `OCTELIUM_AUTH_TOKEN` 时，`IsEnabled()` 返回 false
-- [x] gRPC 初始化失败时，服务自动禁用并记录错误日志
-
 ## 测试结果
 
-编译和单元测试全部通过。手动功能测试需要配置 Octelium 环境变量后执行。
+| 测试类型 | 状态 | 说明 |
+|----------|------|------|
+| 编译验证 | ✅ 通过 | `go build ./...` 无错误 |
+| 单元测试 | ✅ 通过 | 38 个测试全部通过，含 17 个 Octelium 专项测试 |
+| 降级验证 | ✅ 通过 | 未配置 token 时服务正确禁用，API 返回友好错误 |
+| 认证验证 | ✅ 通过 | 无效 token 时返回 Unauthenticated，错误链路清晰 |
+| 端到端功能 | ⏳ 待测 | 需配置有效 `OCTELIUM_AUTH_TOKEN` 后手动执行 |
+
+编译、单元测试、降级和认证流程验证全部通过。端到端功能测试需要配置有效的 Octelium 管理员 auth-token 后执行。
