@@ -77,11 +77,15 @@ func GetOcteliumService() *OcteliumService {
 			domain:    domain,
 			enabled:   authToken != "",
 		}
-		if octeliumService.enabled {
-			if err := octeliumService.initGRPC(); err != nil {
-				common.SysError(fmt.Sprintf("Failed to init Octelium gRPC: %v", err))
-				octeliumService.enabled = false
-			}
+		if !octeliumService.enabled {
+			common.SysLog("Octelium service disabled: OCTELIUM_AUTH_TOKEN not set")
+			return
+		}
+		if err := octeliumService.initGRPC(); err != nil {
+			common.SysError(fmt.Sprintf("Octelium service disabled: gRPC init failed: %v", err))
+			octeliumService.enabled = false
+		} else {
+			common.SysLog(fmt.Sprintf("Octelium service enabled, connected to %s", domain))
 		}
 	})
 	return octeliumService

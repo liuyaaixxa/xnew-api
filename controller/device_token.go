@@ -104,7 +104,7 @@ func AddDeviceToken(c *gin.Context) {
 	// Get octelium service
 	octeliumSvc := service.GetOcteliumService()
 	if !octeliumSvc.IsEnabled() {
-		common.ApiErrorMsg(c, "Device token service is not enabled")
+		common.ApiErrorI18n(c, i18n.MsgDeviceTokenServiceNotEnabled)
 		return
 	}
 

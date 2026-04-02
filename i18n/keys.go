@@ -314,3 +314,8 @@ const (
 	MsgCustomOAuthBindingNotFound   = "custom_oauth.binding_not_found"
 	MsgCustomOAuthProviderIdInvalid = "custom_oauth.provider_id_field_invalid"
 )
+
+// Device token related messages
+const (
+	MsgDeviceTokenServiceNotEnabled = "device_token.service_not_enabled"
+)
