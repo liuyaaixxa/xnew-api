@@ -58,6 +58,7 @@ const DeviceTokenCard = () => {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newToken, setNewToken] = useState(null);
+  const [copyingTokenId, setCopyingTokenId] = useState(null);
 
   // Load device tokens
   const loadTokens = async () => {
@@ -97,12 +98,25 @@ const DeviceTokenCard = () => {
     }
   };
 
-  // Handle copy token
-  const handleCopyToken = async (tokenMask) => {
-    if (await copy(tokenMask)) {
-      showSuccess(t('已复制到剪贴板'));
-    } else {
-      Toast.error(t('无法复制到剪贴板，请手动复制'));
+  // Handle copy token - fetch plaintext token via API then copy
+  const handleCopyToken = async (record) => {
+    if (copyingTokenId) return;
+    setCopyingTokenId(record.id);
+    try {
+      const { success, data } = await getDeviceTokenKey(record.id);
+      if (success && data?.token) {
+        if (await copy(data.token)) {
+          showSuccess(t('已复制到剪贴板'));
+        } else {
+          Toast.error(t('无法复制到剪贴板，请手动复制'));
+        }
+      } else {
+        Toast.error(t('获取令牌失败'));
+      }
+    } catch (error) {
+      Toast.error(t('获取令牌失败'));
+    } finally {
+      setCopyingTokenId(null);
     }
   };
 
@@ -155,7 +169,8 @@ const DeviceTokenCard = () => {
             size="small"
             theme="borderless"
             icon={<IconLink />}
-            onClick={() => handleCopyToken(text)}
+            loading={copyingTokenId === record.id}
+            onClick={() => handleCopyToken(record)}
           />
         </Space>
       ),
