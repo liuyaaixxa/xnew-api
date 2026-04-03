@@ -1,0 +1,10 @@
+FROM nginx:alpine
+
+# Copy English website content to nginx default directory
+COPY index-en.html /usr/share/nginx/html/index.html
+
+# Expose port 80
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

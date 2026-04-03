@@ -1,0 +1,30 @@
+kind: ConfigMap
+apiVersion: core/v1
+metadata:
+  name: website-html-1
+data:
+  chunk-1: "<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teniu Cloud - 把闲置GPU变成收益 | 全球DePIN AI网络</title>
+    <meta name="description" content="Teniu Cloud 是全球去中心化GPU共享网络。把您的闲置GPU变成稳定收益，支持Ollama本地模型和LLM Token共享。">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #050508;
+            --bg-secondary: #0a0a0f;
+            --bg-card: rgba(15, 15, 25, 0.8);
+            --accent-green: #00ff88;
+            --accent-blue: #00a8ff;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #ff6b35;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --glow-green: 0 0 40px rgba(0, 255, 136, 0.3);
+            --glow-blue: 0 0 40px rgba(0, 168, 255, 0.3);
+        }
+

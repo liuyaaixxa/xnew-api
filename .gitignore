@@ -29,3 +29,9 @@ data/
 .gomodcache/
 .gocache-temp
 .gopath
+
+# Playwright MCP local config
+.playwright-mcp/
+
+# Test screenshots
+test-*.png
