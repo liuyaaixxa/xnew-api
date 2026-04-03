@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -23,10 +24,11 @@ import (
 
 // OcteliumService handles communication with Octelium cloud via gRPC
 type OcteliumService struct {
-	authToken string
-	domain    string
-	enabled   bool
-	mu        sync.RWMutex
+	authToken    string
+	domain       string
+	userPolicies []string
+	enabled      bool
+	mu           sync.RWMutex
 
 	grpcConn *grpc.ClientConn
 	coreC    corev1.MainServiceClient
@@ -72,10 +74,21 @@ func GetOcteliumService() *OcteliumService {
 		if domain == "" {
 			domain = "teniuapi.cloud"
 		}
+		// Parse user policies from env, default to "allow-all"
+		userPolicies := []string{"allow-all"}
+		if policiesEnv := os.Getenv("OCTELIUM_USER_POLICIES"); policiesEnv != "" {
+			userPolicies = nil
+			for _, p := range strings.Split(policiesEnv, ",") {
+				if trimmed := strings.TrimSpace(p); trimmed != "" {
+					userPolicies = append(userPolicies, trimmed)
+				}
+			}
+		}
 		octeliumService = &OcteliumService{
-			authToken: authToken,
-			domain:    domain,
-			enabled:   authToken != "",
+			authToken:    authToken,
+			domain:       domain,
+			userPolicies: userPolicies,
+			enabled:      authToken != "",
 		}
 		if !octeliumService.enabled {
 			common.SysLog("Octelium service disabled: OCTELIUM_AUTH_TOKEN not set")
@@ -85,7 +98,7 @@ func GetOcteliumService() *OcteliumService {
 			common.SysError(fmt.Sprintf("Octelium service disabled: gRPC init failed: %v", err))
 			octeliumService.enabled = false
 		} else {
-			common.SysLog(fmt.Sprintf("Octelium service enabled, connected to %s", domain))
+			common.SysLog(fmt.Sprintf("Octelium service enabled, connected to %s, user policies: %v", domain, userPolicies))
 		}
 	})
 	return octeliumService
@@ -200,6 +213,9 @@ func (s *OcteliumService) ensureOcteliumUser(ctx context.Context, username strin
 			},
 			Spec: &corev1.User_Spec{
 				Type: corev1.User_Spec_HUMAN,
+				Authorization: &corev1.User_Spec_Authorization{
+					Policies: s.userPolicies,
+				},
 			},
 		})
 		if err != nil {
