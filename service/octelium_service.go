@@ -188,8 +188,18 @@ func (s *OcteliumService) authenticatedCtx(ctx context.Context) (context.Context
 }
 
 // ensureOcteliumUser checks if user exists in Octelium, creates if not
-func (s *OcteliumService) ensureOcteliumUser(ctx context.Context, username string) error {
-	octeliumName := "newapi-" + username
+func (s *OcteliumService) ensureOcteliumUser(ctx context.Context, username string, deviceName string) error {
+	// Format: {username}-{deviceName} (using hyphens for Octelium compatibility)
+	octeliumName := fmt.Sprintf("%s-%s", username, deviceName)
+
+	// Normalize the name for use in Octelium (lowercase, replace spaces and underscores with hyphens)
+	name := strings.ReplaceAll(octeliumName, " ", "-")
+	name = strings.ReplaceAll(name, "_", "-")
+	name = strings.ToLower(name)
+	name = strings.ToLower(name)
+	if len(name) > 64 {
+		name = name[:64]
+	}
 
 	authCtx, err := s.authenticatedCtx(ctx)
 	if err != nil {
@@ -198,21 +208,21 @@ func (s *OcteliumService) ensureOcteliumUser(ctx context.Context, username strin
 
 	// Try to get user first
 	_, err = s.coreC.GetUser(authCtx, &metav1.GetOptions{
-		Name: octeliumName,
+		Name: name,
 	})
 	if err == nil {
 		return nil // user exists
 	}
 
-	// If not found, create user
+	// If not found, create user with WORKLOAD type
 	if st, ok := status.FromError(err); ok && st.Code() == codes.NotFound {
-		common.SysLog(fmt.Sprintf("Creating Octelium user: %s", octeliumName))
+		common.SysLog(fmt.Sprintf("Creating Octelium user: %s (type: WORKLOAD)", name))
 		_, err = s.coreC.CreateUser(authCtx, &corev1.User{
 			Metadata: &metav1.Metadata{
-				Name: octeliumName,
+				Name: name,
 			},
 			Spec: &corev1.User_Spec{
-				Type: corev1.User_Spec_HUMAN,
+				Type: corev1.User_Spec_WORKLOAD,
 				Authorization: &corev1.User_Spec_Authorization{
 					Policies: s.userPolicies,
 				},
@@ -245,7 +255,7 @@ func (s *OcteliumService) GenerateAuthToken(ctx context.Context, req *GenerateTo
 	}
 
 	// Step 1: Ensure user exists in Octelium
-	if err := s.ensureOcteliumUser(ctx, req.Username); err != nil {
+	if err := s.ensureOcteliumUser(ctx, req.Username, req.Name); err != nil {
 		return nil, fmt.Errorf("ensure octelium user: %w", err)
 	}
 
@@ -254,8 +264,16 @@ func (s *OcteliumService) GenerateAuthToken(ctx context.Context, req *GenerateTo
 		return nil, err
 	}
 
-	octeliumUser := "newapi-" + req.Username
-	credName := fmt.Sprintf("%s-%s", octeliumUser, req.Name)
+	// Use the same format as ensureOcteliumUser: {username}-{deviceName}
+	octeliumUser := fmt.Sprintf("%s-%s", req.Username, req.Name)
+	// Normalize for Octelium (use hyphens)
+	octeliumUser = strings.ReplaceAll(octeliumUser, " ", "-")
+	octeliumUser = strings.ReplaceAll(octeliumUser, "_", "-")
+	octeliumUser = strings.ToLower(octeliumUser)
+	if len(octeliumUser) > 64 {
+		octeliumUser = octeliumUser[:64]
+	}
+	credName := fmt.Sprintf("%s-cred", octeliumUser)
 
 	// Step 2: Create Credential for the user
 	cred, err := s.coreC.CreateCredential(authCtx, &corev1.Credential{
