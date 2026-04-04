@@ -17,6 +17,7 @@ import (
 type DeviceTokenRequest struct {
 	Name   string `json:"name" binding:"required"`
 	Domain string `json:"domain"`
+	Port   int    `json:"port"`
 }
 
 // DeviceTokenBatchRequest represents the request body for batch deleting device tokens
@@ -119,6 +120,7 @@ func AddDeviceToken(c *gin.Context) {
 		Name:     req.Name,
 		Domain:   req.Domain,
 		Username: username,
+		Port:     req.Port,
 	})
 	if err != nil {
 		common.ApiError(c, err)
@@ -172,6 +174,10 @@ func DeleteDeviceToken(c *gin.Context) {
 		_ = octeliumSvc.RevokeAuthToken(context.Background(), deviceToken.Token)
 	}
 
+	// Delete associated Octelium Service (best-effort)
+	username := c.GetString("username")
+	octeliumSvc.DeleteOcteliumService(context.Background(), username, deviceToken.Name)
+
 	// Delete from database
 	if err := model.DeleteDeviceTokenById(uint(id), userId); err != nil {
 		common.ApiError(c, err)
@@ -193,16 +199,19 @@ func DeleteDeviceTokenBatch(c *gin.Context) {
 	}
 
 	userId := c.GetInt("id")
+	username := c.GetString("username")
 
 	// Get octelium service for revocation
 	octeliumSvc := service.GetOcteliumService()
 
-	// Revoke tokens from octelium (best effort)
+	// Revoke tokens and delete services from octelium (best effort)
 	for _, id := range req.Ids {
 		if deviceToken, err := model.GetDeviceTokenByIdAndUserId(id, userId); err == nil {
 			if octeliumSvc.IsEnabled() && deviceToken.Token != "" {
 				_ = octeliumSvc.RevokeAuthToken(context.Background(), deviceToken.Token)
 			}
+			// Delete associated Octelium Service (best-effort)
+			octeliumSvc.DeleteOcteliumService(context.Background(), username, deviceToken.Name)
 		}
 	}
 

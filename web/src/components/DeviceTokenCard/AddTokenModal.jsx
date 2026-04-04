@@ -47,6 +47,7 @@ const AddTokenModal = ({ visible, onClose, onSuccess, newToken, t = (key) => key
   const getInitValues = () => ({
     name: '',
     domain: 'teniuapi.cloud',
+    port: 11434,
   });
 
   const handleSubmit = async (values) => {
@@ -55,6 +56,7 @@ const AddTokenModal = ({ visible, onClose, onSuccess, newToken, t = (key) => key
       const { success, message, data } = await createDeviceToken({
         name: values.name || 'default',
         domain: values.domain || 'teniuapi.cloud',
+        port: values.port || 11434,
       });
 
       if (success) {
@@ -194,6 +196,16 @@ const AddTokenModal = ({ visible, onClose, onSuccess, newToken, t = (key) => key
               extraText={t('设备连接的 octelium 域名，默认为 teniuapi.cloud')}
               rules={[{ required: false }]}
               showClear
+            />
+
+            <Form.InputNumber
+              field="port"
+              label={t('服务端口')}
+              placeholder={t('请输入本地服务端口')}
+              extraText={t('设备本地服务端口，如 Ollama 默认端口 11434')}
+              min={1}
+              max={65535}
+              rules={[{ required: false }]}
             />
 
             <div className="add-token-modal-footer">

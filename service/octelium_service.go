@@ -51,7 +51,10 @@ type GenerateTokenRequest struct {
 	Name     string `json:"name"`
 	Domain   string `json:"domain"`
 	Username string `json:"username"`
+	Port     int    `json:"port"`
 }
+
+const defaultServicePort = 11434
 
 // TokenResponse represents a token generation response
 type TokenResponse struct {
@@ -237,6 +240,58 @@ func (s *OcteliumService) ensureOcteliumUser(ctx context.Context, username strin
 	return fmt.Errorf("get octelium user: %w", err)
 }
 
+// ensureOcteliumService checks if a Service exists in Octelium, creates if not.
+// Service is configured with HTTP mode, public anonymous access, and upstream pointing to localhost:{port}.
+func (s *OcteliumService) ensureOcteliumService(ctx context.Context, serviceName string, port int) error {
+	if port <= 0 {
+		port = defaultServicePort
+	}
+
+	authCtx, err := s.authenticatedCtx(ctx)
+	if err != nil {
+		return err
+	}
+
+	// Check if service already exists
+	_, err = s.coreC.GetService(authCtx, &metav1.GetOptions{
+		Name: serviceName,
+	})
+	if err == nil {
+		return nil // service exists
+	}
+
+	// If not found, create service
+	if st, ok := status.FromError(err); ok && st.Code() == codes.NotFound {
+		upstreamURL := fmt.Sprintf("http://localhost:%d", port)
+		common.SysLog(fmt.Sprintf("Creating Octelium service: %s (upstream: %s, user: %s)", serviceName, upstreamURL, serviceName))
+
+		_, err = s.coreC.CreateService(authCtx, &corev1.Service{
+			Metadata: &metav1.Metadata{
+				Name: serviceName,
+			},
+			Spec: &corev1.Service_Spec{
+				Mode:        corev1.Service_Spec_HTTP,
+				IsPublic:    true,
+				IsAnonymous: true,
+				Config: &corev1.Service_Spec_Config{
+					Upstream: &corev1.Service_Spec_Config_Upstream{
+						User: serviceName,
+						Type: &corev1.Service_Spec_Config_Upstream_Url{
+							Url: upstreamURL,
+						},
+					},
+				},
+			},
+		})
+		if err != nil {
+			return fmt.Errorf("create octelium service: %w", err)
+		}
+		return nil
+	}
+
+	return fmt.Errorf("get octelium service: %w", err)
+}
+
 // PLACEHOLDER_GENERATE
 
 // GenerateAuthToken generates a real auth token via Octelium SDK
@@ -259,20 +314,27 @@ func (s *OcteliumService) GenerateAuthToken(ctx context.Context, req *GenerateTo
 		return nil, fmt.Errorf("ensure octelium user: %w", err)
 	}
 
+	// Step 1.5: Compute the normalized service/user name for reuse
+	serviceName := fmt.Sprintf("%s-%s", req.Username, req.Name)
+	serviceName = strings.ReplaceAll(serviceName, " ", "-")
+	serviceName = strings.ReplaceAll(serviceName, "_", "-")
+	serviceName = strings.ToLower(serviceName)
+	if len(serviceName) > 64 {
+		serviceName = serviceName[:64]
+	}
+
+	// Step 2: Ensure Octelium Service exists for this device
+	if err := s.ensureOcteliumService(ctx, serviceName, req.Port); err != nil {
+		return nil, fmt.Errorf("ensure octelium service: %w", err)
+	}
+
 	authCtx, err := s.authenticatedCtx(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// Use the same format as ensureOcteliumUser: {username}-{deviceName}
-	octeliumUser := fmt.Sprintf("%s-%s", req.Username, req.Name)
-	// Normalize for Octelium (use hyphens)
-	octeliumUser = strings.ReplaceAll(octeliumUser, " ", "-")
-	octeliumUser = strings.ReplaceAll(octeliumUser, "_", "-")
-	octeliumUser = strings.ToLower(octeliumUser)
-	if len(octeliumUser) > 64 {
-		octeliumUser = octeliumUser[:64]
-	}
+	// Use the computed service name (same as user name)
+	octeliumUser := serviceName
 	credName := fmt.Sprintf("%s-cred", octeliumUser)
 
 	// Step 2: Create Credential for the user
@@ -317,6 +379,38 @@ func (s *OcteliumService) GenerateAuthToken(ctx context.Context, req *GenerateTo
 }
 
 // PLACEHOLDER_REVOKE
+
+// DeleteOcteliumService deletes an Octelium Service by name (best-effort).
+// Used when a device token is deleted to clean up the associated service.
+func (s *OcteliumService) DeleteOcteliumService(ctx context.Context, username, deviceName string) {
+	if !s.IsEnabled() {
+		return
+	}
+
+	// Compute service name using the same normalization as creation
+	serviceName := fmt.Sprintf("%s-%s", username, deviceName)
+	serviceName = strings.ReplaceAll(serviceName, " ", "-")
+	serviceName = strings.ReplaceAll(serviceName, "_", "-")
+	serviceName = strings.ToLower(serviceName)
+	if len(serviceName) > 64 {
+		serviceName = serviceName[:64]
+	}
+
+	authCtx, err := s.authenticatedCtx(ctx)
+	if err != nil {
+		common.SysError(fmt.Sprintf("Failed to get auth context for service deletion: %v", err))
+		return
+	}
+
+	_, err = s.coreC.DeleteService(authCtx, &metav1.DeleteOptions{
+		Name: serviceName,
+	})
+	if err != nil {
+		common.SysError(fmt.Sprintf("Failed to delete Octelium service %s (best-effort): %v", serviceName, err))
+	} else {
+		common.SysLog(fmt.Sprintf("Deleted Octelium service: %s", serviceName))
+	}
+}
 
 // RevokeAuthToken revokes an existing auth token (best-effort)
 func (s *OcteliumService) RevokeAuthToken(ctx context.Context, token string) error {
