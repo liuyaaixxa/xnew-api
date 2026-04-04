@@ -20,6 +20,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	grpcmetadata "google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // OcteliumService handles communication with Octelium cloud via gRPC
@@ -57,6 +58,7 @@ type GenerateTokenRequest struct {
 }
 
 const defaultServicePort = 11434
+const defaultCredentialExpireDays = 365
 
 // TokenResponse represents a token generation response
 type TokenResponse struct {
@@ -349,14 +351,16 @@ func (s *OcteliumService) GenerateAuthToken(ctx context.Context, req *GenerateTo
 	octeliumUser := serviceName
 	credName := fmt.Sprintf("%s-cred", octeliumUser)
 
-	// Step 2: Create Credential for the user
+	// Step 2: Create Credential for the user (expires in 365 days by default)
+	expiresAt := time.Now().Add(defaultCredentialExpireDays * 24 * time.Hour)
 	cred, err := s.coreC.CreateCredential(authCtx, &corev1.Credential{
 		Metadata: &metav1.Metadata{
 			Name: credName,
 		},
 		Spec: &corev1.Credential_Spec{
-			Type: corev1.Credential_Spec_AUTH_TOKEN,
-			User: octeliumUser,
+			Type:      corev1.Credential_Spec_AUTH_TOKEN,
+			User:      octeliumUser,
+			ExpiresAt: timestamppb.New(expiresAt),
 		},
 	})
 	if err != nil {
@@ -380,13 +384,13 @@ func (s *OcteliumService) GenerateAuthToken(ctx context.Context, req *GenerateTo
 	}
 
 	token := authTokenResp.AuthenticationToken
-	common.SysLog(fmt.Sprintf("Generated Octelium auth token for user %s device %s", req.Username, req.Name))
+	common.SysLog(fmt.Sprintf("Generated Octelium auth token for user %s device %s (expires: %s)", req.Username, req.Name, expiresAt.Format(time.RFC3339)))
 
 	return &TokenResponse{
 		Token:     token,
 		TokenMask: maskToken(token),
 		Domain:    req.Domain,
-		ExpiresAt: 0,
+		ExpiresAt: expiresAt.Unix(),
 	}, nil
 }
 
