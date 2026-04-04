@@ -26,6 +26,8 @@ import (
 type OcteliumService struct {
 	authToken    string
 	domain       string
+	address      string
+	insecureTLS  bool
 	userPolicies []string
 	enabled      bool
 	mu           sync.RWMutex
@@ -87,9 +89,13 @@ func GetOcteliumService() *OcteliumService {
 				}
 			}
 		}
+		address := os.Getenv("OCTELIUM_ADDRESS")
+		insecureTLS := os.Getenv("OCTELIUM_INSECURE_TLS") == "true"
 		octeliumService = &OcteliumService{
 			authToken:    authToken,
 			domain:       domain,
+			address:      address,
+			insecureTLS:  insecureTLS,
 			userPolicies: userPolicies,
 			enabled:      authToken != "",
 		}
@@ -101,7 +107,7 @@ func GetOcteliumService() *OcteliumService {
 			common.SysError(fmt.Sprintf("Octelium service disabled: gRPC init failed: %v", err))
 			octeliumService.enabled = false
 		} else {
-			common.SysLog(fmt.Sprintf("Octelium service enabled, connected to %s, user policies: %v", domain, userPolicies))
+			common.SysLog(fmt.Sprintf("Octelium service enabled, connected to %s, user policies: %v, insecure TLS: %v", domain, userPolicies, insecureTLS))
 		}
 	})
 	return octeliumService
@@ -109,8 +115,14 @@ func GetOcteliumService() *OcteliumService {
 
 // initGRPC initializes the gRPC connection to Octelium API server
 func (s *OcteliumService) initGRPC() error {
-	addr := net.JoinHostPort(fmt.Sprintf("octelium-api.%s", s.domain), "443")
-	tlsConfig := &tls.Config{MinVersion: tls.VersionTLS12}
+	addr := s.address
+	if addr == "" {
+		addr = net.JoinHostPort(fmt.Sprintf("octelium-api.%s", s.domain), "443")
+	}
+	tlsConfig := &tls.Config{
+		MinVersion:         tls.VersionTLS12,
+		InsecureSkipVerify: s.insecureTLS,
+	}
 
 	conn, err := grpc.NewClient(addr,
 		grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
