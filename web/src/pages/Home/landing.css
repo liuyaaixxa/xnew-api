@@ -11,6 +11,9 @@
   --lp-text-muted: #64748b;
   --lp-border-color: rgba(255, 255, 255, 0.08);
   --lp-glow-green: 0 0 40px rgba(0, 255, 136, 0.3);
+  --lp-glow-blue: rgba(0, 100, 255, 0.08);
+  --lp-glow-indigo: rgba(80, 60, 220, 0.06);
+  --lp-glow-cyan: rgba(0, 200, 255, 0.06);
 
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--lp-bg-primary);
@@ -27,9 +30,11 @@
   right: 0;
   z-index: 1000;
   padding: 1rem 2rem;
-  background: rgba(5, 5, 8, 0.8);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--lp-border-color);
+  background: rgba(5, 5, 8, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.2), rgba(0, 168, 255, 0.2), transparent) 1;
 }
 
 .lp-header-content {
@@ -102,9 +107,9 @@
   right: 0;
   bottom: 0;
   background:
-    radial-gradient(ellipse at 20% 20%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(0, 168, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 70%);
+    radial-gradient(ellipse at 20% 20%, rgba(0, 255, 136, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(0, 168, 255, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.07) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -233,7 +238,22 @@
 /* Features */
 .lp-features {
   padding: 6rem 2rem;
-  background: var(--lp-bg-secondary);
+  background:
+    radial-gradient(ellipse at 10% 90%, rgba(0, 100, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 10%, rgba(80, 60, 220, 0.08) 0%, transparent 50%),
+    var(--lp-bg-secondary);
+  position: relative;
+}
+
+.lp-features::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, var(--lp-bg-primary), transparent);
+  pointer-events: none;
 }
 
 .lp-section-header {
@@ -277,12 +297,14 @@
   border-radius: 20px;
   padding: 2rem;
   transition: all 0.3s;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .lp-feature-card:hover {
-  border-color: var(--lp-accent-green);
+  border-color: rgba(0, 100, 255, 0.5);
   transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(0, 100, 255, 0.1);
 }
 
 .lp-feature-icon {
@@ -312,7 +334,22 @@
 /* How It Works */
 .lp-how-it-works {
   padding: 6rem 2rem;
-  background: var(--lp-bg-primary);
+  background:
+    radial-gradient(ellipse at 85% 50%, rgba(0, 200, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 30% 10%, rgba(80, 60, 220, 0.06) 0%, transparent 50%),
+    var(--lp-bg-primary);
+  position: relative;
+}
+
+.lp-how-it-works::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, var(--lp-bg-secondary), transparent);
+  pointer-events: none;
 }
 
 .lp-steps {
@@ -354,10 +391,30 @@
   color: var(--lp-text-secondary);
 }
 
+.lp-step-content {
+  border-left: 2px solid rgba(0, 168, 255, 0.2);
+  padding-left: 1.5rem;
+}
+
 /* Download */
 .lp-download {
   padding: 6rem 2rem;
-  background: var(--lp-bg-secondary);
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(0, 168, 255, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 10% 30%, rgba(0, 255, 136, 0.05) 0%, transparent 40%),
+    var(--lp-bg-secondary);
+  position: relative;
+}
+
+.lp-download::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, var(--lp-bg-primary), transparent);
+  pointer-events: none;
 }
 
 .lp-download-grid {
@@ -378,12 +435,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .lp-download-card:hover {
-  border-color: var(--lp-accent-green);
+  border-color: rgba(0, 168, 255, 0.5);
   transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(0, 255, 136, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(0, 168, 255, 0.1);
 }
 
 .lp-download-icon {
@@ -481,7 +540,22 @@
 /* Pricing */
 .lp-pricing {
   padding: 6rem 2rem;
-  background: var(--lp-bg-secondary);
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(100, 60, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(0, 100, 255, 0.06) 0%, transparent 50%),
+    #060610;
+  position: relative;
+}
+
+.lp-pricing::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, var(--lp-bg-secondary), transparent);
+  pointer-events: none;
 }
 
 .lp-pricing-cards {
@@ -499,11 +573,14 @@
   padding: 2.5rem;
   text-align: center;
   transition: all 0.3s;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .lp-pricing-card.lp-featured {
   border-color: var(--lp-accent-green);
   position: relative;
+  box-shadow: 0 0 40px rgba(0, 255, 136, 0.08), 0 0 80px rgba(0, 100, 255, 0.05);
 }
 
 .lp-pricing-card.lp-featured::before {
@@ -522,6 +599,7 @@
 
 .lp-pricing-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(80, 60, 220, 0.1);
 }
 
 .lp-pricing-card h3 {
@@ -573,7 +651,10 @@
 .lp-cta {
   padding: 6rem 2rem;
   text-align: center;
-  background: var(--lp-bg-primary);
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(0, 255, 136, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 80%, rgba(0, 168, 255, 0.05) 0%, transparent 50%),
+    var(--lp-bg-primary);
 }
 
 .lp-cta-box {
@@ -583,6 +664,7 @@
   border: 1px solid rgba(0, 255, 136, 0.3);
   border-radius: 32px;
   padding: 4rem;
+  box-shadow: 0 0 60px rgba(0, 255, 136, 0.08), 0 0 120px rgba(0, 168, 255, 0.05);
 }
 
 .lp-cta-box h2 {
@@ -604,6 +686,18 @@
   border-top: 1px solid var(--lp-border-color);
   text-align: center;
   background: var(--lp-bg-primary);
+  position: relative;
+}
+
+.lp-footer::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--lp-bg-primary));
+  pointer-events: none;
 }
 
 .lp-footer-content {
@@ -864,6 +958,19 @@
 
   .lp-pricing-cards {
     grid-template-columns: 1fr;
+  }
+
+  .lp-features::before,
+  .lp-how-it-works::before,
+  .lp-download::before,
+  .lp-pricing::before,
+  .lp-footer::before {
+    height: 40px;
+  }
+
+  .lp-step-content {
+    border-left: none;
+    padding-left: 0;
   }
 
   .lp-legal-container {
