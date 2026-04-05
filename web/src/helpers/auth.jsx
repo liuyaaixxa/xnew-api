@@ -42,6 +42,16 @@ export const AuthRedirect = ({ children }) => {
   return children;
 };
 
+export const HomeRedirect = ({ children }) => {
+  const user = localStorage.getItem('user');
+
+  if (user) {
+    return <Navigate to='/console' replace />;
+  }
+
+  return children;
+};
+
 function PrivateRoute({ children }) {
   if (!localStorage.getItem('user')) {
     return <Navigate to='/login' state={{ from: history.location }} />;
