@@ -17,10 +17,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { API, showError } from '../../helpers';
 import { useIsMobile } from '../../hooks/common/useIsMobile';
-import { StatusContext } from '../../context/Status';
 import { useActualTheme } from '../../context/Theme';
 import { marked } from 'marked';
 import { useTranslation } from 'react-i18next';
@@ -30,7 +29,6 @@ import './landing.css';
 
 const Home = () => {
   const { t, i18n } = useTranslation();
-  const [statusState] = useContext(StatusContext);
   const actualTheme = useActualTheme();
   const [homePageContentLoaded, setHomePageContentLoaded] = useState(false);
   const [homePageContent, setHomePageContent] = useState('');
@@ -87,8 +85,6 @@ const Home = () => {
   useEffect(() => {
     displayHomePageContent().then();
   }, []);
-
-  const docsLink = statusState?.status?.docs_link || '';
 
   return (
     <div className='w-full overflow-x-hidden'>
@@ -148,11 +144,9 @@ const Home = () => {
                   <span>{t('立即开始赚取')}</span>
                   <span>&rarr;</span>
                 </Link>
-                {docsLink && (
-                  <a href={docsLink} target='_blank' rel='noreferrer' className='lp-btn lp-btn-secondary'>
-                    {t('查看文档')}
-                  </a>
-                )}
+                <Link to='/docs' className='lp-btn lp-btn-secondary'>
+                  {t('查看文档')}
+                </Link>
               </div>
             </div>
           </section>
@@ -355,6 +349,7 @@ const Home = () => {
           <footer className='lp-footer'>
             <div className='lp-footer-content'>
               <div className='lp-footer-links'>
+                <Link to='/docs'>{t('文档')}</Link>
                 <Link to='/about'>{t('关于我们')}</Link>
                 <Link to='/privacy'>{t('隐私政策')}</Link>
                 <Link to='/tos'>{t('服务条款')}</Link>
