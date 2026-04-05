@@ -688,6 +688,10 @@ func UpdateAudioCompletionRatioByJSONString(jsonStr string) error {
 	return types.LoadFromJsonStringWithCallback(audioCompletionRatioMap, jsonStr, InvalidateExposedDataCache)
 }
 
+func SetModelRatio(name string, ratio float64) {
+	modelRatioMap.Set(name, ratio)
+}
+
 func GetModelRatioCopy() map[string]float64 {
 	return modelRatioMap.ReadAll()
 }

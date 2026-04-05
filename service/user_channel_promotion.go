@@ -2,9 +2,11 @@ package service
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/model"
+	"github.com/QuantumNous/new-api/setting/ratio_setting"
 )
 
 // PromoteUserChannel creates a real Channel + Ability records from a UserChannel.
@@ -54,6 +56,9 @@ func PromoteUserChannel(uc *model.UserChannel) (int, error) {
 		common.SysLog(fmt.Sprintf("failed to update promoted_channel_id for user_channel %d: %v", uc.Id, err))
 	}
 
+	// Auto-configure default ratios for models that don't have one yet
+	ensureModelRatios(uc.Models)
+
 	// Refresh channel cache so the new channel is immediately routable
 	model.InitChannelCache()
 
@@ -100,4 +105,44 @@ func DemoteUserChannel(userChannelId, promotedChannelId int) error {
 
 	common.SysLog(fmt.Sprintf("demoted user_channel %d, removed channel %d", userChannelId, promotedChannelId))
 	return nil
+}
+
+// ensureModelRatios checks each model in the comma-separated list and
+// auto-configures a default ratio (1.0) for any model that doesn't have one.
+// This prevents "倍率或价格未配置" errors for custom personal channel models.
+func ensureModelRatios(models string) {
+	if models == "" {
+		return
+	}
+
+	// Read the current runtime ratio and price maps
+	ratioMap := ratio_setting.GetModelRatioCopy()
+	priceMap := ratio_setting.GetModelPriceCopy()
+
+	var added []string
+	for _, m := range strings.Split(models, ",") {
+		m = strings.TrimSpace(m)
+		if m == "" {
+			continue
+		}
+		// Skip if already has a ratio or price configured
+		if _, ok := ratioMap[m]; ok {
+			continue
+		}
+		if _, ok := priceMap[m]; ok {
+			continue
+		}
+		// Set default ratio = 1.0 (comparable to GPT-3.5 level)
+		ratio_setting.SetModelRatio(m, 1.0)
+		added = append(added, m)
+	}
+
+	if len(added) > 0 {
+		// Persist the updated ratio map to the database option
+		ratioJSON := ratio_setting.ModelRatio2JSONString()
+		if err := model.UpdateOption("ModelRatio", ratioJSON); err != nil {
+			common.SysLog(fmt.Sprintf("failed to persist model ratios: %v", err))
+		}
+		common.SysLog(fmt.Sprintf("auto-configured default ratio (1.0) for models: %s", strings.Join(added, ", ")))
+	}
 }
