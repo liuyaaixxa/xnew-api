@@ -156,6 +156,27 @@ const useAdminUserChannelsData = () => {
     [loadChannels]
   );
 
+  const testChannel = useCallback(async (id, testModel) => {
+    try {
+      let url = `/api/user-channel/admin/test/${id}`;
+      if (testModel) {
+        url += `?model=${encodeURIComponent(testModel)}`;
+      }
+      const res = await API.get(url);
+      const { success, message, time: responseTime } = res.data;
+      if (success) {
+        showSuccess(`测试成功，耗时 ${responseTime.toFixed(2)}s`);
+      } else {
+        showError(message || '测试失败');
+      }
+      refresh();
+      return res.data;
+    } catch (error) {
+      showError(error.message);
+      return null;
+    }
+  }, [refresh]);
+
   return {
     channels,
     loading,
@@ -169,6 +190,7 @@ const useAdminUserChannelsData = () => {
     approveChannel,
     rejectChannel,
     offlineChannel,
+    testChannel,
     handlePageChange,
     handlePageSizeChange,
     handleReviewStatusChange,

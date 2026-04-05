@@ -8,6 +8,7 @@ import (
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/model"
+	"github.com/QuantumNous/new-api/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -145,9 +146,17 @@ func UpdateUserChannel(c *gin.Context) {
 		channel.Key = existing.Key
 	}
 
-	// Reset approval if previously approved
+	// Reset approval if previously approved, and demote the promoted channel
 	if existing.ReviewStatus == model.UserChannelReviewApproved {
 		channel.ReviewStatus = model.UserChannelReviewPending
+		if existing.PromotedChannelId > 0 {
+			channel.PromotedChannelId = 0
+			go func() {
+				if err := service.DemoteUserChannel(existing.Id, existing.PromotedChannelId); err != nil {
+					common.SysLog(fmt.Sprintf("failed to demote user_channel %d on update: %v", existing.Id, err))
+				}
+			}()
+		}
 	}
 
 	channel.UserId = userId
@@ -166,6 +175,16 @@ func DeleteUserChannel(c *gin.Context) {
 	if err != nil {
 		common.ApiError(c, fmt.Errorf("invalid channel ID"))
 		return
+	}
+
+	// Check if the channel has a promoted channel and demote it
+	existing, _ := model.GetUserChannelById(channelId)
+	if existing != nil && existing.UserId == userId && existing.PromotedChannelId > 0 {
+		go func() {
+			if err := service.DemoteUserChannel(existing.Id, existing.PromotedChannelId); err != nil {
+				common.SysLog(fmt.Sprintf("failed to demote user_channel %d on delete: %v", existing.Id, err))
+			}
+		}()
 	}
 
 	if err := model.DeleteUserChannel(channelId, userId); err != nil {
@@ -334,6 +353,19 @@ func AdminApproveUserChannel(c *gin.Context) {
 		return
 	}
 
+	// Promote to a real Channel so models appear in the marketplace
+	fullChannel, err := model.GetUserChannelById(req.Id)
+	if err != nil {
+		common.SysLog(fmt.Sprintf("failed to reload user_channel %d for promotion: %v", req.Id, err))
+	} else {
+		promotedId, promoteErr := service.PromoteUserChannel(fullChannel)
+		if promoteErr != nil {
+			common.SysLog(fmt.Sprintf("failed to promote user_channel %d: %v", req.Id, promoteErr))
+		} else {
+			common.SysLog(fmt.Sprintf("user_channel %d promoted to channel %d", req.Id, promotedId))
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
@@ -407,8 +439,69 @@ func AdminOfflineUserChannel(c *gin.Context) {
 		return
 	}
 
+	// Demote: remove the promoted Channel + Abilities
+	if channel.PromotedChannelId > 0 {
+		go func() {
+			if err := service.DemoteUserChannel(channel.Id, channel.PromotedChannelId); err != nil {
+				common.SysLog(fmt.Sprintf("failed to demote user_channel %d: %v", channel.Id, err))
+			}
+		}()
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
+	})
+}
+
+// AdminTestUserChannel tests a user channel (admin, no ownership check)
+func AdminTestUserChannel(c *gin.Context) {
+	channelId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		common.ApiError(c, fmt.Errorf("invalid channel ID"))
+		return
+	}
+
+	userChannel, err := model.GetUserChannelById(channelId)
+	if err != nil {
+		common.ApiError(c, fmt.Errorf("channel not found"))
+		return
+	}
+
+	ch := userChannelToChannel(userChannel)
+
+	testModel := c.Query("model")
+	tik := time.Now()
+	result := testChannel(ch, testModel, "", false, testChannelOption{AcceptUnsetRatioModel: true})
+	tok := time.Now()
+	milliseconds := tok.Sub(tik).Milliseconds()
+	consumedTime := float64(milliseconds) / 1000.0
+
+	go func() {
+		_ = model.UpdateUserChannelTestResult(channelId, time.Now().Unix(), int(milliseconds))
+	}()
+
+	if result.localErr != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": result.localErr.Error(),
+			"time":    0.0,
+		})
+		return
+	}
+
+	if result.newAPIError != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": result.newAPIError.Error(),
+			"time":    consumedTime,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+		"time":    consumedTime,
 	})
 }

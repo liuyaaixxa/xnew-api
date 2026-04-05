@@ -293,6 +293,7 @@ func SetApiRouter(router *gin.Engine) {
 			adminUserChannelRoute.POST("/approve", controller.AdminApproveUserChannel)
 			adminUserChannelRoute.POST("/reject", controller.AdminRejectUserChannel)
 			adminUserChannelRoute.POST("/offline", controller.AdminOfflineUserChannel)
+			adminUserChannelRoute.GET("/test/:id", controller.AdminTestUserChannel)
 		}
 
 		usageRoute := apiRouter.Group("/usage")

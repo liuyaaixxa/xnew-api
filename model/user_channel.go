@@ -34,8 +34,9 @@ type UserChannel struct {
 	Remark        *string `json:"remark" gorm:"type:varchar(255)" validate:"max=255"`
 	CreatedTime   int64   `json:"created_time" gorm:"bigint"`
 	UpdatedTime   int64   `json:"updated_time" gorm:"bigint"`
-	TestTime      int64   `json:"test_time" gorm:"bigint"`
-	ResponseTime  int     `json:"response_time"`
+	TestTime           int64   `json:"test_time" gorm:"bigint"`
+	ResponseTime       int     `json:"response_time"`
+	PromotedChannelId  int     `json:"promoted_channel_id" gorm:"default:0"`
 
 	// Join fields (not stored in DB)
 	Username    string `json:"username" gorm:"-"`
@@ -151,8 +152,9 @@ func UpdateUserChannel(channel *UserChannel) error {
 		"test_model":    channel.TestModel,
 		"group":         channel.Group,
 		"remark":        channel.Remark,
-		"review_status": channel.ReviewStatus,
-		"updated_time":  channel.UpdatedTime,
+		"review_status":       channel.ReviewStatus,
+		"promoted_channel_id": channel.PromotedChannelId,
+		"updated_time":        channel.UpdatedTime,
 	}
 	return DB.Model(&UserChannel{}).Where("id = ? AND user_id = ?", channel.Id, channel.UserId).Updates(updates).Error
 }
@@ -195,6 +197,11 @@ func UpdateUserChannelReviewStatus(id int, reviewStatus int, reviewMessage strin
 		return fmt.Errorf("channel not found")
 	}
 	return result.Error
+}
+
+// UpdateUserChannelPromotedChannelId updates the promoted channel ID
+func UpdateUserChannelPromotedChannelId(id int, promotedChannelId int) error {
+	return DB.Model(&UserChannel{}).Where("id = ?", id).Update("promoted_channel_id", promotedChannelId).Error
 }
 
 // UpdateUserChannelTestResult updates test time and response time

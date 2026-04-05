@@ -38,6 +38,7 @@ const AdminUserChannelsTable = () => {
     approveChannel,
     rejectChannel,
     offlineChannel,
+    testChannel,
     handlePageChange,
     handlePageSizeChange,
     handleReviewStatusChange,
@@ -47,6 +48,13 @@ const AdminUserChannelsTable = () => {
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [rejectMessage, setRejectMessage] = useState('');
   const [rejectTarget, setRejectTarget] = useState(null);
+  const [testingId, setTestingId] = useState(null);
+
+  const handleTest = async (record) => {
+    setTestingId(record.id);
+    await testChannel(record.id, record.test_model);
+    setTestingId(null);
+  };
 
   useEffect(() => {
     loadChannels(1);
@@ -87,6 +95,38 @@ const AdminUserChannelsTable = () => {
     setRejectTarget(null);
   };
 
+  const renderModels = (text) => {
+    if (!text) return '-';
+    const models = text.split(',').filter(Boolean);
+    const maxShow = 3;
+    const shown = models.slice(0, maxShow);
+    const overflow = models.length - maxShow;
+    return (
+      <Space wrap>
+        {shown.map((m) => (
+          <Tag size='small' key={m}>{m}</Tag>
+        ))}
+        {overflow > 0 && (
+          <Tooltip content={models.join(', ')}>
+            <Tag size='small' color='blue'>+{overflow}</Tag>
+          </Tooltip>
+        )}
+      </Space>
+    );
+  };
+
+  const renderTestResult = (record) => {
+    if (!record.test_time) return <span style={{ color: 'var(--semi-color-text-2)' }}>-</span>;
+    const time = record.response_time / 1000;
+    const color = time < 3 ? 'green' : 'orange';
+    const testDate = new Date(record.test_time * 1000).toLocaleString();
+    return (
+      <Tooltip content={`${t('测试时间')}: ${testDate}`}>
+        <Tag size='small' color={color}>{time.toFixed(2)}s</Tag>
+      </Tooltip>
+    );
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -114,23 +154,38 @@ const AdminUserChannelsTable = () => {
         render: (text) => renderType(text),
       },
       {
-        title: t('模型'),
-        dataIndex: 'models',
-        key: 'models',
+        title: 'Base URL',
+        dataIndex: 'base_url',
+        key: 'base_url',
+        width: 180,
         render: (text) => {
           if (!text) return '-';
-          const models = text.split(',');
-          if (models.length <= 2) {
-            return models.join(', ');
-          }
+          const display = text.length > 30 ? text.slice(0, 30) + '...' : text;
           return (
             <Tooltip content={text}>
-              <span>
-                {models.slice(0, 2).join(', ')} +{models.length - 2}
-              </span>
+              <span style={{ fontSize: 12 }}>{display}</span>
             </Tooltip>
           );
         },
+      },
+      {
+        title: t('模型'),
+        dataIndex: 'models',
+        key: 'models',
+        render: (text) => renderModels(text),
+      },
+      {
+        title: t('分组'),
+        dataIndex: 'group',
+        key: 'group',
+        width: 80,
+        render: (text) => text || 'default',
+      },
+      {
+        title: t('测试结果'),
+        key: 'test_result',
+        width: 100,
+        render: (_, record) => renderTestResult(record),
       },
       {
         title: t('审核状态'),
@@ -150,13 +205,21 @@ const AdminUserChannelsTable = () => {
       {
         title: t('操作'),
         key: 'action',
-        width: 250,
+        width: 300,
         render: (_, record) => {
           const isPending = record.review_status === 0;
           const isApproved = record.review_status === 1;
+          const isTesting = testingId === record.id;
 
           return (
             <Space>
+              <Button
+                size='small'
+                loading={isTesting}
+                onClick={() => handleTest(record)}
+              >
+                {t('测试')}
+              </Button>
               {isPending && (
                 <>
                   <Button
@@ -190,7 +253,7 @@ const AdminUserChannelsTable = () => {
         },
       },
     ],
-    [t, approveChannel, offlineChannel]
+    [t, approveChannel, offlineChannel, testingId]
   );
 
   const handleSearch = () => {
@@ -251,6 +314,7 @@ const AdminUserChannelsTable = () => {
         rowKey='id'
         pagination={false}
         size='small'
+        scroll={{ x: 'max-content' }}
       />
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
