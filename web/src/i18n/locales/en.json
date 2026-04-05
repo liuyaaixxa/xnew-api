@@ -192,7 +192,7 @@
     "Logo 图片地址": "Logo image address",
     "Midjourney 任务记录": "Midjourney Task Records",
     "MIT许可证": "MIT License",
-    "New API项目仓库地址：": "New API project repository address: ",
+    "New API项目仓库地址：": "Teniu Cloud project repository: ",
     "NewAPI 默认不会将入口请求的 User-Agent 透传到上游渠道；该条件仅用于识别访问本站点的客户端。": "NewAPI does not pass the incoming request's User-Agent to upstream channels by default; this condition is only used to identify clients accessing this site.",
     "OAuth Client ID": "OAuth Client ID",
     "OAuth Client Secret": "OAuth Client Secret",

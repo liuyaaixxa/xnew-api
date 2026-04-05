@@ -78,7 +78,7 @@ const About = () => {
           rel='noopener noreferrer'
           className='!text-semi-color-primary'
         >
-          NewAPI
+          Teniu Cloud
         </a>{' '}
         {t('© {{currentYear}}', { currentYear })}{' '}
         <a
