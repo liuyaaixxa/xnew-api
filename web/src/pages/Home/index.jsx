@@ -106,6 +106,7 @@ const Home = () => {
               <nav className='lp-nav'>
                 <a href='#features'>{t('功能特性')}</a>
                 <a href='#how-it-works'>{t('使用流程')}</a>
+                <a href='#download'>{t('下载客户端')}</a>
                 <a href='#pricing'>{t('价格方案')}</a>
                 <Link to='/login' className='lp-nav-btn'>{t('开始使用')}</Link>
               </nav>
@@ -225,6 +226,47 @@ const Home = () => {
                   <h3>{t('开始赚取')}</h3>
                   <p>{t('您的设备将自动接收计算任务，实时监控收益，随时提现。')}</p>
                 </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Download */}
+          <section className='lp-download' id='download'>
+            <div className='lp-section-header'>
+              <div className='lp-section-tag'>Download</div>
+              <h2 className='lp-section-title'>{t('下载 Teniu Link 节点客户端')}</h2>
+              <p className='lp-section-desc'>{t('选择您的操作系统，一键安装即可加入 Teniu Cloud 网络。')}</p>
+            </div>
+            <div className='lp-download-grid'>
+              <div className='lp-download-card'>
+                <div className='lp-download-icon'>
+                  <svg viewBox='0 0 24 24' fill='currentColor' width='40' height='40'>
+                    <path d='M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z' />
+                  </svg>
+                </div>
+                <h3>macOS</h3>
+                <p>{t('适用于 macOS 10.15+')}</p>
+                <a href='https://teniuapi.online/download/macos/teniulink-node-client.pkg' target='_blank' rel='noreferrer' className='lp-download-btn'>{t('下载安装包')}</a>
+              </div>
+              <div className='lp-download-card'>
+                <div className='lp-download-icon'>
+                  <svg viewBox='0 0 24 24' fill='currentColor' width='40' height='40'>
+                    <path d='M3 12V6.5l8-1.1V12H3zm0 .5h8v6.6l-8-1.1V12.5zM12 12.5h9V3l-9 1.2v8.3zm0 .5v6.3L21 21v-8H12z' />
+                  </svg>
+                </div>
+                <h3>Windows</h3>
+                <p>{t('适用于 Windows 10+')}</p>
+                <a href='https://teniuapi.online/download/windows/teniulink-node-client.pkg' target='_blank' rel='noreferrer' className='lp-download-btn'>{t('下载安装包')}</a>
+              </div>
+              <div className='lp-download-card'>
+                <div className='lp-download-icon'>
+                  <svg viewBox='0 0 256 317' fill='currentColor' width='40' height='40'>
+                    <path d='M229.8 218.8c-4 10.5-8.7 20.2-14.2 29.1-7.5 12.1-13.6 20.5-18.3 25.1-7.3 7.6-15.2 11.5-23.6 11.7-6 0-13.3-1.7-21.7-5.2-8.4-3.5-16.2-5.2-23.3-5.2-7.5 0-15.5 1.7-24.1 5.2-8.6 3.5-15.6 5.3-20.8 5.5-8.1.3-16.1-3.7-24.2-11.9-5.1-5-11.5-13.6-19.1-25.8-8.2-13.1-14.9-28.3-20.2-45.6C14.5 183.6 11 166 11 148.9c0-19.4 4.2-36.1 12.6-50.2 6.6-11.3 15.4-20.2 26.5-26.7 11-6.5 22.9-9.8 35.8-10 6.4 0 14.8 2 25.2 5.9 10.4 3.9 17 6 19.9 6 2.2 0 9.5-2.4 22-7.2 11.8-4.5 21.8-6.3 30-5.6 22.1 1.8 38.8 10.5 49.8 26.3-19.8 12-29.6 28.8-29.3 50.3.3 16.7 6.2 30.7 17.8 41.7 5.3 5 11.2 8.9 17.7 11.7-1.4 4.1-2.9 8-4.5 11.7zM175.5 10.1c0 13.1-4.8 25.4-14.3 36.7-11.5 13.5-25.4 21.3-40.5 20.1-.2-1.6-.3-3.3-.3-5.1 0-12.6 5.5-26 15.2-37 4.9-5.6 11-10.2 18.5-13.9 7.4-3.6 14.4-5.6 21.1-5.9.2 1.7.3 3.4.3 5.1z' />
+                  </svg>
+                </div>
+                <h3>Linux</h3>
+                <p>{t('支持 Ubuntu、Debian、CentOS 等')}</p>
+                <a href='https://teniuapi.online/download/linux/teniulink-node-client.pkg' target='_blank' rel='noreferrer' className='lp-download-btn'>{t('下载安装包')}</a>
               </div>
             </div>
           </section>

@@ -354,6 +354,85 @@
   color: var(--lp-text-secondary);
 }
 
+/* Download */
+.lp-download {
+  padding: 6rem 2rem;
+  background: var(--lp-bg-secondary);
+}
+
+.lp-download-grid {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.lp-download-card {
+  background: var(--lp-bg-card);
+  border: 1px solid var(--lp-border-color);
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lp-download-card:hover {
+  border-color: var(--lp-accent-green);
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(0, 255, 136, 0.1);
+}
+
+.lp-download-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(0, 168, 255, 0.15));
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  color: var(--lp-accent-green);
+}
+
+.lp-download-card h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--lp-text-primary);
+}
+
+.lp-download-card p {
+  color: var(--lp-text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.lp-download-btn {
+  display: block;
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, var(--lp-accent-green), var(--lp-accent-blue));
+  border: none;
+  border-radius: 12px;
+  color: var(--lp-bg-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: auto;
+}
+
+.lp-download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--lp-glow-green);
+}
+
 /* Pricing */
 .lp-pricing {
   padding: 6rem 2rem;
@@ -535,6 +614,10 @@
 
   .lp-cta-box h2 {
     font-size: 1.75rem;
+  }
+
+  .lp-download-grid {
+    grid-template-columns: 1fr;
   }
 
   .lp-features-grid {
