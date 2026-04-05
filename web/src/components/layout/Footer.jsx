@@ -63,25 +63,19 @@ const FooterBar = () => {
                 </p>
                 <div className='flex flex-col gap-4'>
                   <a
-                    href='https://docs.newapi.pro/wiki/project-introduction/'
-                    target='_blank'
-                    rel='noopener noreferrer'
+                    href='/about'
                     className='!text-semi-color-text-1'
                   >
                     {t('关于项目')}
                   </a>
                   <a
-                    href='https://docs.newapi.pro/support/community-interaction/'
-                    target='_blank'
-                    rel='noopener noreferrer'
+                    href='mailto:support@teniucloud.com'
                     className='!text-semi-color-text-1'
                   >
                     {t('联系我们')}
                   </a>
                   <a
-                    href='https://docs.newapi.pro/wiki/features-introduction/'
-                    target='_blank'
-                    rel='noopener noreferrer'
+                    href='/docs'
                     className='!text-semi-color-text-1'
                   >
                     {t('功能特性')}
