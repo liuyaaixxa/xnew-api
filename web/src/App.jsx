@@ -54,9 +54,11 @@ import SetupCheck from './components/layout/SetupCheck';
 
 const Home = lazy(() => import('./pages/Home'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
-const About = lazy(() => import('./pages/About'));
+const About = lazy(() => import('./pages/About/LandingAbout'));
 const UserAgreement = lazy(() => import('./pages/UserAgreement'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const LandingPrivacy = lazy(() => import('./pages/PrivacyPolicy/LandingPrivacy'));
+const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 
 function DynamicOAuth2Callback() {
   const { provider } = useParams();
@@ -373,6 +375,22 @@ function App() {
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <PrivacyPolicy />
+            </Suspense>
+          }
+        />
+        <Route
+          path='/privacy'
+          element={
+            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <LandingPrivacy />
+            </Suspense>
+          }
+        />
+        <Route
+          path='/tos'
+          element={
+            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <TermsOfService />
             </Suspense>
           }
         />
