@@ -356,11 +356,10 @@ const Home = () => {
             <div className='lp-footer-content'>
               <div className='lp-footer-links'>
                 <Link to='/about'>{t('关于我们')}</Link>
-                {docsLink && <a href={docsLink} target='_blank' rel='noreferrer'>{t('文档')}</a>}
                 <Link to='/privacy'>{t('隐私政策')}</Link>
                 <Link to='/tos'>{t('服务条款')}</Link>
               </div>
-              <p className='lp-footer-copy'>&copy; 2025 Teniu Cloud. All rights reserved.</p>
+              <p className='lp-footer-copy'>&copy; 2026 Teniu Cloud. All rights reserved.</p>
             </div>
           </footer>
         </div>
