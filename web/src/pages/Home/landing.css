@@ -433,6 +433,51 @@
   box-shadow: var(--lp-glow-green);
 }
 
+.lp-download-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.lp-download-link {
+  font-size: 0.8rem;
+  color: var(--lp-text-muted);
+  text-decoration: none;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--lp-border-color);
+  border-radius: 8px;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.lp-download-link:hover {
+  color: var(--lp-accent-green);
+  border-color: var(--lp-accent-green);
+}
+
+.lp-download-universal {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.lp-download-zip-link {
+  color: var(--lp-text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--lp-border-color);
+  border-radius: 10px;
+  transition: all 0.3s;
+}
+
+.lp-download-zip-link:hover {
+  color: var(--lp-accent-green);
+  border-color: var(--lp-accent-green);
+}
+
 /* Pricing */
 .lp-pricing {
   padding: 6rem 2rem;
