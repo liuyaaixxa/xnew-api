@@ -49,6 +49,8 @@ const routerMap = {
   deployment: '/console/deployment',
   playground: '/console/playground',
   personal: '/console/personal',
+  'user-channel': '/console/user-channel',
+  'user-channel-review': '/console/user-channel-review',
 };
 
 const SiderBar = ({ onNavigate = () => {} }) => {
@@ -105,6 +107,11 @@ const SiderBar = ({ onNavigate = () => {} }) => {
         className:
           localStorage.getItem('enable_task') === 'true' ? '' : 'tableHiddle',
       },
+      {
+        text: t('个人渠道'),
+        itemKey: 'user-channel',
+        to: '/user-channel',
+      },
     ];
 
     // 根据配置过滤项目
@@ -151,6 +158,12 @@ const SiderBar = ({ onNavigate = () => {} }) => {
         text: t('渠道管理'),
         itemKey: 'channel',
         to: '/channel',
+        className: isAdmin() ? '' : 'tableHiddle',
+      },
+      {
+        text: t('个人渠道管理'),
+        itemKey: 'user-channel-review',
+        to: '/user-channel-review',
         className: isAdmin() ? '' : 'tableHiddle',
       },
       {

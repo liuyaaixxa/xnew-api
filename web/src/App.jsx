@@ -32,6 +32,8 @@ import { StatusContext } from './context/Status';
 import PasswordResetForm from './components/auth/PasswordResetForm';
 import PasswordResetConfirm from './components/auth/PasswordResetConfirm';
 import Channel from './pages/Channel';
+import UserChannel from './pages/UserChannel';
+import UserChannelReview from './pages/UserChannelReview';
 import Token from './pages/Token';
 import Redemption from './pages/Redemption';
 import TopUp from './pages/TopUp';
@@ -136,6 +138,22 @@ function App() {
           element={
             <AdminRoute>
               <Channel />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path='/console/user-channel'
+          element={
+            <PrivateRoute>
+              <UserChannel />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path='/console/user-channel-review'
+          element={
+            <AdminRoute>
+              <UserChannelReview />
             </AdminRoute>
           }
         />

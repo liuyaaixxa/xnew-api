@@ -1,4 +1,6 @@
-# CLAUDE.md — Project Conventions for new-api
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Overview
 
@@ -6,36 +8,116 @@ This is an AI API gateway/proxy built with Go. It aggregates 40+ upstream AI pro
 
 ## Tech Stack
 
-- **Backend**: Go 1.22+, Gin web framework, GORM v2 ORM
+- **Backend**: Go 1.25+, Gin web framework, GORM v2 ORM
 - **Frontend**: React 18, Vite, Semi Design UI (@douyinfe/semi-ui)
 - **Databases**: SQLite, MySQL, PostgreSQL (all three must be supported)
 - **Cache**: Redis (go-redis) + in-memory cache
 - **Auth**: JWT, WebAuthn/Passkeys, OAuth (GitHub, Discord, OIDC, etc.)
 - **Frontend package manager**: Bun (preferred over npm/yarn/pnpm)
 
+## Development Commands
+
+### Backend (Go)
+```bash
+# Build backend (outputs 'new-api' binary)
+go build -ldflags "-s -w -X 'github.com/QuantumNous/new-api/common.Version=<version>'"
+
+# Run backend locally
+go run main.go
+
+# Run all tests
+go test ./...
+
+# Run tests in a specific package
+go test ./relay/channel/...
+
+# Run a specific test
+go test -run TestCalculateTextQuotaSummary ./service/
+```
+
+### Frontend (React/Vite)
+```bash
+cd web
+
+# Install dependencies
+bun install
+
+# Development server (hot reload, proxy to backend on port 3000)
+bun run dev
+
+# Production build
+bun run build
+
+# Lint/format
+bun run lint:fix
+bun run eslint:fix
+
+# i18n tools
+bun run i18n:extract   # Extract new translation keys
+bun run i18n:sync      # Sync translations across locales
+bun run i18n:lint      # Check translation quality
+```
+
+### Full Build (Docker)
+```bash
+# Build Docker image (includes frontend + backend)
+docker build -t new-api .
+```
+
 ## Architecture
 
 Layered architecture: Router -> Controller -> Service -> Model
 
 ```
-router/        — HTTP routing (API, relay, dashboard, web)
-controller/    — Request handlers
-service/       — Business logic
-model/         — Data models and DB access (GORM)
-relay/         — AI API relay/proxy with provider adapters
-  relay/channel/ — Provider-specific adapters (openai/, claude/, gemini/, aws/, etc.)
-middleware/    — Auth, rate limiting, CORS, logging, distribution
-setting/       — Configuration management (ratio, model, operation, system, performance)
-common/        — Shared utilities (JSON, crypto, Redis, env, rate-limit, etc.)
-dto/           — Data transfer objects (request/response structs)
-constant/      — Constants (API types, channel types, context keys)
-types/         — Type definitions (relay formats, file sources, errors)
-i18n/          — Backend internationalization (go-i18n, en/zh)
-oauth/         — OAuth provider implementations
-pkg/           — Internal packages (cachex, ionet)
-web/           — React frontend
-  web/src/i18n/  — Frontend internationalization (i18next, zh/en/fr/ru/ja/vi)
+main.go           — Entry point; initializes DB, Redis, cache, i18n, OAuth, starts Gin server
+router/           — HTTP routing (4 modules: API, relay, dashboard, web)
+  api-router.go   — Admin/user management APIs
+  relay-router.go — AI model relay endpoints (/v1/chat/completions, etc.)
+  dashboard.go    — Statistics and monitoring APIs
+  web-router.go   — Serves embedded React frontend
+controller/       — Request handlers
+service/          — Business logic (billing, quota calculation, task polling)
+model/            — Data models and DB access (GORM)
+relay/            — AI API relay/proxy with provider adapters
+  relay/channel/  — Provider-specific adapters (openai/, claude/, gemini/, aws/, etc.)
+  relay_adaptor.go — Routes requests to appropriate channel adaptor
+middleware/       — Auth, rate limiting, CORS, logging, I18n, request ID
+setting/          — Configuration management (ratio, model, operation, system, performance)
+common/           — Shared utilities (JSON, crypto, Redis, env, rate-limit, etc.)
+dto/              — Data transfer objects (request/response structs)
+constant/         — Constants (API types, channel types, context keys)
+types/            — Type definitions (relay formats, file sources, errors)
+i18n/             — Backend internationalization (go-i18n, en/zh)
+oauth/            — OAuth provider implementations
+pkg/              — Internal packages (cachex, ionet)
+web/              — React frontend
+  web/src/i18n/   — Frontend internationalization (i18next, zh/en/fr/ru/ja/vi)
 ```
+
+### Provider Adaptor Pattern
+
+Each AI provider has an adaptor in `relay/channel/<provider>/` implementing `relay/channel/adapter.go`:
+
+```go
+type Adaptor interface {
+    Init(info *relaycommon.RelayInfo)
+    GetRequestURL(info *relaycommon.RelayInfo) (string, error)
+    SetupRequestHeader(c *gin.Context, req *http.Header, info *relaycommon.RelayInfo) error
+    ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeneralOpenAIRequest) (any, error)
+    ConvertClaudeRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.ClaudeRequest) (any, error)
+    ConvertGeminiRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeminiChatRequest) (any, error)
+    DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (any, error)
+    DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError)
+    GetModelList() []string
+    GetChannelName() string
+}
+```
+
+When adding a new provider:
+1. Create `relay/channel/<provider>/adaptor.go` implementing the `Adaptor` interface
+2. Add channel type constant in `constant/channel.go`
+3. Register adaptor in `relay/relay_adaptor.go`'s `GetAdaptor()` function
+4. Add provider-specific DTOs if request/response formats differ from OpenAI
 
 ## Internationalization (i18n)
 
@@ -50,6 +132,31 @@ web/           — React frontend
 - Usage: `useTranslation()` hook, call `t('中文key')` in components
 - Semi UI locale synced via `SemiLocaleWrapper`
 - CLI tools: `bun run i18n:extract`, `bun run i18n:sync`, `bun run i18n:lint`
+
+## Testing
+
+### Test Framework
+- Uses `github.com/stretchr/testify/require` for assertions
+- Gin tests use `gin.SetMode(gin.TestMode)` and `httptest.NewRecorder()`
+
+### Test Pattern Example
+```go
+func TestSomething(t *testing.T) {
+    gin.SetMode(gin.TestMode)
+    w := httptest.NewRecorder()
+    ctx, _ := gin.CreateTestContext(w)
+
+    // Setup test data...
+    result := someFunction(ctx, input)
+
+    require.Equal(t, expected, result)
+    require.NoError(t, err)
+}
+```
+
+### Test File Locations
+- Tests are placed alongside the code they test: `*_test.go` in each package
+- Key test files: `service/*_test.go`, `relay/channel/*_test.go`, `dto/*_test.go`
 
 ## Rules
 

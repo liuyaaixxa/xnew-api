@@ -272,6 +272,29 @@ func SetApiRouter(router *gin.Engine) {
 			deviceTokenRoute.GET("/:id/key", middleware.CriticalRateLimit(), middleware.DisableCache(), controller.GetDeviceTokenKey)
 		}
 
+		// User personal channel management
+		userChannelRoute := apiRouter.Group("/user-channel")
+		userChannelRoute.Use(middleware.UserAuth())
+		{
+			userChannelRoute.GET("/", controller.GetUserChannels)
+			userChannelRoute.GET("/:id", controller.GetUserChannel)
+			userChannelRoute.POST("/", controller.AddUserChannel)
+			userChannelRoute.PUT("/", controller.UpdateUserChannel)
+			userChannelRoute.DELETE("/:id", controller.DeleteUserChannel)
+			userChannelRoute.PUT("/status", controller.UpdateUserChannelStatus)
+			userChannelRoute.GET("/test/:id", controller.TestUserChannel)
+		}
+
+		// Admin user channel review
+		adminUserChannelRoute := apiRouter.Group("/user-channel/admin")
+		adminUserChannelRoute.Use(middleware.AdminAuth())
+		{
+			adminUserChannelRoute.GET("/", controller.AdminGetUserChannels)
+			adminUserChannelRoute.POST("/approve", controller.AdminApproveUserChannel)
+			adminUserChannelRoute.POST("/reject", controller.AdminRejectUserChannel)
+			adminUserChannelRoute.POST("/offline", controller.AdminOfflineUserChannel)
+		}
+
 		usageRoute := apiRouter.Group("/usage")
 		usageRoute.Use(middleware.CORS(), middleware.CriticalRateLimit())
 		{

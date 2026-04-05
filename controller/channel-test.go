@@ -42,6 +42,10 @@ type testResult struct {
 	newAPIError *types.NewAPIError
 }
 
+type testChannelOption struct {
+	AcceptUnsetRatioModel bool
+}
+
 func normalizeChannelTestEndpoint(channel *model.Channel, modelName, endpointType string) string {
 	normalized := strings.TrimSpace(endpointType)
 	if normalized != "" {
@@ -56,7 +60,7 @@ func normalizeChannelTestEndpoint(channel *model.Channel, modelName, endpointTyp
 	return normalized
 }
 
-func testChannel(channel *model.Channel, testModel string, endpointType string, isStream bool) testResult {
+func testChannel(channel *model.Channel, testModel string, endpointType string, isStream bool, opts ...testChannelOption) testResult {
 	tik := time.Now()
 	var unsupportedTestChannelTypes = []int{
 		constant.ChannelTypeMidjourney,
@@ -150,6 +154,13 @@ func testChannel(channel *model.Channel, testModel string, endpointType string, 
 		}
 	}
 	cache.WriteContext(c)
+
+	// Apply test options (e.g., accept unset ratio for personal channel testing)
+	if len(opts) > 0 && opts[0].AcceptUnsetRatioModel {
+		userSetting := cache.GetSetting()
+		userSetting.AcceptUnsetRatioModel = true
+		common.SetContextKey(c, constant.ContextKeyUserSetting, userSetting)
+	}
 
 	//c.Request.Header.Set("Authorization", "Bearer "+channel.Key)
 	c.Request.Header.Set("Content-Type", "application/json")

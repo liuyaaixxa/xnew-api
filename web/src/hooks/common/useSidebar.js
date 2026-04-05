@@ -38,6 +38,7 @@ export const DEFAULT_ADMIN_CONFIG = {
     log: true,
     midjourney: true,
     task: true,
+    'user-channel': true,
   },
   personal: {
     enabled: true,
@@ -47,6 +48,7 @@ export const DEFAULT_ADMIN_CONFIG = {
   admin: {
     enabled: true,
     channel: true,
+    'user-channel-review': true,
     models: true,
     deployment: true,
     redemption: true,
