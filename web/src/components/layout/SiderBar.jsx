@@ -220,11 +220,11 @@ const SiderBar = ({ onNavigate = () => {} }) => {
         itemKey: 'playground',
         to: '/playground',
       },
-      {
-        text: t('聊天'),
-        itemKey: 'chat',
-        items: chatItems,
-      },
+      // {
+      //   text: t('聊天'),
+      //   itemKey: 'chat',
+      //   items: chatItems,
+      // },
     ];
 
     // 根据配置过滤项目
