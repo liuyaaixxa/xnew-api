@@ -9,3 +9,14 @@
 登录Octelium的方法               
 export OCTELIUM_DOMAIN=teniuapi.cloud && export OCTELIUM_INSECURE_TLS=true &&\
 octelium login --domain teniuapi.cloud --auth-token AQpABfm0_8f_2oRB2CU3-DuGzUW-8KMY_ObpOqoVA0DAkM0pFxoL8I9PGah8RxFoDubwXvPlUYjATCFVM-uVmFFxAxJACAMSEOeSH6OT10ZYlgI84BaexqsaEABsB0iPz0L2kMiNsBnsTTciENRjGXFl50M1v7L-owaFWQsqBgic4cLPBg
+
+
+
+AQpAIX3LZd32BApHYOODNjtrAJR3B54svreqcf12F2JLl1ks3XVkdHdckM0FQjzacFKfJe5ZYQo6H_zJU6FQhmP2BRI4CAMSEOeSH6OT10ZYlgI84BaexqsaELV86BKGDE1HpVnQQMrhypIiEMuThMWAfENpggeVjocM6Eg
+
+export OCTELIUM_DOMAIN=teniuapi.cloud && export OCTELIUM_INSECURE_TLS=true &&\
+octelium logout --domain teniuapi.cloud 
+
+export OCTELIUM_DOMAIN=teniuapi.cloud && export OCTELIUM_INSECURE_TLS=true &&\
+octelium login --domain teniuapi.cloud --auth-token AQpAIX3LZd32BApHYOODNjtrAJR3B54svreqcf12F2JLl1ks3XVkdHdckM0FQjzacFKfJe5ZYQo6H_zJU6FQhmP2BRI4CAMSEOeSH6OT10ZYlgI84BaexqsaELV86BKGDE1HpVnQQMrhypIiEMuThMWAfENpggeVjocM6Eg
+

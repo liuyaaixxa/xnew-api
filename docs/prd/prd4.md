@@ -25,5 +25,18 @@ AQpA****HhoQ
 
 登录服务器参考集群方式如下：
 export OCTELIUM_DOMAIN=teniuapi.cloud && export OCTELIUM_INSECURE_TLS=true &&\
-octelium login --domain teniuapi.cloud --auth-token AQpAWZUBRkp9n_6SOk0i_CpuIfiGSts32hV7M-mPvS1PNznbZW6pYei6tquHEVTHUSsBDNR-nLrK1Ss9UXCoQ7RfDBI4CAMSEOeSH6OT10ZYlgI84BaexqsaEPvHi7aVtkAUl14W1EPPbc4iEL75-04_JEfouVlmhC8HhoQ
+export octelium logout &&\
+octelium login --domain teniuapi.cloud --auth-token  \
+AQpACtBpPaNf2SCLq4nWS5R_sn3IqJd3LMsFj_Lr3lgB52blyvRJ-CHzvrcCn4w7IhKTMeTk-cqZFWiZ2szyI4MhAxI4CAMSEOeSH6OT10ZYlgI84BaexqsaENWwdJJKk06OrZAwP_WUh_4iEAWQjxKpH0V4gO9rE8IYjN4
 
+
+
+export OCTELIUM_DOMAIN=teniuapi.cloud && export OCTELIUM_INSECURE_TLS=true &&\
+export octelium logout &&\
+octelium connect --serve admin-port00 --domain teniuapi.cloud --auth-token  \
+AQpACtBpPaNf2SCLq4nWS5R_sn3IqJd3LMsFj_Lr3lgB52blyvRJ-CHzvrcCn4w7IhKTMeTk-cqZFWiZ2szyI4MhAxI4CAMSEOeSH6OT10ZYlgI84BaexqsaENWwdJJKk06OrZAwP_WUh_4iEAWQjxKpH0V4gO9rE8IYjN4
+
+
+octelium disconnect &&\
+octelium connect --serve admin-dev-port2 --domain teniuapi.cloud --auth-token  \
+AQpAZfwpNyTos4TkylCwKzcVN62QjxlirYyfvqSPF5JpTbWlcOnatCYSn3Lc0NkURCdc48v4XVthqCWC4w4YFCQoCRI4CAMSEOeSH6OT10ZYlgI84BaexqsaEIbhktJi9kZHpQFWdlw7or4iEDzbMHjb0E9-lkfZ6PXCTs0

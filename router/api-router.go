@@ -283,6 +283,7 @@ func SetApiRouter(router *gin.Engine) {
 			userChannelRoute.DELETE("/:id", controller.DeleteUserChannel)
 			userChannelRoute.PUT("/status", controller.UpdateUserChannelStatus)
 			userChannelRoute.GET("/test/:id", controller.TestUserChannel)
+			userChannelRoute.POST("/fetch_models", controller.FetchUserChannelModels)
 		}
 
 		// Admin user channel review

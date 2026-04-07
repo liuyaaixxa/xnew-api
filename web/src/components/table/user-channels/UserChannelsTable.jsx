@@ -92,6 +92,18 @@ const UserChannelsTable = () => {
         key: 'name',
       },
       {
+        title: t('设备名'),
+        dataIndex: 'device_name',
+        key: 'device_name',
+        render: (text) => text || '-',
+      },
+      {
+        title: t('域名地址'),
+        dataIndex: 'device_domain',
+        key: 'device_domain',
+        render: (text) => text || '-',
+      },
+      {
         title: t('类型'),
         dataIndex: 'type',
         key: 'type',

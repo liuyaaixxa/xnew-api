@@ -37,6 +37,9 @@ type UserChannel struct {
 	TestTime           int64   `json:"test_time" gorm:"bigint"`
 	ResponseTime       int     `json:"response_time"`
 	PromotedChannelId  int     `json:"promoted_channel_id" gorm:"default:0"`
+	DeviceTokenId      int     `json:"device_token_id" gorm:"default:0"`
+	DeviceName         string  `json:"device_name" gorm:"type:varchar(64);default:''"`
+	DeviceDomain       string  `json:"device_domain" gorm:"type:varchar(128);default:''"`
 
 	// Join fields (not stored in DB)
 	Username    string `json:"username" gorm:"-"`
@@ -154,6 +157,9 @@ func UpdateUserChannel(channel *UserChannel) error {
 		"remark":        channel.Remark,
 		"review_status":       channel.ReviewStatus,
 		"promoted_channel_id": channel.PromotedChannelId,
+		"device_token_id":     channel.DeviceTokenId,
+		"device_name":         channel.DeviceName,
+		"device_domain":       channel.DeviceDomain,
 		"updated_time":        channel.UpdatedTime,
 	}
 	return DB.Model(&UserChannel{}).Where("id = ? AND user_id = ?", channel.Id, channel.UserId).Updates(updates).Error

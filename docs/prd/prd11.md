@@ -8,7 +8,18 @@
 项目背景： 
 
 相关材料： 
-
+kind: Service
+metadata:
+  name: admin-prd11dev02
+spec:
+  mode: HTTP
+  isPublic: true
+  isAnonymous: true
+  config:
+    upstream:
+      url: http://localhost:11434
+      user: admin-prd11dev02
+      
 登录Octelium的方法     
 octelium logout && \          
 export OCTELIUM_DOMAIN=teniuapi.cloud && export OCTELIUM_INSECURE_TLS=true && \
