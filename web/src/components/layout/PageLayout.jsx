@@ -222,7 +222,7 @@ const PageLayout = () => {
           {!shouldHideFooter && (
             <Layout.Footer
               style={{
-                flex: '0 0 auto',
+                flex: '0 0 ',
                 width: '100%',
               }}
             >

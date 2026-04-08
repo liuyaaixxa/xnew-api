@@ -1,0 +1,800 @@
+/* ==================== Home V2 — Salient-style Clean & Grand ==================== */
+/* Inspired by Tailwind UI Salient: white space, large type, pill buttons, section depth */
+
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&display=swap');
+
+.hv2 {
+  --hv2-bg: #ffffff;
+  --hv2-bg-subtle: #f8fafc;
+  --hv2-bg-dark: #0f172a;
+  --hv2-bg-dark-card: #1e293b;
+  --hv2-accent: #2563eb;
+  --hv2-accent-hover: #1d4ed8;
+  --hv2-text: #0f172a;
+  --hv2-text-secondary: #475569;
+  --hv2-text-muted: #94a3b8;
+  --hv2-border: #e2e8f0;
+  --hv2-ring: rgba(37, 99, 235, 0.12);
+
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--hv2-text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  background: var(--hv2-bg);
+}
+
+html.dark .hv2 {
+  --hv2-bg: #0b0f19;
+  --hv2-bg-subtle: #111827;
+  --hv2-bg-dark: #1e293b;
+  --hv2-bg-dark-card: #334155;
+  --hv2-text: #f1f5f9;
+  --hv2-text-secondary: #94a3b8;
+  --hv2-text-muted: #64748b;
+  --hv2-border: rgba(255, 255, 255, 0.08);
+  --hv2-ring: rgba(37, 99, 235, 0.2);
+}
+
+/* Headings use Lexend for that premium Salient feel */
+.hv2 h1, .hv2 h2, .hv2 h3 {
+  font-family: 'Lexend', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ---- Header ---- */
+.hv2-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--hv2-border);
+}
+
+html.dark .hv2-header {
+  background: rgba(11, 15, 25, 0.85);
+}
+
+.hv2-header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hv2-logo {
+  font-family: 'Lexend', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--hv2-text);
+  text-decoration: none;
+}
+
+.hv2-nav {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.hv2-nav-link {
+  color: var(--hv2-text-secondary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.hv2-nav-link:hover {
+  color: var(--hv2-text);
+}
+
+.hv2-nav-signin {
+  color: var(--hv2-text-secondary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.hv2-nav-signin:hover {
+  color: var(--hv2-text);
+}
+
+.hv2-nav-cta {
+  padding: 0.5rem 1.25rem;
+  background: var(--hv2-accent);
+  color: #fff !important;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.hv2-nav-cta:hover {
+  background: var(--hv2-accent-hover);
+}
+
+/* ---- Hero ---- */
+.hv2-hero {
+  position: relative;
+  padding: 10rem 2rem 6rem;
+  overflow: hidden;
+  background: var(--hv2-bg);
+}
+
+.hv2-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* Subtle background radial glow */
+.hv2-hero::before {
+  content: '';
+  position: absolute;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1200px;
+  height: 800px;
+  background: radial-gradient(ellipse, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+html.dark .hv2-hero::before {
+  background: radial-gradient(ellipse, rgba(37, 99, 235, 0.12) 0%, transparent 70%);
+}
+
+.hv2-hero h1 {
+  font-size: clamp(2.75rem, 6vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  color: var(--hv2-text);
+  margin-bottom: 1.5rem;
+}
+
+.hv2-hero h1 .hv2-hl {
+  color: var(--hv2-accent);
+}
+
+.hv2-hero-desc {
+  font-size: 1.125rem;
+  line-height: 1.75;
+  color: var(--hv2-text-secondary);
+  max-width: 600px;
+  margin: 0 auto 2.5rem;
+}
+
+.hv2-hero-btns {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 4rem;
+}
+
+/* Salient-style buttons: pill shape */
+.hv2-btn {
+  padding: 0.75rem 1.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.hv2-btn-dark {
+  background: var(--hv2-bg-dark);
+  color: #fff;
+  border: none;
+}
+
+html.dark .hv2-btn-dark {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.hv2-btn-dark:hover {
+  background: #1e293b;
+}
+
+html.dark .hv2-btn-dark:hover {
+  background: #cbd5e1;
+}
+
+.hv2-btn-outline {
+  background: transparent;
+  color: var(--hv2-text);
+  border: 1px solid var(--hv2-border);
+}
+
+.hv2-btn-outline:hover {
+  border-color: #cbd5e1;
+  color: var(--hv2-text);
+}
+
+html.dark .hv2-btn-outline:hover {
+  border-color: #475569;
+}
+
+.hv2-btn-primary {
+  background: var(--hv2-accent);
+  color: #fff;
+  border: none;
+}
+
+.hv2-btn-primary:hover {
+  background: var(--hv2-accent-hover);
+}
+
+.hv2-btn-white {
+  background: #fff;
+  color: var(--hv2-bg-dark);
+  border: none;
+}
+
+.hv2-btn-white:hover {
+  background: #f1f5f9;
+}
+
+/* Stats in hero */
+.hv2-stats {
+  display: flex;
+  justify-content: center;
+  gap: 4rem;
+}
+
+.hv2-stat-val {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--hv2-text);
+  font-family: 'Lexend', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.hv2-stat-lbl {
+  font-size: 0.8rem;
+  color: var(--hv2-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
+/* ---- Section utilities ---- */
+.hv2-section {
+  position: relative;
+  padding: 6rem 2rem;
+}
+
+.hv2-section--white {
+  background: var(--hv2-bg);
+}
+
+.hv2-section--subtle {
+  background: var(--hv2-bg-subtle);
+}
+
+/* Dark section — for pricing, gives huge depth contrast */
+.hv2-section--dark {
+  background: var(--hv2-bg-dark);
+  color: #fff;
+}
+
+.hv2-section--dark .hv2-section-title {
+  color: #fff;
+}
+
+.hv2-section--dark .hv2-section-desc {
+  color: #94a3b8;
+}
+
+.hv2-section-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hv2-section-head {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.hv2-section-tag {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--hv2-accent);
+  margin-bottom: 0.75rem;
+}
+
+.hv2-section-title {
+  font-size: clamp(1.875rem, 4vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--hv2-text);
+  margin-bottom: 1rem;
+  line-height: 1.15;
+}
+
+.hv2-section-desc {
+  font-size: 1.05rem;
+  color: var(--hv2-text-secondary);
+  max-width: 560px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ---- Features — clean cards with subtle shadows ---- */
+.hv2-features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.hv2-feature {
+  padding: 2rem;
+  border-radius: 16px;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.hv2-feature:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
+}
+
+html.dark .hv2-feature:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.hv2-feature-icon {
+  width: 44px;
+  height: 44px;
+  background: rgba(37, 99, 235, 0.08);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  margin-bottom: 1.25rem;
+  color: var(--hv2-accent);
+}
+
+html.dark .hv2-feature-icon {
+  background: rgba(37, 99, 235, 0.15);
+}
+
+.hv2-feature h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--hv2-text);
+}
+
+.hv2-feature p {
+  font-size: 0.9rem;
+  color: var(--hv2-text-secondary);
+  line-height: 1.65;
+}
+
+/* ---- Steps — horizontal numbered flow ---- */
+.hv2-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3rem;
+}
+
+.hv2-step {
+  text-align: center;
+  position: relative;
+}
+
+.hv2-step-num {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 1.5rem;
+  background: var(--hv2-accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  font-family: 'Lexend', sans-serif;
+}
+
+.hv2-step h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--hv2-text);
+}
+
+.hv2-step p {
+  font-size: 0.9rem;
+  color: var(--hv2-text-secondary);
+  max-width: 280px;
+  margin: 0 auto;
+  line-height: 1.65;
+}
+
+/* Dotted line between steps */
+.hv2-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 26px;
+  left: calc(50% + 34px);
+  width: calc(100% - 68px);
+  height: 0;
+  border-top: 2px dashed var(--hv2-border);
+}
+
+/* ---- Download cards ---- */
+.hv2-dl-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.hv2-dl-card {
+  background: var(--hv2-bg);
+  border: 1px solid var(--hv2-border);
+  border-radius: 16px;
+  padding: 2.25rem 1.75rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.25s, box-shadow 0.25s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+html.dark .hv2-dl-card {
+  background: var(--hv2-bg-subtle);
+  border-color: var(--hv2-border);
+}
+
+.hv2-dl-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.1);
+}
+
+html.dark .hv2-dl-card:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.hv2-dl-icon {
+  width: 56px;
+  height: 56px;
+  background: rgba(37, 99, 235, 0.06);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  color: var(--hv2-accent);
+}
+
+html.dark .hv2-dl-icon {
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.hv2-dl-card h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  color: var(--hv2-text);
+}
+
+.hv2-dl-card > p {
+  color: var(--hv2-text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.hv2-dl-main-btn {
+  display: block;
+  width: 100%;
+  padding: 0.7rem 1.25rem;
+  background: var(--hv2-accent);
+  border: none;
+  border-radius: 9999px;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.2s;
+  margin-top: auto;
+}
+
+.hv2-dl-main-btn:hover {
+  background: var(--hv2-accent-hover);
+}
+
+.hv2-dl-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.hv2-dl-link {
+  font-size: 0.75rem;
+  color: var(--hv2-text-muted);
+  text-decoration: none;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--hv2-border);
+  border-radius: 6px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.hv2-dl-link:hover {
+  color: var(--hv2-accent);
+  border-color: var(--hv2-accent);
+}
+
+.hv2-dl-universal {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.hv2-dl-zip {
+  color: var(--hv2-text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+
+.hv2-dl-zip:hover {
+  color: var(--hv2-accent);
+}
+
+/* ---- Pricing (dark bg for depth) ---- */
+.hv2-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.hv2-price-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: transform 0.25s;
+}
+
+.hv2-price-card:hover {
+  transform: translateY(-3px);
+}
+
+.hv2-price-card--featured {
+  background: var(--hv2-accent);
+  border-color: var(--hv2-accent);
+  position: relative;
+  box-shadow: 0 20px 60px rgba(37, 99, 235, 0.35);
+}
+
+.hv2-price-card--featured .hv2-price-val,
+.hv2-price-card--featured h3,
+.hv2-price-card--featured .hv2-price-period,
+.hv2-price-card--featured .hv2-price-list li {
+  color: #fff;
+}
+
+.hv2-price-card--featured .hv2-price-list li::before {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.hv2-price-card h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 0.75rem;
+}
+
+.hv2-price-val {
+  font-size: 2.75rem;
+  font-weight: 800;
+  font-family: 'Lexend', sans-serif;
+  color: #fff;
+  margin-bottom: 0.25rem;
+  letter-spacing: -0.03em;
+}
+
+.hv2-price-val .hv2-currency {
+  font-size: 1.25rem;
+  vertical-align: top;
+  margin-right: 0.1rem;
+}
+
+.hv2-price-period {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-bottom: 1.5rem;
+}
+
+.hv2-price-list {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+  margin-bottom: 1.75rem;
+}
+
+.hv2-price-list li {
+  padding: 0.4rem 0;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hv2-price-list li::before {
+  content: '\2713';
+  color: rgba(37, 99, 235, 0.8);
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.hv2-price-card:not(.hv2-price-card--featured) .hv2-price-list li::before {
+  color: var(--hv2-accent);
+}
+
+/* ---- CTA ---- */
+.hv2-cta {
+  position: relative;
+  padding: 6rem 2rem;
+  background: var(--hv2-accent);
+  overflow: hidden;
+}
+
+.hv2-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.hv2-cta-inner {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.hv2-cta-inner h2 {
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.hv2-cta-inner p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.05rem;
+  margin-bottom: 2rem;
+  line-height: 1.7;
+}
+
+/* ---- Footer ---- */
+.hv2-footer {
+  padding: 3rem 2rem;
+  background: var(--hv2-bg-dark);
+  text-align: center;
+}
+
+.hv2-footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hv2-footer-links {
+  display: flex;
+  gap: 1.75rem;
+}
+
+.hv2-footer-links a {
+  color: #64748b;
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+
+.hv2-footer-links a:hover {
+  color: #94a3b8;
+}
+
+.hv2-footer-copy {
+  color: #475569;
+  font-size: 0.8rem;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 1024px) {
+  .hv2-pricing-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .hv2-features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hv2-steps {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .hv2-step:not(:last-child)::after {
+    display: none;
+  }
+
+  .hv2-stats {
+    gap: 2.5rem;
+  }
+
+  .hv2-footer-inner {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .hv2-nav {
+    display: none;
+  }
+
+  .hv2-hero {
+    padding: 7rem 1.25rem 3.5rem;
+  }
+
+  .hv2-features-grid,
+  .hv2-dl-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hv2-stats {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .hv2-pricing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hv2-section {
+    padding: 4rem 1.25rem;
+  }
+
+  .hv2-cta {
+    padding: 4rem 1.25rem;
+  }
+}
