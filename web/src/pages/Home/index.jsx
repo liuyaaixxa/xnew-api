@@ -294,9 +294,20 @@ const Home = () => {
             </div>
             <div className='lp-pricing-cards'>
               <div className='lp-pricing-card'>
-                <h3>{t('免费版')}</h3>
+                <h3>{t('免费套餐')}</h3>
                 <div className='lp-pricing-value'><span className='lp-currency'>$</span>0</div>
                 <div className='lp-pricing-period'>{t('永久免费')}</div>
+                <ul className='lp-pricing-features'>
+                  <li>{t('1 个 GPU 节点')}</li>
+                  <li>{t('1 个设备令牌')}</li>
+                  <li>{t('社区支持')}</li>
+                </ul>
+                <Link to='/register' className='lp-btn lp-btn-secondary'>{t('开始使用')}</Link>
+              </div>
+              <div className='lp-pricing-card'>
+                <h3>{t('基础套餐版')}</h3>
+                <div className='lp-pricing-value'><span className='lp-currency'>$</span>5</div>
+                <div className='lp-pricing-period'>{t('每月')}</div>
                 <ul className='lp-pricing-features'>
                   <li>{t('1 个 GPU 节点')}</li>
                   <li>{t('1 个设备令牌')}</li>
@@ -306,7 +317,7 @@ const Home = () => {
                 <Link to='/register' className='lp-btn lp-btn-secondary'>{t('开始使用')}</Link>
               </div>
               <div className='lp-pricing-card lp-featured'>
-                <h3>Pro</h3>
+                <h3>{t('高级套餐版')}</h3>
                 <div className='lp-pricing-value'><span className='lp-currency'>$</span>50</div>
                 <div className='lp-pricing-period'>{t('每月')}</div>
                 <ul className='lp-pricing-features'>
@@ -316,7 +327,7 @@ const Home = () => {
                   <li>{t('7×24 优先支持')}</li>
                   <li>{t('高级数据分析')}</li>
                 </ul>
-                <Link to='/register' className='lp-btn lp-btn-primary'>{t('选择 Pro')}</Link>
+                <Link to='/register' className='lp-btn lp-btn-primary'>{t('选择高级套餐')}</Link>
               </div>
               <div className='lp-pricing-card'>
                 <h3>{t('企业版')}</h3>
