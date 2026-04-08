@@ -117,17 +117,10 @@ const HomeV2 = () => {
           {/* ── Hero ── */}
           <section className='hv2-hero'>
             <NeuralBg nodeCount={isMobile ? 30 : 60} />
-            {/* Floating GPU glassmorphism cards — bottom-left cluster */}
-            {!isMobile && (
-              <>
-                <div className='hv2-gpu-float hv2-gpu-float--1'>
-                  <img src='/fQNA8cT7s.jpeg' alt='' />
-                </div>
-                <div className='hv2-gpu-float hv2-gpu-float--2'>
-                  <img src='/fQNA8cT7s.jpeg' alt='' />
-                </div>
-              </>
-            )}
+            {/* GPU image — bottom-left corner, 1/3 visible */}
+            <div className='hv2-gpu-corner'>
+              <img src='/fQNA8cT7s.jpeg' alt='' />
+            </div>
             <div className='hv2-hero-content'>
               <h1>
                 {t('将闲置 GPU')}{' '}
