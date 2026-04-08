@@ -89,21 +89,25 @@ const HomeV2 = () => {
 
   // Scroll-reveal: observe .hv2-reveal elements
   useEffect(() => {
-    const els = document.querySelectorAll('.hv2-reveal, .hv2-reveal-stagger');
-    if (!els.length) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add('hv2-visible');
-            io.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    // Small delay to ensure DOM is fully painted after React render
+    const timer = setTimeout(() => {
+      const els = document.querySelectorAll('.hv2-reveal, .hv2-reveal-stagger');
+      if (!els.length) return;
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('hv2-visible');
+              io.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0, rootMargin: '0px 0px -20px 0px' }
+      );
+      els.forEach((el) => io.observe(el));
+      return () => io.disconnect();
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   // NOTE: dangerouslySetInnerHTML below is used for admin-configured homepage
