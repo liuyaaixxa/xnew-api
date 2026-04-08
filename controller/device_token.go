@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -87,8 +88,13 @@ func AddDeviceToken(c *gin.Context) {
 		return
 	}
 
-	// Check max device tokens limit
-	maxTokens := model.GetMaxUserDeviceTokens()
+	// Check subscription resource limits for device tokens
+	limits := service.GetUserResourceLimits(userId)
+	maxTokens := limits.MaxDeviceTokens
+	if maxTokens == 0 {
+		// 0 = unlimited in subscription, fall back to env var cap
+		maxTokens = model.GetMaxUserDeviceTokens()
+	}
 	count, err := model.CountUserDeviceTokens(userId)
 	if err != nil {
 		common.ApiError(c, err)
@@ -97,7 +103,7 @@ func AddDeviceToken(c *gin.Context) {
 	if int(count) >= maxTokens {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "Maximum number of device tokens reached",
+			"message": fmt.Sprintf("您的套餐最多允许创建 %d 个设备令牌，请升级套餐以创建更多", maxTokens),
 		})
 		return
 	}

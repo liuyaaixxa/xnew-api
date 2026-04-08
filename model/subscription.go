@@ -171,6 +171,11 @@ type SubscriptionPlan struct {
 	// Total quota (amount in quota units, 0 = unlimited)
 	TotalAmount int64 `json:"total_amount" gorm:"type:bigint;not null;default:0"`
 
+	// Resource limits (0 = unlimited)
+	MaxDeviceTokens int `json:"max_device_tokens" gorm:"type:int;default:0"`
+	MaxUserChannels int `json:"max_user_channels" gorm:"type:int;default:0"`
+	MaxSharedModels int `json:"max_shared_models" gorm:"type:int;default:0"`
+
 	// Quota reset period for plan
 	QuotaResetPeriod        string `json:"quota_reset_period" gorm:"type:varchar(16);default:'never'"`
 	QuotaResetCustomSeconds int64  `json:"quota_reset_custom_seconds" gorm:"type:bigint;default:0"`

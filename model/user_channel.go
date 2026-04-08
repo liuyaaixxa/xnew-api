@@ -46,6 +46,13 @@ type UserChannel struct {
 	DisplayName string `json:"display_name" gorm:"-"`
 }
 
+// CountUserChannels counts total channels for a user
+func CountUserChannels(userId int) (int64, error) {
+	var count int64
+	err := DB.Model(&UserChannel{}).Where("user_id = ?", userId).Count(&count).Error
+	return count, err
+}
+
 // InsertUserChannel creates a new user channel record
 func InsertUserChannel(channel *UserChannel) error {
 	channel.CreatedTime = time.Now().Unix()

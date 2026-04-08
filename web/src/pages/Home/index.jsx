@@ -299,21 +299,21 @@ const Home = () => {
                 <div className='lp-pricing-period'>{t('永久免费')}</div>
                 <ul className='lp-pricing-features'>
                   <li>{t('1 个 GPU 节点')}</li>
-                  <li>{t('基础收益分成')}</li>
+                  <li>{t('1 个设备令牌')}</li>
+                  <li>{t('发布 5 个共享模型')}</li>
                   <li>{t('社区支持')}</li>
-                  <li>{t('标准结算')}</li>
                 </ul>
                 <Link to='/register' className='lp-btn lp-btn-secondary'>{t('开始使用')}</Link>
               </div>
               <div className='lp-pricing-card lp-featured'>
                 <h3>Pro</h3>
-                <div className='lp-pricing-value'><span className='lp-currency'>$</span>29</div>
+                <div className='lp-pricing-value'><span className='lp-currency'>$</span>50</div>
                 <div className='lp-pricing-period'>{t('每月')}</div>
                 <ul className='lp-pricing-features'>
-                  <li>{t('无限 GPU 节点')}</li>
-                  <li>{t('优先任务分配')}</li>
+                  <li>{t('10 个 GPU 节点')}</li>
+                  <li>{t('100 个设备令牌')}</li>
+                  <li>{t('不限共享模型')}</li>
                   <li>{t('7×24 优先支持')}</li>
-                  <li>{t('实时结算')}</li>
                   <li>{t('高级数据分析')}</li>
                 </ul>
                 <Link to='/register' className='lp-btn lp-btn-primary'>{t('选择 Pro')}</Link>
@@ -323,9 +323,9 @@ const Home = () => {
                 <div className='lp-pricing-value'>{t('定制')}</div>
                 <div className='lp-pricing-period'>{t('专属方案')}</div>
                 <ul className='lp-pricing-features'>
-                  <li>{t('专属基础设施')}</li>
-                  <li>{t('定制集成')}</li>
-                  <li>{t('SLA 保障')}</li>
+                  <li>{t('专属基础算力中心')}</li>
+                  <li>{t('OSS 集成')}</li>
+                  <li>{t('SLA 服务保障')}</li>
                   <li>{t('专属客户经理')}</li>
                 </ul>
                 <Link to='/register' className='lp-btn lp-btn-secondary'>{t('联系销售')}</Link>

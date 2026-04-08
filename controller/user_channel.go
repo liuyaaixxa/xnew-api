@@ -96,6 +96,36 @@ func AddUserChannel(c *gin.Context) {
 		return
 	}
 
+	// Check subscription resource limits
+	limits := service.GetUserResourceLimits(userId)
+
+	// Check channel count limit
+	if limits.MaxUserChannels > 0 {
+		channelCount, err := model.CountUserChannels(userId)
+		if err != nil {
+			common.ApiError(c, err)
+			return
+		}
+		if int(channelCount) >= limits.MaxUserChannels {
+			common.ApiErrorMsg(c, fmt.Sprintf("您的套餐最多允许创建 %d 个渠道，请升级套餐以创建更多", limits.MaxUserChannels))
+			return
+		}
+	}
+
+	// Check shared model count limit
+	if limits.MaxSharedModels > 0 {
+		currentModels, err := service.CountUserSharedModels(userId)
+		if err != nil {
+			common.ApiError(c, err)
+			return
+		}
+		newModels := len(strings.Split(channel.Models, ","))
+		if currentModels+newModels > limits.MaxSharedModels {
+			common.ApiErrorMsg(c, fmt.Sprintf("您的套餐最多允许发布 %d 个共享模型（当前已有 %d 个），请升级套餐", limits.MaxSharedModels, currentModels))
+			return
+		}
+	}
+
 	channel.UserId = userId
 	channel.Status = common.ChannelStatusEnabled
 	channel.ReviewStatus = model.UserChannelReviewPending
