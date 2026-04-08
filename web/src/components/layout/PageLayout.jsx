@@ -226,7 +226,7 @@ const PageLayout = () => {
                 width: '100%',
               }}
             >
-              {/* <FooterBar /> */}
+              <FooterBar />
             </Layout.Footer>
           )}
         </Layout>

@@ -783,6 +783,257 @@ html:not(.dark) .blur-ball-teal {
   opacity: 0.2;
 }
 
+/* ==================== Auth 页面 ==================== */
+/* 冷灰白背景 */
+.auth-bg {
+  background: linear-gradient(160deg, #eef1f5 0%, #e4e7ed 50%, #eaecf1 100%);
+}
+
+html.dark .auth-bg {
+  background: linear-gradient(160deg, #1a1a2e 0%, #16162a 50%, #1a1a2e 100%);
+}
+
+/* 毛玻璃动态线条 */
+.auth-bg::before,
+.auth-bg::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.auth-bg::before {
+  background:
+    repeating-linear-gradient(
+      -35deg,
+      transparent 0,
+      transparent 80px,
+      rgba(160, 170, 190, 0.12) 80px,
+      rgba(160, 170, 190, 0.12) 81px,
+      transparent 81px,
+      transparent 180px,
+      rgba(140, 155, 180, 0.08) 180px,
+      rgba(140, 155, 180, 0.08) 181.5px,
+      transparent 181.5px,
+      transparent 260px
+    );
+  filter: blur(1.5px);
+  animation: auth-lines-drift 25s linear infinite;
+}
+
+.auth-bg::after {
+  background:
+    repeating-linear-gradient(
+      35deg,
+      transparent 0,
+      transparent 120px,
+      rgba(150, 165, 190, 0.09) 120px,
+      rgba(150, 165, 190, 0.09) 121px,
+      transparent 121px,
+      transparent 240px,
+      rgba(130, 150, 175, 0.06) 240px,
+      rgba(130, 150, 175, 0.06) 241.5px,
+      transparent 241.5px,
+      transparent 340px
+    );
+  filter: blur(2px);
+  animation: auth-lines-drift-reverse 30s linear infinite;
+}
+
+html.dark .auth-bg::before {
+  background:
+    repeating-linear-gradient(
+      -35deg,
+      transparent 0,
+      transparent 80px,
+      rgba(100, 120, 180, 0.08) 80px,
+      rgba(100, 120, 180, 0.08) 81px,
+      transparent 81px,
+      transparent 180px,
+      rgba(80, 100, 160, 0.05) 180px,
+      rgba(80, 100, 160, 0.05) 181.5px,
+      transparent 181.5px,
+      transparent 260px
+    );
+}
+
+html.dark .auth-bg::after {
+  background:
+    repeating-linear-gradient(
+      35deg,
+      transparent 0,
+      transparent 120px,
+      rgba(90, 110, 170, 0.06) 120px,
+      rgba(90, 110, 170, 0.06) 121px,
+      transparent 121px,
+      transparent 240px,
+      rgba(70, 90, 150, 0.04) 240px,
+      rgba(70, 90, 150, 0.04) 241.5px,
+      transparent 241.5px,
+      transparent 340px
+    );
+}
+
+/* 确保卡片内容在线条之上（排除 blur-ball） */
+.auth-bg > *:not(.blur-ball) {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes auth-lines-drift {
+  from { transform: translate(0, 0); }
+  to   { transform: translate(260px, 180px); }
+}
+
+@keyframes auth-lines-drift-reverse {
+  from { transform: translate(0, 0); }
+  to   { transform: translate(-340px, 240px); }
+}
+
+/* 卡片立体感 */
+.auth-bg .semi-card {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 6px 16px rgba(0, 0, 0, 0.08),
+    0 16px 48px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+html.dark .auth-bg .semi-card {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 6px 16px rgba(0, 0, 0, 0.25),
+    0 16px 48px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ---- Auth 两列布局 ---- */
+.auth-layout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5rem;
+  width: 100%;
+  max-width: 1000px;
+  margin-top: 60px;
+  padding: 0 3rem;
+}
+
+/* ---- 左侧 Slogan ---- */
+.auth-slogan {
+  flex: 0 1 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.auth-slogan-headline {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.auth-slogan-headline .auth-slogan-accent {
+  background: linear-gradient(135deg, #00c96b 0%, #00a8ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+html.dark .auth-slogan-headline {
+  background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+html.dark .auth-slogan-headline .auth-slogan-accent {
+  background: linear-gradient(135deg, #00ff88 0%, #00a8ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.auth-slogan-desc {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: #64748b;
+  max-width: 380px;
+}
+
+html.dark .auth-slogan-desc {
+  color: #94a3b8;
+}
+
+/* 装饰线 */
+.auth-slogan-line {
+  width: 48px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #00c96b, #00a8ff);
+  opacity: 0.7;
+}
+
+html.dark .auth-slogan-line {
+  opacity: 0.5;
+}
+
+/* 特性标签 */
+.auth-slogan-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.auth-slogan-tag {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.3rem 0.75rem;
+  border-radius: 50px;
+  background: rgba(0, 168, 255, 0.06);
+  color: #4a7ca5;
+  border: 1px solid rgba(0, 168, 255, 0.12);
+}
+
+html.dark .auth-slogan-tag {
+  background: rgba(0, 255, 136, 0.06);
+  color: rgba(0, 255, 136, 0.7);
+  border-color: rgba(0, 255, 136, 0.15);
+}
+
+/* 右侧表单 */
+.auth-form-side {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* 移动端：隐藏 slogan, 表单居中 */
+@media (max-width: 860px) {
+  .auth-layout {
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 400px;
+  }
+
+  .auth-slogan {
+    display: none;
+  }
+
+  .auth-form-side {
+    max-width: 100%;
+  }
+}
+
 /* ==================== 卡片马卡龙模糊球（类封装） ==================== */
 /* 使用方式：给容器加上 with-pastel-balls 类即可，无需在 JSX 中插入额外节点 */
 .with-pastel-balls {
