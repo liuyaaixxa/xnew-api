@@ -87,6 +87,25 @@ const HomeV2 = () => {
     displayHomePageContent().then();
   }, []);
 
+  // Scroll-reveal: observe .hv2-reveal elements
+  useEffect(() => {
+    const els = document.querySelectorAll('.hv2-reveal, .hv2-reveal-stagger');
+    if (!els.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add('hv2-visible');
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   // NOTE: dangerouslySetInnerHTML below is used for admin-configured homepage
   // content from the backend API — same pattern as the original index.jsx.
 
@@ -121,7 +140,7 @@ const HomeV2 = () => {
             <div className='hv2-gpu-corner'>
               <img src='/fQNA8cT7s.jpeg' alt='' />
             </div>
-            <div className='hv2-hero-content'>
+            <div className='hv2-hero-content hv2-reveal'>
               <h1>
                 {t('将闲置 GPU')}{' '}
                 <span className='hv2-hl'>{t('转化为')}</span>
@@ -160,12 +179,12 @@ const HomeV2 = () => {
           {/* ── Features ── */}
           <section className='hv2-section hv2-section--subtle' id='features'>
             <div className='hv2-section-inner'>
-              <div className='hv2-section-head'>
+              <div className='hv2-section-head hv2-reveal'>
                 <div className='hv2-section-tag'>Features</div>
                 <h2 className='hv2-section-title'>{t('为什么选择 Teniu Cloud？')}</h2>
                 <p className='hv2-section-desc'>{t('最强大的去中心化 GPU 共享平台，帮助您轻松将闲置资源变现。')}</p>
               </div>
-              <div className='hv2-features-grid'>
+              <div className='hv2-features-grid hv2-reveal-stagger'>
                 <div className='hv2-feature'>
                   <div className='hv2-feature-icon'>&#9889;</div>
                   <h3>{t('一键部署')}</h3>
@@ -203,12 +222,12 @@ const HomeV2 = () => {
           {/* ── How It Works ── */}
           <section className='hv2-section hv2-section--white' id='how-it-works'>
             <div className='hv2-section-inner'>
-              <div className='hv2-section-head'>
+              <div className='hv2-section-head hv2-reveal'>
                 <div className='hv2-section-tag'>How It Works</div>
                 <h2 className='hv2-section-title'>{t('简单 3 步，开始赚取')}</h2>
                 <p className='hv2-section-desc'>{t('流程简单，即刻开始赚取收益。')}</p>
               </div>
-              <div className='hv2-steps'>
+              <div className='hv2-steps hv2-reveal-stagger'>
                 <div className='hv2-step'>
                   <div className='hv2-step-num'>01</div>
                   <h3>{t('注册账户')}</h3>
@@ -231,12 +250,12 @@ const HomeV2 = () => {
           {/* ── Download ── */}
           <section className='hv2-section hv2-section--subtle' id='download'>
             <div className='hv2-section-inner'>
-              <div className='hv2-section-head'>
+              <div className='hv2-section-head hv2-reveal'>
                 <div className='hv2-section-tag'>Download</div>
                 <h2 className='hv2-section-title'>{t('下载 Teniu Link 节点客户端')}</h2>
                 <p className='hv2-section-desc'>{t('选择您的操作系统，一键安装即可加入 Teniu Cloud 网络。')}</p>
               </div>
-              <div className='hv2-dl-grid'>
+              <div className='hv2-dl-grid hv2-reveal-stagger'>
                 <div className='hv2-dl-card'>
                   <div className='hv2-dl-icon'>
                     <svg viewBox='0 0 24 24' fill='currentColor' width='28' height='28'>
@@ -294,12 +313,12 @@ const HomeV2 = () => {
           {/* ── Pricing (dark section for depth) ── */}
           <section className='hv2-section hv2-section--dark' id='pricing'>
             <div className='hv2-section-inner'>
-              <div className='hv2-section-head'>
+              <div className='hv2-section-head hv2-reveal'>
                 <div className='hv2-section-tag'>Pricing</div>
                 <h2 className='hv2-section-title'>{t('灵活的价格方案')}</h2>
                 <p className='hv2-section-desc'>{t('选择最适合您的方案，随时升级。')}</p>
               </div>
-              <div className='hv2-pricing-grid'>
+              <div className='hv2-pricing-grid hv2-reveal-stagger'>
                 <div className='hv2-price-card'>
                   <h3>{t('免费套餐')}</h3>
                   <div className='hv2-price-val'><span className='hv2-currency'>$</span>0</div>
@@ -354,7 +373,7 @@ const HomeV2 = () => {
 
           {/* ── CTA ── */}
           <section className='hv2-cta'>
-            <div className='hv2-cta-inner'>
+            <div className='hv2-cta-inner hv2-reveal hv2-reveal--scale'>
               <h2>{t('准备好开始赚取了吗？')}</h2>
               <p>{t('加入数千名已通过 Teniu Cloud 赚取收益的用户，今天就开始您的旅程！')}</p>
               <Link to='/register' className='hv2-btn hv2-btn-white'>
@@ -365,7 +384,7 @@ const HomeV2 = () => {
           </section>
 
           {/* ── Footer ── */}
-          <footer className='hv2-footer'>
+          <footer className='hv2-footer hv2-reveal'>
             <div className='hv2-footer-inner'>
               <div className='hv2-footer-links'>
                 <Link to='/docs'>{t('文档')}</Link>
