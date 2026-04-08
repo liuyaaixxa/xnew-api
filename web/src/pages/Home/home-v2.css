@@ -214,59 +214,33 @@ html.dark .hv2-gpu-float::after {
   );
 }
 
-/* Card positions — left side */
+/* Bottom-left cluster */
 .hv2-gpu-float--1 {
-  width: 220px;
-  height: 160px;
-  top: 12%;
-  left: 4%;
-  transform: rotate(-6deg);
-  animation: hv2-float-1 8s ease-in-out infinite;
-}
-
-/* Card positions — right side */
-.hv2-gpu-float--2 {
   width: 260px;
   height: 180px;
-  top: 8%;
-  right: 3%;
-  transform: rotate(4deg);
-  animation: hv2-float-2 10s ease-in-out infinite;
-}
-
-/* Card positions — bottom left */
-.hv2-gpu-float--3 {
-  width: 180px;
-  height: 130px;
-  bottom: 14%;
-  left: 8%;
-  transform: rotate(3deg);
-  animation: hv2-float-3 9s ease-in-out infinite;
-}
-
-/* Card positions — bottom right */
-.hv2-gpu-float--4 {
-  width: 200px;
-  height: 145px;
-  bottom: 10%;
-  right: 6%;
+  bottom: 8%;
+  left: 3%;
   transform: rotate(-4deg);
-  animation: hv2-float-2 11s ease-in-out infinite reverse;
+  animation: hv2-float-1 9s ease-in-out infinite;
+}
+
+.hv2-gpu-float--2 {
+  width: 190px;
+  height: 135px;
+  bottom: 28%;
+  left: 12%;
+  transform: rotate(3deg);
+  animation: hv2-float-2 11s ease-in-out infinite;
 }
 
 @keyframes hv2-float-1 {
-  0%, 100% { transform: rotate(-6deg) translateY(0); }
-  50% { transform: rotate(-6deg) translateY(-14px); }
+  0%, 100% { transform: rotate(-4deg) translateY(0); }
+  50% { transform: rotate(-4deg) translateY(-12px); }
 }
 
 @keyframes hv2-float-2 {
-  0%, 100% { transform: rotate(4deg) translateY(0); }
-  50% { transform: rotate(4deg) translateY(-18px); }
-}
-
-@keyframes hv2-float-3 {
   0%, 100% { transform: rotate(3deg) translateY(0); }
-  50% { transform: rotate(3deg) translateY(-10px); }
+  50% { transform: rotate(3deg) translateY(-16px); }
 }
 
 /* Hide floating cards on smaller screens */
