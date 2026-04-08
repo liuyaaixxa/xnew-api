@@ -164,8 +164,8 @@ html.dark .hv2-hero::before {
   overflow: hidden;
   pointer-events: none;
   background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.10);
   box-shadow:
     0 12px 48px rgba(37, 99, 235, 0.12),
