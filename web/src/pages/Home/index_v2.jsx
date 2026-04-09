@@ -146,7 +146,7 @@ const HomeV2 = () => {
             </div>
             <div className='hv2-hero-content hv2-reveal'>
               <h1>
-                {t('将闲置 GPU')}{' '}
+                {t('将闲置 LLM Token / GPU')}{' '}
                 <span className='hv2-hl'>{t('转化为')}</span>
                 <br />
                 {t('稳定收益')}
