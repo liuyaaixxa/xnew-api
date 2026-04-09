@@ -146,10 +146,9 @@ const HomeV2 = () => {
             </div>
             <div className='hv2-hero-content hv2-reveal'>
               <h1>
-                {t('将闲置 LLM Token / GPU')}{' '}
-                <span className='hv2-hl'>{t('转化为')}</span>
+                {t('将闲置 LLM Token / GPU')}
                 <br />
-                {t('稳定收益')}
+                <span className='hv2-hl'>{t('转化为')}</span>{t('稳定收益')}
               </h1>
               <p className='hv2-hero-desc'>
                 {t('Teniu Cloud 是一个去中心化 GPU 共享网络，让您将闲置算力变现。支持 Ollama 本地模型和 LLM Token 共享。')}
