@@ -34,6 +34,7 @@ func (p ChatCompletionsToResponsesPolicy) IsChannelEnabled(channelID int, channe
 
 type GlobalSettings struct {
 	PassThroughRequestEnabled        bool                             `json:"pass_through_request_enabled"`
+	AutoPassThroughChannelTypes      []int                            `json:"auto_pass_through_channel_types"` // 自动透传的通道类型列表
 	ThinkingModelBlacklist           []string                         `json:"thinking_model_blacklist"`
 	ChatCompletionsToResponsesPolicy ChatCompletionsToResponsesPolicy `json:"chat_completions_to_responses_policy"`
 }
@@ -41,6 +42,13 @@ type GlobalSettings struct {
 // 默认配置
 var defaultOpenaiSettings = GlobalSettings{
 	PassThroughRequestEnabled: false,
+	AutoPassThroughChannelTypes: []int{
+		14, // Anthropic
+		15, // Baidu
+		16, // Zhipu
+		17, // Ali
+		18, // Xunfei
+	},
 	ThinkingModelBlacklist: []string{
 		"moonshotai/kimi-k2-thinking",
 		"kimi-k2-thinking",
@@ -76,4 +84,12 @@ func ShouldPreserveThinkingSuffix(modelName string) bool {
 		}
 	}
 	return false
+}
+
+// IsAutoPassThroughChannelType 判断通道类型是否在自动透传列表中
+func IsAutoPassThroughChannelType(channelType int) bool {
+	if len(globalSettings.AutoPassThroughChannelTypes) == 0 {
+		return false
+	}
+	return slices.Contains(globalSettings.AutoPassThroughChannelTypes, channelType)
 }

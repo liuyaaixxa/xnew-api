@@ -55,7 +55,9 @@ func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
 		if hasSpecialPlan && specialPlan.ClaudeBaseURL != "" {
 			return fmt.Sprintf("%s/v1/messages", specialPlan.ClaudeBaseURL), nil
 		}
-		return fmt.Sprintf("%s/api/anthropic/v1/messages", baseURL), nil
+		// Zhipu standard API does not support Claude format endpoint
+		// Return error to indicate this channel doesn't support Claude format
+		return "", fmt.Errorf("channel does not support Claude format API (/v1/messages). Please use OpenAI format (/v1/chat/completions) or configure channel with a supported base URL (e.g., 'glm-coding-plan' for Claude-compatible endpoint)")
 	default:
 		switch info.RelayMode {
 		case relayconstant.RelayModeEmbeddings:

@@ -95,7 +95,7 @@ func TextHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *types
 
 	var requestBody io.Reader
 
-	if passThroughGlobal || info.ChannelSetting.PassThroughBodyEnabled {
+	if passThroughGlobal || info.ChannelSetting.PassThroughBodyEnabled || shouldAutoPassThrough(info) {
 		storage, err := common.GetBodyStorage(c)
 		if err != nil {
 			return types.NewErrorWithStatusCode(err, types.ErrorCodeReadRequestBodyFailed, http.StatusBadRequest, types.ErrOptionWithSkipRetry())
@@ -214,4 +214,54 @@ func TextHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *types
 		service.PostTextConsumeQuota(c, info, usage.(*dto.Usage), nil)
 	}
 	return nil
+}
+
+// shouldAutoPassThrough 判断是否应该自动透传请求
+// 对于标准 OpenAI 兼容通道，如果没有特殊处理需求，则自动透传原始请求
+func shouldAutoPassThrough(info *relaycommon.RelayInfo) bool {
+	// 如果全局或渠道已启用透传
+	if model_setting.GetGlobalSettings().PassThroughRequestEnabled || info.ChannelSetting.PassThroughBodyEnabled {
+		return true
+	}
+
+	// 检查是否在自动透传通道类型列表中
+	if model_setting.IsAutoPassThroughChannelType(info.ChannelType) {
+		// 如果有系统提示配置，则需要处理请求，不透传
+		if info.ChannelSetting.SystemPrompt != "" {
+			return false
+		}
+		// 如果有参数覆盖配置，则需要处理请求，不透传
+		if len(info.ParamOverride) > 0 {
+			return false
+		}
+		// 如果有其他渠道设置需要处理，不透传
+		if info.ChannelSetting.SystemPromptOverride {
+			return false
+		}
+		return true
+	}
+
+	// 默认：只有标准 OpenAI 兼容通道才自动透传
+	// ChannelTypeOpenAI (1) 和 ChannelTypeAzure (3) 使用标准 OpenAI API 格式
+	if info.ChannelType != constant.ChannelTypeOpenAI && info.ChannelType != constant.ChannelTypeAzure {
+		return false
+	}
+
+	// 如果有系统提示配置，则需要处理请求，不透传
+	if info.ChannelSetting.SystemPrompt != "" {
+		return false
+	}
+
+	// 如果有参数覆盖配置，则需要处理请求，不透传
+	if len(info.ParamOverride) > 0 {
+		return false
+	}
+
+	// 如果有其他渠道设置需要处理，不透传
+	// 例如 SystemPromptOverride 等
+	if info.ChannelSetting.SystemPromptOverride {
+		return false
+	}
+
+	return true
 }
