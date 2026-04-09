@@ -4314,6 +4314,23 @@
     "默认折叠侧边栏": "Mặc định thu gọn thanh bên",
     "默认测试模型": "Mô hình kiểm tra mặc định",
     "默认用户消息": "Xin chào",
-    "默认补全倍率": "Tỷ lệ hoàn thành mặc định"
+    "默认补全倍率": "Tỷ lệ hoàn thành mặc định",
+    "下载 Teniu Link 节点[Agent GateWay+ChatBox] 客户端": "Tải Teniu Link Node [Agent GateWay+ChatBox] Client",
+    "使用便宜Token": "Dùng Token giá rẻ",
+    "共享入驻套餐": "Gói chia sẻ",
+    "共享您的闲置 GPU 算力或 LLM Token，按贡献获取收益，套餐随时升级。": "Chia sẻ GPU hoặc LLM Token nhàn rỗi, nhận thu nhập theo đóng góp, nâng cấp gói bất cứ lúc nào.",
+    "创建账户后，在控制台一键生成 API Key，支持多种鉴权方式。": "Sau khi đăng ký, tạo API Key chỉ với một cú nhấp trong bảng điều khiển. Hỗ trợ nhiều phương thức xác thực.",
+    "加载首页内容失败...": "Tải nội dung trang chủ thất bại...",
+    "如何使用大模型 Token": "Cách sử dụng Token LLM",
+    "将 API Base URL 替换为 Teniu.AI 地址，无需修改代码即可无缝切换，享受低价 Token。": "Thay thế API Base URL bằng địa chỉ Teniu.AI — chuyển đổi liền mạch không cần sửa code, tận hưởng token giá rẻ.",
+    "将闲置 LLM Token / GPU": "Biến LLM Token / GPU nhàn rỗi",
+    "接入文档": "Tài liệu tích hợp",
+    "替换 API 地址调用": "Thay thế endpoint API",
+    "查看模型价格": "Xem giá model",
+    "注册并获取 API Key": "Đăng ký và lấy API Key",
+    "浏览模型广场，选择 GPT-4o、Claude、Gemini 等主流模型，按需充值额度。": "Duyệt thị trường model, chọn GPT-4o, Claude, Gemini và hơn thế, nạp tiền theo nhu cầu.",
+    "立即共享赚钱": "Chia sẻ và kiếm tiền ngay",
+    "选择模型与充值": "Chọn model và nạp tiền",
+    "通过 Teniu.AI 以极低成本使用主流大模型 API，兼容 OpenAI 格式，即开即用。": "Sử dụng API LLM chi phí cực thấp qua Teniu.AI. Tương thích OpenAI, sẵn sàng sử dụng."
   }
 }
