@@ -292,7 +292,7 @@ const HomeV2 = () => {
             <div className='hv2-section-inner'>
               <div className='hv2-section-head hv2-reveal'>
                 <div className='hv2-section-tag'>Download</div>
-                <h2 className='hv2-section-title'>{t('下载 Teniu Link 节点客户端')}</h2>
+                <h2 className='hv2-section-title'>{t('下载 Teniu Link 节点[Agent GateWay+ChatBox] 客户端')}</h2>
                 <p className='hv2-section-desc'>{t('选择您的操作系统，一键安装即可加入 Teniu Cloud 网络。')}</p>
               </div>
               <div className='hv2-dl-grid hv2-reveal-stagger'>
