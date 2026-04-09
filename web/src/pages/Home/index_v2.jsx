@@ -151,7 +151,7 @@ const HomeV2 = () => {
                 <span className='hv2-hl'>{t('转化为')}</span>{t('稳定收益')}
               </h1>
               <p className='hv2-hero-desc'>
-                {t('Teniu Cloud 是一个去中心化 GPU 共享网络，让您将闲置算力变现。支持 Ollama 本地模型和 LLM Token 共享。')}
+                {t('Teniu.AI 是一个去中心化 GPU 共享网络，让您将闲置算力变现。支持 Ollama 本地模型和 LLM Token 共享。')}
               </p>
               <div className='hv2-hero-btns'>
                 <Link to='/register' className='hv2-btn hv2-btn-dark'>
@@ -184,7 +184,7 @@ const HomeV2 = () => {
             <div className='hv2-section-inner'>
               <div className='hv2-section-head hv2-reveal'>
                 <div className='hv2-section-tag'>Features</div>
-                <h2 className='hv2-section-title'>{t('为什么选择 Teniu Cloud？')}</h2>
+                <h2 className='hv2-section-title'>{t('为什么选择 Teniu.AI？')}</h2>
                 <p className='hv2-section-desc'>{t('最强大的去中心化 GPU 共享平台，帮助您轻松将闲置资源变现。')}</p>
               </div>
               <div className='hv2-features-grid hv2-reveal-stagger'>
@@ -228,7 +228,7 @@ const HomeV2 = () => {
               <div className='hv2-section-head hv2-reveal'>
                 <div className='hv2-section-tag'>LLM Token</div>
                 <h2 className='hv2-section-title'>{t('如何使用大模型 Token')}</h2>
-                <p className='hv2-section-desc'>{t('通过 Teniu Cloud 以极低成本使用主流大模型 API，兼容 OpenAI 格式，即开即用。')}</p>
+                <p className='hv2-section-desc'>{t('通过 Teniu.AI 以极低成本使用主流大模型 API，兼容 OpenAI 格式，即开即用。')}</p>
               </div>
               <div className='hv2-steps hv2-reveal-stagger'>
                 <div className='hv2-step'>
@@ -244,7 +244,7 @@ const HomeV2 = () => {
                 <div className='hv2-step'>
                   <div className='hv2-step-num'>03</div>
                   <h3>{t('替换 API 地址调用')}</h3>
-                  <p>{t('将 API Base URL 替换为 Teniu Cloud 地址，无需修改代码即可无缝切换，享受低价 Token。')}</p>
+                  <p>{t('将 API Base URL 替换为 Teniu.AI 地址，无需修改代码即可无缝切换，享受低价 Token。')}</p>
                 </div>
               </div>
               <div className='hv2-token-cta hv2-reveal'>
@@ -271,7 +271,7 @@ const HomeV2 = () => {
                 <div className='hv2-step'>
                   <div className='hv2-step-num'>01</div>
                   <h3>{t('注册账户')}</h3>
-                  <p>{t('创建您的 Teniu Cloud 账户并完成身份验证，开启您的赚取之旅。')}</p>
+                  <p>{t('创建您的 Teniu.AI 账户并完成身份验证，开启您的赚取之旅。')}</p>
                 </div>
                 <div className='hv2-step'>
                   <div className='hv2-step-num'>02</div>
@@ -293,7 +293,7 @@ const HomeV2 = () => {
               <div className='hv2-section-head hv2-reveal'>
                 <div className='hv2-section-tag'>Download</div>
                 <h2 className='hv2-section-title'>{t('下载 Teniu Link 节点[Agent GateWay+ChatBox] 客户端')}</h2>
-                <p className='hv2-section-desc'>{t('选择您的操作系统，一键安装即可加入 Teniu Cloud 网络。')}</p>
+                <p className='hv2-section-desc'>{t('选择您的操作系统，一键安装即可加入 Teniu.AI 网络。')}</p>
               </div>
               <div className='hv2-dl-grid hv2-reveal-stagger'>
                 <div className='hv2-dl-card'>
@@ -415,7 +415,7 @@ const HomeV2 = () => {
           <section className='hv2-cta'>
             <div className='hv2-cta-inner hv2-reveal hv2-reveal--scale'>
               <h2>{t('准备好开始赚取了吗？')}</h2>
-              <p>{t('加入数千名已通过 Teniu Cloud 赚取收益的用户，今天就开始您的旅程！')}</p>
+              <p>{t('加入数千名已通过 Teniu.AI 赚取收益的用户，今天就开始您的旅程！')}</p>
               <Link to='/register' className='hv2-btn hv2-btn-white'>
                 <span>{t('立即开始')}</span>
                 <span>&rarr;</span>
@@ -432,7 +432,7 @@ const HomeV2 = () => {
                 <Link to='/privacy'>{t('隐私政策')}</Link>
                 <Link to='/tos'>{t('服务条款')}</Link>
               </div>
-              <p className='hv2-footer-copy'>&copy; 2026 Teniu Cloud. All rights reserved.</p>
+              <p className='hv2-footer-copy'>&copy; 2026 Teniu.AI. All rights reserved.</p>
             </div>
           </footer>
         </div>
