@@ -527,6 +527,15 @@ html.dark .hv2-feature-icon {
   border-top: 2px dashed var(--hv2-border);
 }
 
+/* ---- Token section CTA ---- */
+.hv2-token-cta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 3rem;
+}
+
 /* ---- Download cards ---- */
 .hv2-dl-grid {
   display: grid;

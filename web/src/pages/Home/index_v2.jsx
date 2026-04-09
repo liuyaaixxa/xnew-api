@@ -155,11 +155,11 @@ const HomeV2 = () => {
               </p>
               <div className='hv2-hero-btns'>
                 <Link to='/register' className='hv2-btn hv2-btn-dark'>
-                  <span>{t('立即开始赚取')}</span>
+                  <span>{t('立即共享赚钱')}</span>
                   <span>&rarr;</span>
                 </Link>
-                <Link to='/docs' className='hv2-btn hv2-btn-outline'>
-                  {t('查看文档')}
+                <Link to='/pricing' className='hv2-btn hv2-btn-outline'>
+                  {t('使用便宜Token')}
                 </Link>
               </div>
               <div className='hv2-stats'>
@@ -218,6 +218,43 @@ const HomeV2 = () => {
                   <h3>{t('智能调度')}</h3>
                   <p>{t('智能任务调度系统，自动匹配最优节点，最大化效率和收益。')}</p>
                 </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ── How to Use LLM Token ── */}
+          <section className='hv2-section hv2-section--white' id='use-token'>
+            <div className='hv2-section-inner'>
+              <div className='hv2-section-head hv2-reveal'>
+                <div className='hv2-section-tag'>LLM Token</div>
+                <h2 className='hv2-section-title'>{t('如何使用大模型 Token')}</h2>
+                <p className='hv2-section-desc'>{t('通过 Teniu Cloud 以极低成本使用主流大模型 API，兼容 OpenAI 格式，即开即用。')}</p>
+              </div>
+              <div className='hv2-steps hv2-reveal-stagger'>
+                <div className='hv2-step'>
+                  <div className='hv2-step-num'>01</div>
+                  <h3>{t('注册并获取 API Key')}</h3>
+                  <p>{t('创建账户后，在控制台一键生成 API Key，支持多种鉴权方式。')}</p>
+                </div>
+                <div className='hv2-step'>
+                  <div className='hv2-step-num'>02</div>
+                  <h3>{t('选择模型与充值')}</h3>
+                  <p>{t('浏览模型广场，选择 GPT-4o、Claude、Gemini 等主流模型，按需充值额度。')}</p>
+                </div>
+                <div className='hv2-step'>
+                  <div className='hv2-step-num'>03</div>
+                  <h3>{t('替换 API 地址调用')}</h3>
+                  <p>{t('将 API Base URL 替换为 Teniu Cloud 地址，无需修改代码即可无缝切换，享受低价 Token。')}</p>
+                </div>
+              </div>
+              <div className='hv2-token-cta hv2-reveal'>
+                <Link to='/pricing' className='hv2-btn hv2-btn-dark'>
+                  <span>{t('查看模型价格')}</span>
+                  <span>&rarr;</span>
+                </Link>
+                <Link to='/docs' className='hv2-btn hv2-btn-outline'>
+                  {t('接入文档')}
+                </Link>
               </div>
             </div>
           </section>
