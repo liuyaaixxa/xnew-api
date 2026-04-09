@@ -98,7 +98,7 @@ const Home = () => {
           {/* Header */}
           <header className='lp-header'>
             <div className='lp-header-content'>
-              <div className='lp-logo'>Teniu Cloud</div>
+              <div className='lp-logo'>Teniu.AI</div>
               <nav className='lp-nav'>
                 <a href='#features'>{t('功能特性')}</a>
                 <a href='#how-it-works'>{t('使用流程')}</a>
@@ -123,7 +123,7 @@ const Home = () => {
                 {t('稳定收益')}
               </h1>
               <p className='lp-hero-desc'>
-                {t('Teniu Cloud 是一个去中心化 GPU 共享网络，让您将闲置算力变现。支持 Ollama 本地模型和 LLM Token 共享。')}
+                {t('Teniu.AI 是一个去中心化 GPU 共享网络，让您将闲置算力变现。支持 Ollama 本地模型和 LLM Token 共享。')}
               </p>
               <div className='lp-hero-stats'>
                 <div>
@@ -155,7 +155,7 @@ const Home = () => {
           <section className='lp-features' id='features'>
             <div className='lp-section-header'>
               <div className='lp-section-tag'>Features</div>
-              <h2 className='lp-section-title'>{t('为什么选择 Teniu Cloud？')}</h2>
+              <h2 className='lp-section-title'>{t('为什么选择 Teniu.AI？')}</h2>
               <p className='lp-section-desc'>{t('最强大的去中心化 GPU 共享平台，帮助您轻松将闲置资源变现。')}</p>
             </div>
             <div className='lp-features-grid'>
@@ -204,7 +204,7 @@ const Home = () => {
                 <div className='lp-step-number'>01</div>
                 <div className='lp-step-content'>
                   <h3>{t('注册账户')}</h3>
-                  <p>{t('创建您的 Teniu Cloud 账户并完成身份验证，开启您的赚取之旅。')}</p>
+                  <p>{t('创建您的 Teniu.AI 账户并完成身份验证，开启您的赚取之旅。')}</p>
                 </div>
               </div>
               <div className='lp-step'>
@@ -229,7 +229,7 @@ const Home = () => {
             <div className='lp-section-header'>
               <div className='lp-section-tag'>Download</div>
               <h2 className='lp-section-title'>{t('下载 Teniu Link 节点客户端')}</h2>
-              <p className='lp-section-desc'>{t('选择您的操作系统，一键安装即可加入 Teniu Cloud 网络。')}</p>
+              <p className='lp-section-desc'>{t('选择您的操作系统，一键安装即可加入 Teniu.AI 网络。')}</p>
             </div>
             <div className='lp-download-grid'>
               <div className='lp-download-card'>
@@ -348,7 +348,7 @@ const Home = () => {
           <section className='lp-cta'>
             <div className='lp-cta-box'>
               <h2>{t('准备好开始赚取了吗？')}</h2>
-              <p>{t('加入数千名已通过 Teniu Cloud 赚取收益的用户，今天就开始您的旅程！')}</p>
+              <p>{t('加入数千名已通过 Teniu.AI 赚取收益的用户，今天就开始您的旅程！')}</p>
               <Link to='/register' className='lp-btn lp-btn-primary'>
                 <span>{t('立即开始')}</span>
                 <span>&rarr;</span>
@@ -365,7 +365,7 @@ const Home = () => {
                 <Link to='/privacy'>{t('隐私政策')}</Link>
                 <Link to='/tos'>{t('服务条款')}</Link>
               </div>
-              <p className='lp-footer-copy'>&copy; 2026 Teniu Cloud. All rights reserved.</p>
+              <p className='lp-footer-copy'>&copy; 2026 Teniu.AI. All rights reserved.</p>
             </div>
           </footer>
         </div>

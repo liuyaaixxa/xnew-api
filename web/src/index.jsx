@@ -37,7 +37,7 @@ import en_GB from '@douyinfe/semi-ui/lib/es/locale/source/en_GB';
 // Welcome message (Do not remove this without permission from the original developer)
 if (typeof window !== 'undefined') {
   console.log(
-    '%cWE ❤ TENIU CLOUD%c Powered by Teniu Cloud',
+    '%cWE ❤ TENIU CLOUD%c Powered by Teniu.AI',
     'color: #00ff88; font-weight: bold; font-size: 24px;',
     'color: inherit; font-size: 14px;',
   );

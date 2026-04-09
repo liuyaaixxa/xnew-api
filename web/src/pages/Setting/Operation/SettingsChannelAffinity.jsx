@@ -1138,7 +1138,7 @@ export default function SettingsChannelAffinity(props) {
                         )}
                         <br />
                         {t(
-                          'Teniu Cloud 默认不会将入口请求的 User-Agent 透传到上游渠道；该条件仅用于识别访问本站点的客户端。',
+                          'Teniu.AI 默认不会将入口请求的 User-Agent 透传到上游渠道；该条件仅用于识别访问本站点的客户端。',
                         )}
                         <br />
                         {t(

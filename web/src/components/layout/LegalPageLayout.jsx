@@ -10,7 +10,7 @@ const LegalPageLayout = ({ title, subtitle, children }) => {
     <div className='lp-legal-page'>
       <nav className='lp-legal-nav'>
         <Link to='/' className='lp-legal-nav-brand'>
-          Teniu Cloud
+          Teniu.AI
         </Link>
         <Link to='/' className='lp-legal-nav-back'>
           <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>

@@ -10,7 +10,7 @@ const AuthSlogan = () => {
         <span className='auth-slogan-accent'>稳定收益</span>
       </h1>
       <p className='auth-slogan-desc'>
-        Teniu Cloud 是一个去中心化 GPU 共享网络，让您将闲置算力变现。支持 Ollama 本地模型和 LLM Token 共享。
+        Teniu.AI 是一个去中心化 GPU 共享网络，让您将闲置算力变现。支持 Ollama 本地模型和 LLM Token 共享。
       </p>
       <div className='auth-slogan-tags'>
         <span className='auth-slogan-tag'>GPU 共享</span>

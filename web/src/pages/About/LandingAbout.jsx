@@ -8,12 +8,12 @@ const LandingAbout = () => {
   return (
     <LegalPageLayout
       title={t('关于我们')}
-      subtitle={t('Teniu Cloud — 让每一份算力都有价值')}
+      subtitle={t('Teniu.AI — 让每一份算力都有价值')}
     >
       <div className='lp-legal-section'>
         <h2>{t('我们的使命')}</h2>
         <p>
-          {t('Teniu Cloud 致力于构建去中心化的智能算力共享网络，让全球用户能够轻松共享和使用闲置的计算资源。我们相信，通过连接世界各地的算力节点，可以大幅降低 AI 推理和计算的成本，让先进的人工智能技术惠及每一个人。')}
+          {t('Teniu.AI 致力于构建去中心化的智能算力共享网络，让全球用户能够轻松共享和使用闲置的计算资源。我们相信，通过连接世界各地的算力节点，可以大幅降低 AI 推理和计算的成本，让先进的人工智能技术惠及每一个人。')}
         </p>
       </div>
 

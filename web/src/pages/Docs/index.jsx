@@ -18,7 +18,7 @@ const Docs = () => {
       <div className='lp-legal-section'>
         <h2>{t('快速开始')}</h2>
         <p>
-          {t('只需 3 步，即可开始通过 Teniu Cloud 共享算力并赚取收益。')}
+          {t('只需 3 步，即可开始通过 Teniu.AI 共享算力并赚取收益。')}
         </p>
         <div className='lp-legal-card-grid'>
           <div className='lp-legal-card'>
@@ -31,7 +31,7 @@ const Docs = () => {
               <Link to='/register' style={{ color: '#00ff88' }}>
                 {t('注册页面')}
               </Link>{' '}
-              {t('创建您的 Teniu Cloud 账户。')}
+              {t('创建您的 Teniu.AI 账户。')}
             </p>
           </div>
           <div className='lp-legal-card'>
@@ -53,7 +53,7 @@ const Docs = () => {
             </div>
             <h3>{t('共享赚取')}</h3>
             <p>
-              {t('登录客户端，配置服务，连接到 Teniu Cloud 网络开始赚取。')}
+              {t('登录客户端，配置服务，连接到 Teniu.AI 网络开始赚取。')}
             </p>
           </div>
         </div>
@@ -203,7 +203,7 @@ const Docs = () => {
       <div className='lp-legal-section'>
         <h2>{t('连接设备并共享服务')}</h2>
         <p>
-          {t('安装完成后，按照以下步骤将您的设备连接到 Teniu Cloud 网络：')}
+          {t('安装完成后，按照以下步骤将您的设备连接到 Teniu.AI 网络：')}
         </p>
         <ul>
           <li>
@@ -216,7 +216,7 @@ const Docs = () => {
           </li>
           <li>
             <strong>{t('连接网络')}</strong> —{' '}
-            {t('点击"连接"按钮，您的设备将加入 Teniu Cloud 网络，开始接受和处理 AI 推理任务。')}
+            {t('点击"连接"按钮，您的设备将加入 Teniu.AI 网络，开始接受和处理 AI 推理任务。')}
           </li>
         </ul>
       </div>
@@ -252,7 +252,7 @@ const Docs = () => {
 
         <h3>{t('支持哪些 AI 模型？')}</h3>
         <p>
-          {t('Teniu Cloud 支持所有 Ollama 兼容的模型，包括 Llama、Mistral、Gemma、Qwen 等主流开源模型。您可以通过 ollama pull 命令下载所需模型。')}
+          {t('Teniu.AI 支持所有 Ollama 兼容的模型，包括 Llama、Mistral、Gemma、Qwen 等主流开源模型。您可以通过 ollama pull 命令下载所需模型。')}
         </p>
 
         <h3>{t('收益如何结算？')}</h3>
