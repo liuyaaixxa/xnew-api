@@ -355,7 +355,7 @@ const HomeV2 = () => {
             <div className='hv2-section-inner'>
               <div className='hv2-section-head hv2-reveal'>
                 <div className='hv2-section-tag'>Pricing</div>
-                <h2 className='hv2-section-title'>{t('灵活的价格方案')}</h2>
+                <h2 className='hv2-section-title'>{t('共享入驻套餐')}</h2>
                 <p className='hv2-section-desc'>{t('选择最适合您的方案，随时升级。')}</p>
               </div>
               <div className='hv2-pricing-grid hv2-reveal-stagger'>
