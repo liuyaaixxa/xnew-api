@@ -356,7 +356,7 @@ const HomeV2 = () => {
               <div className='hv2-section-head hv2-reveal'>
                 <div className='hv2-section-tag'>Pricing</div>
                 <h2 className='hv2-section-title'>{t('共享入驻套餐')}</h2>
-                <p className='hv2-section-desc'>{t('选择最适合您的方案，随时升级。')}</p>
+                <p className='hv2-section-desc'>{t('共享您的闲置 GPU 算力或 LLM Token，按贡献获取收益，套餐随时升级。')}</p>
               </div>
               <div className='hv2-pricing-grid hv2-reveal-stagger'>
                 <div className='hv2-price-card'>
