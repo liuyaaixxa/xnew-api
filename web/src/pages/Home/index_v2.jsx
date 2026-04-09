@@ -125,7 +125,7 @@ const HomeV2 = () => {
           {/* ── Header ── */}
           <header className='hv2-header'>
             <div className='hv2-header-inner'>
-              <span className='hv2-logo'>Teniu Cloud</span>
+              <span className='hv2-logo'>Teniu.AI</span>
               <nav className='hv2-nav'>
                 <a href='#features' className='hv2-nav-link'>{t('功能特性')}</a>
                 <a href='#how-it-works' className='hv2-nav-link'>{t('使用流程')}</a>
