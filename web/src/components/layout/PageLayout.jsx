@@ -187,6 +187,7 @@ const PageLayout = () => {
               border: 'none',
               paddingRight: '0',
               width: 'var(--sidebar-current-width)',
+              background: 'var(--semi-color-bg-1)',
             }}
           >
             <SiderBar
