@@ -895,8 +895,14 @@ html.dark .hv2-dl-icon {
 
 /* ==================== Scroll Reveal Animations ==================== */
 
-/* Base: hidden state */
-.hv2-reveal {
+/*
+ * Strategy: CSS defaults to VISIBLE. JS adds .hv2-reveal-ready to the
+ * container ONLY after IntersectionObserver is set up, which then hides
+ * un-observed elements. If JS fails, content stays visible.
+ */
+
+/* Hidden state — only when parent has .hv2-reveal-ready */
+.hv2-reveal-ready .hv2-reveal {
   opacity: 0;
   transform: translateY(40px);
   transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
@@ -904,59 +910,59 @@ html.dark .hv2-dl-icon {
 }
 
 /* Visible state */
-.hv2-reveal.hv2-visible {
+.hv2-reveal-ready .hv2-reveal.hv2-visible {
   opacity: 1;
   transform: translateY(0);
 }
 
 /* Variant: slide from left */
-.hv2-reveal--left {
+.hv2-reveal-ready .hv2-reveal--left {
   transform: translateX(-50px);
 }
-.hv2-reveal--left.hv2-visible {
+.hv2-reveal-ready .hv2-reveal--left.hv2-visible {
   transform: translateX(0);
 }
 
 /* Variant: slide from right */
-.hv2-reveal--right {
+.hv2-reveal-ready .hv2-reveal--right {
   transform: translateX(50px);
 }
-.hv2-reveal--right.hv2-visible {
+.hv2-reveal-ready .hv2-reveal--right.hv2-visible {
   transform: translateX(0);
 }
 
 /* Variant: scale up */
-.hv2-reveal--scale {
+.hv2-reveal-ready .hv2-reveal--scale {
   transform: scale(0.92);
 }
-.hv2-reveal--scale.hv2-visible {
+.hv2-reveal-ready .hv2-reveal--scale.hv2-visible {
   transform: scale(1);
 }
 
 /* Staggered children — feature cards, steps, pricing cards, download cards */
-.hv2-reveal-stagger > * {
+.hv2-reveal-ready .hv2-reveal-stagger > * {
   opacity: 0;
   transform: translateY(30px);
   transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.hv2-reveal-stagger.hv2-visible > * {
+.hv2-reveal-ready .hv2-reveal-stagger.hv2-visible > * {
   opacity: 1;
   transform: translateY(0);
 }
 
-.hv2-reveal-stagger.hv2-visible > *:nth-child(1) { transition-delay: 0s; }
-.hv2-reveal-stagger.hv2-visible > *:nth-child(2) { transition-delay: 0.08s; }
-.hv2-reveal-stagger.hv2-visible > *:nth-child(3) { transition-delay: 0.16s; }
-.hv2-reveal-stagger.hv2-visible > *:nth-child(4) { transition-delay: 0.24s; }
-.hv2-reveal-stagger.hv2-visible > *:nth-child(5) { transition-delay: 0.32s; }
-.hv2-reveal-stagger.hv2-visible > *:nth-child(6) { transition-delay: 0.40s; }
+.hv2-reveal-ready .hv2-reveal-stagger.hv2-visible > *:nth-child(1) { transition-delay: 0s; }
+.hv2-reveal-ready .hv2-reveal-stagger.hv2-visible > *:nth-child(2) { transition-delay: 0.08s; }
+.hv2-reveal-ready .hv2-reveal-stagger.hv2-visible > *:nth-child(3) { transition-delay: 0.16s; }
+.hv2-reveal-ready .hv2-reveal-stagger.hv2-visible > *:nth-child(4) { transition-delay: 0.24s; }
+.hv2-reveal-ready .hv2-reveal-stagger.hv2-visible > *:nth-child(5) { transition-delay: 0.32s; }
+.hv2-reveal-ready .hv2-reveal-stagger.hv2-visible > *:nth-child(6) { transition-delay: 0.40s; }
 
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .hv2-reveal,
-  .hv2-reveal-stagger > * {
+  .hv2-reveal-ready .hv2-reveal,
+  .hv2-reveal-ready .hv2-reveal-stagger > * {
     opacity: 1;
     transform: none;
     transition: none;

@@ -88,11 +88,14 @@ const HomeV2 = () => {
   }, []);
 
   // Scroll-reveal: observe .hv2-reveal elements
+  // Strategy: content is VISIBLE by default. We add .hv2-reveal-ready to the
+  // container only AFTER IntersectionObserver is set up, so if JS fails or
+  // the observer doesn't fire, content remains visible.
   useEffect(() => {
-    // Small delay to ensure DOM is fully painted after React render
     const timer = setTimeout(() => {
+      const container = document.querySelector('.hv2-reveal-container');
       const els = document.querySelectorAll('.hv2-reveal, .hv2-reveal-stagger');
-      if (!els.length) return;
+      if (!els.length || !container) return;
       const io = new IntersectionObserver(
         (entries) => {
           entries.forEach((e) => {
@@ -105,6 +108,8 @@ const HomeV2 = () => {
         { threshold: 0, rootMargin: '0px 0px -20px 0px' }
       );
       els.forEach((el) => io.observe(el));
+      // Only now enable the hidden-by-default CSS
+      container.classList.add('hv2-reveal-ready');
       return () => io.disconnect();
     }, 100);
     return () => clearTimeout(timer);
@@ -114,7 +119,7 @@ const HomeV2 = () => {
   // content from the backend API — same pattern as the original index.jsx.
 
   return (
-    <div className='w-full overflow-x-hidden'>
+    <div className='w-full overflow-x-hidden hv2-reveal-container'>
       <NoticeModal
         visible={noticeVisible}
         onClose={() => setNoticeVisible(false)}
