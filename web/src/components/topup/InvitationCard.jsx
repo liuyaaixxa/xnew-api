@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Avatar,
   Typography,
@@ -27,7 +28,7 @@ import {
   Badge,
   Space,
 } from '@douyinfe/semi-ui';
-import { Copy, Users, BarChart2, TrendingUp, Gift, Zap } from 'lucide-react';
+import { Copy, Users, BarChart2, UserPlus, Coins, Zap, Cpu, Rocket } from 'lucide-react';
 
 const { Text } = Typography;
 
@@ -39,19 +40,37 @@ const InvitationCard = ({
   affLink,
   handleAffLinkClick,
 }) => {
+  const navigate = useNavigate();
+
+  const handleGoEarn = () => {
+    navigate('/console/user-channel');
+  };
   return (
     <Card className='!rounded-2xl shadow-sm border-0'>
       {/* 卡片头部 */}
-      <div className='flex items-center mb-4'>
-        <Avatar size='small' color='green' className='mr-3 shadow-md'>
-          <Gift size={16} />
-        </Avatar>
-        <div>
-          <Typography.Text className='text-lg font-medium'>
-            {t('邀请奖励')}
-          </Typography.Text>
-          <div className='text-xs'>{t('邀请好友获得额外奖励')}</div>
+      <div className='flex items-center justify-between mb-4'>
+        <div className='flex items-center'>
+          <Avatar size='small' color='amber' className='mr-3 shadow-md'>
+            <Coins size={16} />
+          </Avatar>
+          <div>
+            <Typography.Text className='text-lg font-medium'>
+              {t('赚取收益')}
+            </Typography.Text>
+            <div className='text-xs'>{t('共享GPU/TOKEN获得收益')}</div>
+          </div>
         </div>
+        {/* 去赚钱按钮 */}
+        <Button
+          type='primary'
+          theme='solid'
+          size='small'
+          icon={<Rocket size={14} />}
+          onClick={handleGoEarn}
+          className='!rounded-lg'
+        >
+          {t('去赚钱')}
+        </Button>
       </div>
 
       {/* 收益展示区域 */}
@@ -94,31 +113,6 @@ const InvitationCard = ({
 
                 {/* 统计数据 */}
                 <div className='grid grid-cols-3 gap-6 mt-4'>
-                  {/* 待使用收益 */}
-                  <div className='text-center'>
-                    <div
-                      className='text-base sm:text-2xl font-bold mb-2'
-                      style={{ color: 'white' }}
-                    >
-                      {renderQuota(userState?.user?.aff_quota || 0)}
-                    </div>
-                    <div className='flex items-center justify-center text-sm'>
-                      <TrendingUp
-                        size={14}
-                        className='mr-1'
-                        style={{ color: 'rgba(255,255,255,0.8)' }}
-                      />
-                      <Text
-                        style={{
-                          color: 'rgba(255,255,255,0.8)',
-                          fontSize: '12px',
-                        }}
-                      >
-                        {t('待使用收益')}
-                      </Text>
-                    </div>
-                  </div>
-
                   {/* 总收益 */}
                   <div className='text-center'>
                     <div
@@ -144,16 +138,16 @@ const InvitationCard = ({
                     </div>
                   </div>
 
-                  {/* 邀请人数 */}
+                  {/* 邀请收益 */}
                   <div className='text-center'>
                     <div
                       className='text-base sm:text-2xl font-bold mb-2'
                       style={{ color: 'white' }}
                     >
-                      {userState?.user?.aff_count || 0}
+                      {renderQuota(userState?.user?.aff_quota || 0)}
                     </div>
                     <div className='flex items-center justify-center text-sm'>
-                      <Users
+                      <UserPlus
                         size={14}
                         className='mr-1'
                         style={{ color: 'rgba(255,255,255,0.8)' }}
@@ -164,7 +158,32 @@ const InvitationCard = ({
                           fontSize: '12px',
                         }}
                       >
-                        {t('邀请人数')}
+                        {t('邀请收益')}
+                      </Text>
+                    </div>
+                  </div>
+
+                  {/* GPU收益 */}
+                  <div className='text-center'>
+                    <div
+                      className='text-base sm:text-2xl font-bold mb-2'
+                      style={{ color: 'white' }}
+                    >
+                      {renderQuota(userState?.user?.gpu_quota || 0)}
+                    </div>
+                    <div className='flex items-center justify-center text-sm'>
+                      <Cpu
+                        size={14}
+                        className='mr-1'
+                        style={{ color: 'rgba(255,255,255,0.8)' }}
+                      />
+                      <Text
+                        style={{
+                          color: 'rgba(255,255,255,0.8)',
+                          fontSize: '12px',
+                        }}
+                      >
+                        {t('GPU收益')}
                       </Text>
                     </div>
                   </div>
@@ -174,23 +193,36 @@ const InvitationCard = ({
           }
         >
           {/* 邀请链接部分 */}
-          <Input
-            value={affLink}
-            readonly
-            className='!rounded-lg'
-            prefix={t('邀请链接')}
-            suffix={
-              <Button
-                type='primary'
-                theme='solid'
-                onClick={handleAffLinkClick}
-                icon={<Copy size={14} />}
+          <div className='flex items-center justify-between gap-4'>
+            <div className='flex-1'>
+              <Input
+                value={affLink}
+                readonly
                 className='!rounded-lg'
-              >
-                {t('复制')}
-              </Button>
-            }
-          />
+                prefix={t('邀请链接')}
+                suffix={
+                  <Button
+                    type='primary'
+                    theme='solid'
+                    onClick={handleAffLinkClick}
+                    icon={<Copy size={14} />}
+                    className='!rounded-lg'
+                  >
+                    {t('复制')}
+                  </Button>
+                }
+              />
+            </div>
+            {/* 已邀请人数 */}
+            <div className='flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100'>
+              <Users size={14} className='text-green-500' />
+              <Text className='text-xs text-green-600'>{t('已邀请')}</Text>
+              <Text className='text-xs font-medium text-green-700'>
+                {userState?.user?.aff_count || 0}
+              </Text>
+              <Text className='text-xs text-green-600'>{t('人')}</Text>
+            </div>
+          </div>
         </Card>
 
         {/* 奖励说明 */}
