@@ -49,6 +49,7 @@ const routerMap = {
   deployment: '/console/deployment',
   playground: '/console/playground',
   personal: '/console/personal',
+  wallet: '/console/wallet',
   'user-channel': '/console/user-channel',
   'user-channel-review': '/console/user-channel-review',
 };
@@ -135,6 +136,11 @@ const SiderBar = ({ onNavigate = () => {} }) => {
         text: t('钱包管理'),
         itemKey: 'topup',
         to: '/topup',
+      },
+      {
+        text: t('加密钱包'),
+        itemKey: 'wallet',
+        to: '/wallet',
       },
       {
         text: t('个人设置'),
