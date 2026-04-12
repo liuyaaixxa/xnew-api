@@ -66,7 +66,7 @@ export default function WalletPage() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
+      <div className='mt-[60px]' style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
         <Spin size='large' />
       </div>
     );
@@ -74,7 +74,7 @@ export default function WalletPage() {
 
   if (!wallet?.enabled) {
     return (
-      <div style={{ padding: '24px' }}>
+      <div className='mt-[60px]' style={{ padding: '24px' }}>
         <Banner
           type='info'
           description={t('管理员尚未配置加密钱包功能')}
@@ -84,7 +84,7 @@ export default function WalletPage() {
   }
 
   return (
-    <div style={{ padding: '24px', maxWidth: 640 }}>
+    <div className='mt-[60px]' style={{ padding: '24px', maxWidth: 640 }}>
       <Title heading={4} style={{ marginBottom: 24 }}>
         <Wallet size={22} style={{ marginRight: 8, verticalAlign: 'middle' }} />
         {t('加密钱包')}
