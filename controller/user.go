@@ -219,6 +219,9 @@ func Register(c *gin.Context) {
 		}
 	}
 
+	// Async: create Openfort wallet for new user
+	go service.CreateOpenfortWallet(insertedUser.Id)
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
