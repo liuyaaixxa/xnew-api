@@ -282,6 +282,9 @@ func migrateDB() error {
 		&UserOAuthBinding{},
 		&DeviceToken{},
 		&UserChannel{},
+		&WithdrawalDetail{},
+		&WithdrawalRecord{},
+		&WithdrawalPaymentRecord{},
 	)
 	if err != nil {
 		return err

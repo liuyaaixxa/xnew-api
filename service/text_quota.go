@@ -427,4 +427,26 @@ func PostTextConsumeQuota(ctx *gin.Context, relayInfo *relaycommon.RelayInfo, us
 		Group:            relayInfo.UsingGroup,
 		Other:            other,
 	})
+
+	// 创建提现明细（如果是个人渠道）
+	if relayInfo.ChannelMeta != nil && relayInfo.ChannelMeta.ChannelId > 0 {
+		channel, err := model.GetChannelById(relayInfo.ChannelMeta.ChannelId, true)
+		if err == nil && channel.UserChannelId > 0 {
+			// 这是个人渠道，创建提现明细
+			userChannel, _ := model.GetUserChannelById(channel.UserChannelId)
+			if userChannel != nil && userChannel.UserId > 0 {
+				detail := &model.WithdrawalDetail{
+					UserId:        userChannel.UserId,
+					ChannelId:     channel.Id,
+					UserChannelId: channel.UserChannelId,
+					ModelName:     logModel,
+					GroupName:     relayInfo.UsingGroup,
+					Quota:         int64(summary.Quota),
+					IsValid:       1,
+					IsWithdrawn:   model.WithdrawalDetailNotWithdrawn,
+				}
+				model.CreateWithdrawalDetail(detail)
+			}
+		}
+	}
 }

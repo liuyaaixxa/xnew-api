@@ -36,6 +36,7 @@ import { StatusContext } from '../../context/Status';
 
 import RechargeCard from './RechargeCard';
 import InvitationCard from './InvitationCard';
+import WithdrawalCard from './WithdrawalCard';
 import TransferModal from './modals/TransferModal';
 import PaymentConfirmModal from './modals/PaymentConfirmModal';
 import TopupHistoryModal from './modals/TopupHistoryModal';
@@ -834,6 +835,11 @@ const TopUp = () => {
           setOpenTransfer={setOpenTransfer}
           affLink={affLink}
           handleAffLinkClick={handleAffLinkClick}
+        />
+        <WithdrawalCard
+          t={t}
+          userState={userState}
+          renderQuota={renderQuota}
         />
       </div>
     </div>
