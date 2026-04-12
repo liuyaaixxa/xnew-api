@@ -30,6 +30,9 @@ data/
 .gocache-temp
 .gopath
 
+# Git worktrees
+.worktrees/
+
 # Playwright MCP local config
 .playwright-mcp/
 
