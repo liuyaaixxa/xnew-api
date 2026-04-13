@@ -106,6 +106,8 @@ func InitOptionMap() {
 	common.OptionMap["WaffoMinTopUp"] = strconv.Itoa(setting.WaffoMinTopUp)
 	common.OptionMap["WaffoPayMethods"] = setting.WaffoPayMethods2JsonString()
 	common.OptionMap["OpenfortApiKey"] = setting.OpenfortApiKey
+	common.OptionMap["OpenfortPublishableKey"] = setting.OpenfortPublishableKey
+	common.OptionMap["OpenfortWalletSecret"] = setting.OpenfortWalletSecret
 	common.OptionMap["OpenfortShieldPublishableKey"] = setting.OpenfortShieldPublishableKey
 	common.OptionMap["OpenfortShieldSecretKey"] = setting.OpenfortShieldSecretKey
 	common.OptionMap["OpenfortEncryptionShare"] = setting.OpenfortEncryptionShare
@@ -410,6 +412,10 @@ func updateOptionMap(key string, value string) (err error) {
 		setting.WaffoMinTopUp, _ = strconv.Atoi(value)
 	case "OpenfortApiKey":
 		setting.OpenfortApiKey = value
+	case "OpenfortPublishableKey":
+		setting.OpenfortPublishableKey = value
+	case "OpenfortWalletSecret":
+		setting.OpenfortWalletSecret = value
 	case "OpenfortShieldPublishableKey":
 		setting.OpenfortShieldPublishableKey = value
 	case "OpenfortShieldSecretKey":
