@@ -139,7 +139,7 @@ const SiderBar = ({ onNavigate = () => {} }) => {
         to: '/topup',
       },
       {
-        text: t('加密钱包'),
+        text: t('积分钱包'),
         itemKey: 'wallet',
         to: '/wallet',
       },

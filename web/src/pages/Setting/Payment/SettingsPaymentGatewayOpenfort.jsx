@@ -110,7 +110,7 @@ export default function SettingsPaymentGatewayOpenfort(props) {
         onValueChange={handleFormChange}
         getFormApi={(api) => (formApiRef.current = api)}
       >
-        <Form.Section text={t('Openfort 加密钱包设置')}>
+        <Form.Section text={t('Openfort 积分钱包设置')}>
           <Banner
             type='info'
             description={t('配置 Openfort 后，用户注册时将自动创建 Solana 钱包。请前往 Openfort 控制台获取以下密钥。')}

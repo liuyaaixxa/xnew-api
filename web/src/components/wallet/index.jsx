@@ -100,7 +100,7 @@ export default function WalletPage() {
       <div className='mt-[60px]' style={{ padding: '24px' }}>
         <Banner
           type='info'
-          description={t('管理员尚未配置加密钱包功能')}
+          description={t('管理员尚未配置积分钱包功能')}
         />
       </div>
     );
@@ -110,7 +110,7 @@ export default function WalletPage() {
     <div className='mt-[60px]' style={{ padding: '24px', maxWidth: 640 }}>
       <Title heading={4} style={{ marginBottom: 24 }}>
         <Wallet size={22} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-        {t('加密钱包')}
+        {t('积分钱包')}
       </Title>
 
       <Card style={{ marginBottom: 16 }}>
@@ -172,7 +172,7 @@ export default function WalletPage() {
         ) : (
           <div style={{ textAlign: 'center', padding: '24px 0' }}>
             <Text type='tertiary' style={{ display: 'block', marginBottom: 16 }}>
-              {t('您还没有创建加密钱包，点击下方按钮创建')}
+              {t('您还没有创建积分钱包，点击下方按钮创建')}
             </Text>
             <Button
               theme='solid'
@@ -256,7 +256,7 @@ export default function WalletPage() {
 
       <Banner
         type='info'
-        description={t('加密钱包用于未来接收节点收益（Solana USDC）。钱包地址是您在区块链上的唯一标识。')}
+        description={t('积分钱包用于接收平台积分奖励。钱包地址是您在平台上的唯一标识。')}
         style={{ marginTop: 16 }}
       />
     </div>
