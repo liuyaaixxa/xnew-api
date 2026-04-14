@@ -1,7 +1,6 @@
 package service
 
 import (
-	"bytes"
 	"crypto/ecdsa"
 	"crypto/rand"
 	"crypto/sha256"
@@ -12,6 +11,8 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
+	"os/exec"
 	"regexp"
 	"strings"
 	"time"
@@ -251,14 +252,9 @@ func randomHex(n int) (string, error) {
 	return hex.EncodeToString(b), nil
 }
 
-// TransferSOLFromTreasury transfers SOL from the treasury wallet to the given address.
+// TransferSOLFromTreasury transfers SOL from the treasury wallet to the given address
+// using the Openfort CLI.
 func TransferSOLFromTreasury(toAddress string, amountSOL float64) error {
-	if setting.OpenfortApiKey == "" {
-		return fmt.Errorf("OpenfortApiKey not configured")
-	}
-	if setting.OpenfortWalletSecret == "" {
-		return fmt.Errorf("OpenfortWalletSecret not configured")
-	}
 	if setting.OpenfortTreasuryAccountId == "" {
 		return fmt.Errorf("OpenfortTreasuryAccountId not configured")
 	}
@@ -274,45 +270,26 @@ func TransferSOLFromTreasury(toAddress string, amountSOL float64) error {
 		cluster = "devnet"
 	}
 
-	// Build request body
-	reqPayload := map[string]string{
-		"to":      toAddress,
-		"amount":  fmt.Sprintf("%d", lamports),
-		"token":   "sol",
-		"cluster": cluster,
+	args := []string{
+		"accounts", "solana", "transfer",
+		setting.OpenfortTreasuryAccountId,
+		"--to", toAddress,
+		"--amount", fmt.Sprintf("%d", lamports),
+		"--cluster", cluster,
+		"--format", "json",
 	}
-	reqBody, err := common.Marshal(reqPayload)
+
+	cmd := exec.Command("openfort", args...)
+	cmd.Env = append(os.Environ(),
+		"OPENFORT_API_KEY="+setting.OpenfortApiKey,
+		"OPENFORT_WALLET_SECRET="+setting.OpenfortWalletSecret,
+		"OPENFORT_PUBLISHABLE_KEY="+setting.OpenfortPublishableKey,
+	)
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("marshal request body: %w", err)
+		return fmt.Errorf("openfort CLI error: %s (output: %s)", err, string(output))
 	}
 
-	apiURL := fmt.Sprintf("%s/v2/accounts/solana/%s/transfer", openfortBaseURL, setting.OpenfortTreasuryAccountId)
-
-	// Generate Wallet Auth JWT
-	walletAuthJWT, err := BuildWalletAuthJWT("POST", apiURL, reqBody)
-	if err != nil {
-		return fmt.Errorf("build wallet auth: %w", err)
-	}
-
-	req, err := http.NewRequest("POST", apiURL, bytes.NewReader(reqBody))
-	if err != nil {
-		return fmt.Errorf("build request: %w", err)
-	}
-	req.Header.Set("Authorization", "Bearer "+setting.OpenfortApiKey)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Wallet-Auth", walletAuthJWT)
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("http request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	body, _ := io.ReadAll(resp.Body)
-	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		return fmt.Errorf("transfer API returned %d: %s", resp.StatusCode, string(body))
-	}
-
-	common.SysLog(fmt.Sprintf("openfort: transferred %d lamports (%.9f SOL) to %s", lamports, amountSOL, toAddress))
+	common.SysLog(fmt.Sprintf("openfort: transferred %d lamports (%.9f SOL) to %s, output: %s", lamports, amountSOL, toAddress, string(output)))
 	return nil
 }
