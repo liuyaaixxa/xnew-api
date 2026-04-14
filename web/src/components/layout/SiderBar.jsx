@@ -204,7 +204,7 @@ const SiderBar = ({ onNavigate = () => {} }) => {
         className: isAdmin() ? '' : 'tableHiddle',
       },
       {
-        text: t('国库管理'),
+        text: t('积分管理'),
         itemKey: 'treasury',
         to: '/treasury',
         className: isAdmin() ? '' : 'tableHiddle',

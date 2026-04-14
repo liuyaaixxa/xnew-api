@@ -335,7 +335,7 @@ export default function TreasuryPage() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <Title heading={4} style={{ margin: 0 }}>
             <Landmark size={22} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-            {t('国库管理')}
+            {t('积分管理')}
           </Title>
           <Button
             icon={<RefreshCw size={14} />}

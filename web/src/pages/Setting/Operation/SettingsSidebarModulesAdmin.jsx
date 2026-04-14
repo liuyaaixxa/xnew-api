@@ -276,8 +276,8 @@ export default function SettingsSidebarModulesAdmin(props) {
         { key: 'user', title: t('用户管理'), description: t('用户账户管理') },
         {
           key: 'treasury',
-          title: t('国库管理'),
-          description: t('国库余额查看'),
+          title: t('积分管理'),
+          description: t('积分余额查看'),
         },
         {
           key: 'setting',
