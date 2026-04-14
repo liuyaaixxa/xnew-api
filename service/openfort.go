@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"crypto/ecdsa"
 	"crypto/rand"
 	"crypto/sha256"
@@ -133,7 +134,7 @@ func createSolanaBackendWallet() (address string, err error) {
 	apiURL := openfortBaseURL + "/v2/accounts/backend"
 
 	// Generate Wallet Auth JWT
-	walletAuthJWT, err := buildWalletAuthJWT("POST", apiURL, []byte(reqBody))
+	walletAuthJWT, err := BuildWalletAuthJWT("POST", apiURL, []byte(reqBody))
 	if err != nil {
 		return "", fmt.Errorf("build wallet auth: %w", err)
 	}
@@ -170,9 +171,9 @@ func createSolanaBackendWallet() (address string, err error) {
 	return addr, nil
 }
 
-// buildWalletAuthJWT creates an ES256 JWT for the X-Wallet-Auth header.
+// BuildWalletAuthJWT creates an ES256 JWT for the X-Wallet-Auth header.
 // The JWT contains the request URI, a hash of the request body, and standard claims.
-func buildWalletAuthJWT(method, requestURL string, reqBody []byte) (string, error) {
+func BuildWalletAuthJWT(method, requestURL string, reqBody []byte) (string, error) {
 	// Parse the wallet secret (base64-encoded DER EC private key)
 	derBytes, err := base64.StdEncoding.DecodeString(setting.OpenfortWalletSecret)
 	if err != nil {
@@ -248,4 +249,70 @@ func randomHex(n int) (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(b), nil
+}
+
+// TransferSOLFromTreasury transfers SOL from the treasury wallet to the given address.
+func TransferSOLFromTreasury(toAddress string, amountSOL float64) error {
+	if setting.OpenfortApiKey == "" {
+		return fmt.Errorf("OpenfortApiKey not configured")
+	}
+	if setting.OpenfortWalletSecret == "" {
+		return fmt.Errorf("OpenfortWalletSecret not configured")
+	}
+	if setting.OpenfortTreasuryAccountId == "" {
+		return fmt.Errorf("OpenfortTreasuryAccountId not configured")
+	}
+
+	// Convert SOL to lamports (1 SOL = 1e9 lamports)
+	lamports := uint64(amountSOL * 1e9)
+
+	// Normalize cluster name
+	cluster := setting.OpenfortSolanaCluster
+	if cluster == "mainnet" {
+		cluster = "mainnet-beta"
+	} else if cluster != "mainnet-beta" {
+		cluster = "devnet"
+	}
+
+	// Build request body
+	reqPayload := map[string]string{
+		"to":      toAddress,
+		"amount":  fmt.Sprintf("%d", lamports),
+		"token":   "sol",
+		"cluster": cluster,
+	}
+	reqBody, err := common.Marshal(reqPayload)
+	if err != nil {
+		return fmt.Errorf("marshal request body: %w", err)
+	}
+
+	apiURL := fmt.Sprintf("%s/v2/accounts/solana/%s/transfer", openfortBaseURL, setting.OpenfortTreasuryAccountId)
+
+	// Generate Wallet Auth JWT
+	walletAuthJWT, err := BuildWalletAuthJWT("POST", apiURL, reqBody)
+	if err != nil {
+		return fmt.Errorf("build wallet auth: %w", err)
+	}
+
+	req, err := http.NewRequest("POST", apiURL, bytes.NewReader(reqBody))
+	if err != nil {
+		return fmt.Errorf("build request: %w", err)
+	}
+	req.Header.Set("Authorization", "Bearer "+setting.OpenfortApiKey)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Wallet-Auth", walletAuthJWT)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("http request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		return fmt.Errorf("transfer API returned %d: %s", resp.StatusCode, string(body))
+	}
+
+	common.SysLog(fmt.Sprintf("openfort: transferred %d lamports (%.9f SOL) to %s", lamports, amountSOL, toAddress))
+	return nil
 }
