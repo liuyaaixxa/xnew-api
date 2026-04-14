@@ -125,6 +125,7 @@ type treasuryUserItem struct {
 	Username      string  `json:"username"`
 	SolanaAddress string  `json:"solana_address"`
 	Balance       float64 `json:"balance"`
+	CreatedAt     int64   `json:"created_at"`
 }
 
 // getSolanaBalance queries the Solana RPC for the balance of the given address.
@@ -172,7 +173,7 @@ func GetTreasuryUsers(c *gin.Context) {
 	var users []model.User
 	var total int64
 
-	query := model.DB.Model(&model.User{}).Select("id, username, solana_address")
+	query := model.DB.Model(&model.User{}).Select("id, username, solana_address, created_at")
 	if walletStatus == "has_wallet" {
 		query = query.Where("solana_address != ''")
 	}
@@ -205,6 +206,7 @@ func GetTreasuryUsers(c *gin.Context) {
 			ID:            u.Id,
 			Username:      u.Username,
 			SolanaAddress: u.SolanaAddress,
+			CreatedAt:     u.CreatedAt,
 		}
 		if u.SolanaAddress != "" {
 			item.Balance = getSolanaBalance(rpcURL, u.SolanaAddress)

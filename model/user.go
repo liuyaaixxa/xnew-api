@@ -52,6 +52,7 @@ type User struct {
 	StripeCustomer   string         `json:"stripe_customer" gorm:"type:varchar(64);column:stripe_customer;index"`
 	OpenfortPlayerId string         `json:"openfort_player_id" gorm:"column:openfort_player_id;index"`
 	SolanaAddress    string         `json:"solana_address" gorm:"column:solana_address;index"`
+	CreatedAt        int64          `json:"created_at" gorm:"autoCreateTime"`
 }
 
 func (user *User) ToBaseUser() *UserBase {
