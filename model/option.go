@@ -108,6 +108,9 @@ func InitOptionMap() {
 	common.OptionMap["OpenfortApiKey"] = setting.OpenfortApiKey
 	common.OptionMap["OpenfortPublishableKey"] = setting.OpenfortPublishableKey
 	common.OptionMap["OpenfortWalletSecret"] = setting.OpenfortWalletSecret
+	common.OptionMap["OpenfortTreasuryAccountId"] = setting.OpenfortTreasuryAccountId
+	common.OptionMap["OpenfortTreasuryAddress"] = setting.OpenfortTreasuryAddress
+	common.OptionMap["OpenfortSolanaCluster"] = setting.OpenfortSolanaCluster
 	common.OptionMap["OpenfortShieldPublishableKey"] = setting.OpenfortShieldPublishableKey
 	common.OptionMap["OpenfortShieldSecretKey"] = setting.OpenfortShieldSecretKey
 	common.OptionMap["OpenfortEncryptionShare"] = setting.OpenfortEncryptionShare
@@ -416,6 +419,12 @@ func updateOptionMap(key string, value string) (err error) {
 		setting.OpenfortPublishableKey = value
 	case "OpenfortWalletSecret":
 		setting.OpenfortWalletSecret = value
+	case "OpenfortTreasuryAccountId":
+		setting.OpenfortTreasuryAccountId = value
+	case "OpenfortTreasuryAddress":
+		setting.OpenfortTreasuryAddress = value
+	case "OpenfortSolanaCluster":
+		setting.OpenfortSolanaCluster = value
 	case "OpenfortShieldPublishableKey":
 		setting.OpenfortShieldPublishableKey = value
 	case "OpenfortShieldSecretKey":
