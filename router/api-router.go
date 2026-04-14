@@ -348,6 +348,7 @@ func SetApiRouter(router *gin.Engine) {
 			treasuryRoute.GET("/users", controller.GetTreasuryUsers)
 			treasuryRoute.POST("/transfer", controller.TransferToUser)
 			treasuryRoute.GET("/transactions", controller.GetAddressTransactions)
+			treasuryRoute.GET("/logs", controller.GetTreasuryLogs)
 		}
 
 		groupRoute := apiRouter.Group("/group")

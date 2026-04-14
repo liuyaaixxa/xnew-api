@@ -3908,6 +3908,9 @@
     "收入": "Received",
     "支出": "Sent",
     "发送方": "From",
-    "接收方": "To"
+    "接收方": "To",
+    "操作日志": "Operation Logs",
+    "暂无操作日志": "No operation logs",
+    "操作人": "Operator"
   }
 }

@@ -4400,6 +4400,9 @@
     "收入": "Nhận",
     "支出": "Gửi",
     "发送方": "Người gửi",
-    "接收方": "Người nhận"
+    "接收方": "Người nhận",
+    "操作日志": "Nhật ký hoạt động",
+    "暂无操作日志": "Không có nhật ký hoạt động",
+    "操作人": "Người thao tác"
   }
 }

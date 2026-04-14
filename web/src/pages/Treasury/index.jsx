@@ -15,7 +15,7 @@ import {
   SideSheet,
   Empty,
 } from '@douyinfe/semi-ui';
-import { Landmark, Copy, RefreshCw, Send, FileText } from 'lucide-react';
+import { Landmark, Copy, RefreshCw, Send, FileText, ClipboardList } from 'lucide-react';
 import { API, showError } from '../../helpers';
 
 const { Title, Text, Paragraph } = Typography;
@@ -49,6 +49,13 @@ export default function TreasuryPage() {
     user: null,
     loading: false,
     transactions: [],
+  });
+
+  // Operation log drawer state
+  const [logDrawer, setLogDrawer] = useState({
+    visible: false,
+    loading: false,
+    logs: [],
   });
 
   const fetchTreasury = useCallback(async (isRefresh = false) => {
@@ -157,6 +164,25 @@ export default function TreasuryPage() {
 
   const closeTxDrawer = () => {
     setTxDrawer({ visible: false, user: null, loading: false, transactions: [] });
+  };
+
+  const openLogDrawer = async () => {
+    setLogDrawer({ visible: true, loading: true, logs: [] });
+    try {
+      const res = await API.get('/api/treasury/logs');
+      const { success, data } = res.data;
+      if (success) {
+        setLogDrawer((prev) => ({ ...prev, loading: false, logs: data || [] }));
+      } else {
+        setLogDrawer((prev) => ({ ...prev, loading: false }));
+      }
+    } catch (_e) {
+      setLogDrawer((prev) => ({ ...prev, loading: false }));
+    }
+  };
+
+  const closeLogDrawer = () => {
+    setLogDrawer({ visible: false, loading: false, logs: [] });
   };
 
   const handleTransfer = async () => {
@@ -360,15 +386,25 @@ export default function TreasuryPage() {
               size='small'
             />
           </div>
-          <Select
-            value={walletFilter}
-            onChange={handleFilterChange}
-            style={{ width: 160 }}
-            size='small'
-          >
-            <Select.Option value='all'>{t('全部用户')}</Select.Option>
-            <Select.Option value='has_wallet'>{t('有钱包')}</Select.Option>
-          </Select>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Button
+              icon={<ClipboardList size={14} />}
+              size='small'
+              theme='light'
+              onClick={openLogDrawer}
+            >
+              {t('操作日志')}
+            </Button>
+            <Select
+              value={walletFilter}
+              onChange={handleFilterChange}
+              style={{ width: 160 }}
+              size='small'
+            >
+              <Select.Option value='all'>{t('全部用户')}</Select.Option>
+              <Select.Option value='has_wallet'>{t('有钱包')}</Select.Option>
+            </Select>
+          </div>
         </div>
 
         <Table
@@ -507,6 +543,78 @@ export default function TreasuryPage() {
                       {truncateAddress(tx.signature)}
                     </Text>
                   </div>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </SideSheet>
+
+      {/* Operation Log Drawer */}
+      <SideSheet
+        title={t('操作日志')}
+        visible={logDrawer.visible}
+        onCancel={closeLogDrawer}
+        placement='right'
+        width={560}
+      >
+        {logDrawer.loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
+            <Spin />
+          </div>
+        ) : logDrawer.logs.length === 0 ? (
+          <Empty title={t('暂无操作日志')} style={{ padding: 40 }} />
+        ) : (
+          <div>
+            {logDrawer.logs.map((log) => {
+              const time = log.created_at
+                ? new Date(log.created_at * 1000).toLocaleString()
+                : '—';
+              const statusColor = log.status === 'success' ? 'green' : log.status === 'failed' ? 'red' : 'orange';
+              return (
+                <Card
+                  key={log.id}
+                  style={{ marginBottom: 12 }}
+                  bodyStyle={{ padding: 12 }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Tag color='blue' size='small'>{t('转入')}</Tag>
+                      <Tag color={statusColor} size='small'>
+                        {log.status === 'success' ? t('成功') : log.status === 'failed' ? t('失败') : t('处理中')}
+                      </Tag>
+                    </div>
+                    <Text size='small' type='tertiary'>{time}</Text>
+                  </div>
+                  <div style={{ marginBottom: 6 }}>
+                    <Text strong style={{ fontSize: 16 }}>{log.amount.toFixed(4)} SOL</Text>
+                  </div>
+                  <div style={{ marginBottom: 4 }}>
+                    <Text type='secondary' size='small'>{t('操作人')}: </Text>
+                    <Text size='small'>{log.operator}</Text>
+                  </div>
+                  <div style={{ marginBottom: 4 }}>
+                    <Text type='secondary' size='small'>{t('目标用户')}: </Text>
+                    <Text size='small'>{log.target_user} (ID: {log.target_user_id})</Text>
+                  </div>
+                  <div style={{ marginBottom: 4 }}>
+                    <Text type='secondary' size='small'>{t('发送方')}: </Text>
+                    <Text style={{ fontFamily: 'monospace', fontSize: 12 }}>
+                      {truncateAddress(log.from_address)}
+                    </Text>
+                  </div>
+                  <div style={{ marginBottom: 4 }}>
+                    <Text type='secondary' size='small'>{t('接收方')}: </Text>
+                    <Text style={{ fontFamily: 'monospace', fontSize: 12 }}>
+                      {truncateAddress(log.to_address)}
+                    </Text>
+                  </div>
+                  {log.remark && (
+                    <div>
+                      <Text type='secondary' size='small'>{t('备注')}: </Text>
+                      <Text size='small' type='danger'>{log.remark}</Text>
+                    </div>
+                  )}
                 </Card>
               );
             })}

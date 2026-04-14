@@ -257,7 +257,27 @@ func TransferToUser(c *gin.Context) {
 		return
 	}
 
+	// Get operator info
+	operatorId := c.GetInt("id")
+	operatorName := c.GetString("username")
+
+	// Build log entry
+	logEntry := &model.TreasuryLog{
+		OperatorId:   operatorId,
+		Operator:     operatorName,
+		Action:       "transfer_to_user",
+		TargetUser:   user.Username,
+		TargetUserId: user.Id,
+		FromAddress:  setting.OpenfortTreasuryAddress,
+		ToAddress:    user.SolanaAddress,
+		Amount:       req.Amount,
+		Status:       "pending",
+	}
+
 	if err := service.TransferSOLFromTreasury(user.SolanaAddress, req.Amount); err != nil {
+		logEntry.Status = "failed"
+		logEntry.Remark = err.Error()
+		_ = logEntry.Insert()
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
 			"message": fmt.Sprintf("transfer failed: %v", err),
@@ -265,9 +285,29 @@ func TransferToUser(c *gin.Context) {
 		return
 	}
 
+	logEntry.Status = "success"
+	_ = logEntry.Insert()
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "transfer successful",
+	})
+}
+
+// GetTreasuryLogs returns treasury operation logs (last 90 days).
+// Admin endpoint: GET /api/treasury/logs
+func GetTreasuryLogs(c *gin.Context) {
+	logs, err := model.GetTreasuryLogs(90, 200)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": fmt.Sprintf("failed to get logs: %v", err),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    logs,
 	})
 }
 

@@ -3872,6 +3872,9 @@
     "收入": "Reçu",
     "支出": "Envoyé",
     "发送方": "Expéditeur",
-    "接收方": "Destinataire"
+    "接收方": "Destinataire",
+    "操作日志": "Journal des opérations",
+    "暂无操作日志": "Aucun journal d'opération",
+    "操作人": "Opérateur"
   }
 }
