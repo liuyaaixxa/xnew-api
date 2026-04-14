@@ -50,6 +50,7 @@ const routerMap = {
   playground: '/console/playground',
   personal: '/console/personal',
   wallet: '/console/wallet',
+  treasury: '/console/treasury',
   'user-channel': '/console/user-channel',
   'user-channel-review': '/console/user-channel-review',
 };
@@ -200,6 +201,12 @@ const SiderBar = ({ onNavigate = () => {} }) => {
         text: t('用户管理'),
         itemKey: 'user',
         to: '/user',
+        className: isAdmin() ? '' : 'tableHiddle',
+      },
+      {
+        text: t('国库管理'),
+        itemKey: 'treasury',
+        to: '/treasury',
         className: isAdmin() ? '' : 'tableHiddle',
       },
       {

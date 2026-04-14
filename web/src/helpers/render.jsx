@@ -76,6 +76,7 @@ import {
   Server,
   CalendarClock,
   Wallet as WalletIcon,
+  Landmark,
 } from 'lucide-react';
 import {
   SiAtlassian,
@@ -150,6 +151,8 @@ export function getLucideIcon(key, selected = false) {
       return <Settings {...commonProps} color={iconColor} />;
     case 'wallet':
       return <WalletIcon {...commonProps} color={iconColor} />;
+    case 'treasury':
+      return <Landmark {...commonProps} color={iconColor} />;
     default:
       return <CircleUser {...commonProps} color={iconColor} />;
   }
