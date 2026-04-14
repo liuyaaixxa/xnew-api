@@ -14,6 +14,7 @@ import {
   Toast,
   SideSheet,
   Empty,
+  Tooltip,
 } from '@douyinfe/semi-ui';
 import { Landmark, Copy, RefreshCw, Send, FileText, ClipboardList } from 'lucide-react';
 import { API, showError } from '../../helpers';
@@ -251,35 +252,36 @@ export default function TreasuryPage() {
     {
       title: t('操作'),
       key: 'action',
+      width: 120,
       render: (_text, record) => (
         <div style={{ display: 'flex', gap: 4 }}>
-          <Button
-            icon={<Send size={14} />}
-            size='small'
-            theme='light'
-            type='primary'
-            disabled={!record.solana_address}
-            onClick={() => openTransferModal(record)}
-          >
-            {t('转入')}
-          </Button>
-          <Button
-            icon={<FileText size={14} />}
-            size='small'
-            theme='light'
-            disabled={!record.solana_address}
-            onClick={() => openTxDrawer(record)}
-          >
-            {t('交易明细')}
-          </Button>
-          <Button
-            icon={<ClipboardList size={14} />}
-            size='small'
-            theme='light'
-            onClick={() => openLogDrawer(record)}
-          >
-            {t('操作日志')}
-          </Button>
+          <Tooltip content={t('转入')}>
+            <Button
+              icon={<Send size={14} />}
+              size='small'
+              theme='light'
+              type='primary'
+              disabled={!record.solana_address}
+              onClick={() => openTransferModal(record)}
+            />
+          </Tooltip>
+          <Tooltip content={t('交易明细')}>
+            <Button
+              icon={<FileText size={14} />}
+              size='small'
+              theme='light'
+              disabled={!record.solana_address}
+              onClick={() => openTxDrawer(record)}
+            />
+          </Tooltip>
+          <Tooltip content={t('操作日志')}>
+            <Button
+              icon={<ClipboardList size={14} />}
+              size='small'
+              theme='light'
+              onClick={() => openLogDrawer(record)}
+            />
+          </Tooltip>
         </div>
       ),
     },
@@ -316,7 +318,7 @@ export default function TreasuryPage() {
     : 'orange';
 
   return (
-    <div className='mt-[60px]' style={{ padding: '24px', maxWidth: 960 }}>
+    <div className='mt-[60px]' style={{ padding: '24px' }}>
       {/* Treasury Card */}
       <div style={{ maxWidth: 640 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
