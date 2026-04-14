@@ -133,6 +133,18 @@ export default function WalletPage() {
                 />
               </div>
             </div>
+            <div style={{ marginBottom: 12 }}>
+              <Text type='secondary' size='small'>{t('钱包余额')}</Text>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Text strong style={{ fontSize: 20 }}>
+                  {wallet.balance != null ? wallet.balance.toFixed(4) : '0.0000'}
+                </Text>
+                <Text type='secondary'>SOL</Text>
+                {wallet.cluster && (
+                  <Tag size='small' color='blue'>{wallet.cluster}</Tag>
+                )}
+              </div>
+            </div>
           </>
         ) : (
           <div style={{ textAlign: 'center', padding: '24px 0' }}>

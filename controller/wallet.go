@@ -27,6 +27,22 @@ func GetWallet(c *gin.Context) {
 		status = "creating"
 	}
 
+	// Query on-chain balance if wallet exists
+	var balanceSOL float64
+	if user.SolanaAddress != "" {
+		cluster := setting.OpenfortSolanaCluster
+		var rpcURL string
+		switch cluster {
+		case "mainnet", "mainnet-beta":
+			rpcURL = "https://api.mainnet-beta.solana.com"
+		case "testnet":
+			rpcURL = "https://api.testnet.solana.com"
+		default:
+			rpcURL = "https://api.devnet.solana.com"
+		}
+		balanceSOL = getSolanaBalance(rpcURL, user.SolanaAddress)
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"data": gin.H{
@@ -34,6 +50,8 @@ func GetWallet(c *gin.Context) {
 			"solana_address":     user.SolanaAddress,
 			"status":             status,
 			"enabled":            setting.OpenfortApiKey != "",
+			"balance":            balanceSOL,
+			"cluster":            setting.OpenfortSolanaCluster,
 		},
 	})
 }
