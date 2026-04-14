@@ -297,7 +297,16 @@ func TransferToUser(c *gin.Context) {
 // GetTreasuryLogs returns treasury operation logs (last 90 days).
 // Admin endpoint: GET /api/treasury/logs
 func GetTreasuryLogs(c *gin.Context) {
-	logs, err := model.GetTreasuryLogs(90, 200)
+	userIdStr := c.Query("user_id")
+	var logs []model.TreasuryLog
+	var err error
+	if userIdStr != "" {
+		userId := 0
+		fmt.Sscanf(userIdStr, "%d", &userId)
+		logs, err = model.GetTreasuryLogsByUserId(userId, 90, 200)
+	} else {
+		logs, err = model.GetTreasuryLogs(90, 200)
+	}
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,

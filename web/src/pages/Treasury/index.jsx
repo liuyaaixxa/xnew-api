@@ -54,6 +54,7 @@ export default function TreasuryPage() {
   // Operation log drawer state
   const [logDrawer, setLogDrawer] = useState({
     visible: false,
+    user: null,
     loading: false,
     logs: [],
   });
@@ -166,10 +167,10 @@ export default function TreasuryPage() {
     setTxDrawer({ visible: false, user: null, loading: false, transactions: [] });
   };
 
-  const openLogDrawer = async () => {
-    setLogDrawer({ visible: true, loading: true, logs: [] });
+  const openLogDrawer = async (user) => {
+    setLogDrawer({ visible: true, user, loading: true, logs: [] });
     try {
-      const res = await API.get('/api/treasury/logs');
+      const res = await API.get(`/api/treasury/logs?user_id=${user.id}`);
       const { success, data } = res.data;
       if (success) {
         setLogDrawer((prev) => ({ ...prev, loading: false, logs: data || [] }));
@@ -182,7 +183,7 @@ export default function TreasuryPage() {
   };
 
   const closeLogDrawer = () => {
-    setLogDrawer({ visible: false, loading: false, logs: [] });
+    setLogDrawer({ visible: false, user: null, loading: false, logs: [] });
   };
 
   const handleTransfer = async () => {
@@ -270,6 +271,14 @@ export default function TreasuryPage() {
             onClick={() => openTxDrawer(record)}
           >
             {t('交易明细')}
+          </Button>
+          <Button
+            icon={<ClipboardList size={14} />}
+            size='small'
+            theme='light'
+            onClick={() => openLogDrawer(record)}
+          >
+            {t('操作日志')}
           </Button>
         </div>
       ),
@@ -387,14 +396,6 @@ export default function TreasuryPage() {
             />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Button
-              icon={<ClipboardList size={14} />}
-              size='small'
-              theme='light'
-              onClick={openLogDrawer}
-            >
-              {t('操作日志')}
-            </Button>
             <Select
               value={walletFilter}
               onChange={handleFilterChange}
@@ -552,7 +553,11 @@ export default function TreasuryPage() {
 
       {/* Operation Log Drawer */}
       <SideSheet
-        title={t('操作日志')}
+        title={
+          logDrawer.user
+            ? `${t('操作日志')} — ${logDrawer.user.username}`
+            : t('操作日志')
+        }
         visible={logDrawer.visible}
         onCancel={closeLogDrawer}
         placement='right'

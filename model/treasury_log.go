@@ -51,3 +51,14 @@ func GetTreasuryLogsByAddress(address string, days int, limit int) ([]TreasuryLo
 		Find(&logs).Error
 	return logs, err
 }
+
+// GetTreasuryLogsByUserId returns logs for a specific target user within the given time range.
+func GetTreasuryLogsByUserId(userId int, days int, limit int) ([]TreasuryLog, error) {
+	var logs []TreasuryLog
+	since := time.Now().AddDate(0, 0, -days).Unix()
+	err := DB.Where("target_user_id = ? AND created_at >= ?", userId, since).
+		Order("id desc").
+		Limit(limit).
+		Find(&logs).Error
+	return logs, err
+}
