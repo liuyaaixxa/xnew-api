@@ -39,6 +39,7 @@ data/
 # Test screenshots
 test-*.png
 
-# PRD documents and OpenSpec changes (local development only)
+# PRD documents, reports and OpenSpec changes (local development only)
 docs/prd/
+docs/report/
 openspec/
