@@ -344,6 +344,8 @@ func SetApiRouter(router *gin.Engine) {
 		treasuryRoute.Use(middleware.AdminAuth())
 		{
 			treasuryRoute.GET("/", controller.GetTreasuryInfo)
+			treasuryRoute.GET("/users", controller.GetTreasuryUsers)
+			treasuryRoute.POST("/transfer", controller.TransferToUser)
 		}
 
 		groupRoute := apiRouter.Group("/group")
