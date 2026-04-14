@@ -3886,6 +3886,19 @@
     "Solana 集群": "Solana Cluster",
     "国库余额查看": "View treasury balance",
     "获取国库信息失败": "Failed to get treasury info",
-    "国库地址未配置，请在系统设置中配置 Openfort 国库地址": "Treasury address not configured. Please configure the Openfort treasury address in system settings."
+    "国库地址未配置，请在系统设置中配置 Openfort 国库地址": "Treasury address not configured. Please configure the Openfort treasury address in system settings.",
+    "用户区块链账号": "User Blockchain Accounts",
+    "全部用户": "All Users",
+    "有钱包": "Has Wallet",
+    "用户ID": "User ID",
+    "钱包余额": "Wallet Balance",
+    "转入": "Transfer In",
+    "转入 SOL": "Transfer SOL",
+    "从国库转出": "From Treasury",
+    "转入金额 (SOL)": "Transfer Amount (SOL)",
+    "转账成功": "Transfer successful",
+    "转账失败": "Transfer failed",
+    "获取用户列表失败": "Failed to get user list",
+    "确认转账": "Confirm Transfer"
   }
 }

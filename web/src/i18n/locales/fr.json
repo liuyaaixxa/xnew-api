@@ -3850,6 +3850,19 @@
     "Solana 集群": "Cluster Solana",
     "国库余额查看": "Consulter le solde de la trésorerie",
     "获取国库信息失败": "Échec de la récupération des informations de la trésorerie",
-    "国库地址未配置，请在系统设置中配置 Openfort 国库地址": "L'adresse de la trésorerie n'est pas configurée. Veuillez la configurer dans les paramètres système Openfort."
+    "国库地址未配置，请在系统设置中配置 Openfort 国库地址": "L'adresse de la trésorerie n'est pas configurée. Veuillez la configurer dans les paramètres système Openfort.",
+    "用户区块链账号": "Comptes blockchain des utilisateurs",
+    "全部用户": "Tous les utilisateurs",
+    "有钱包": "Avec portefeuille",
+    "用户ID": "ID utilisateur",
+    "钱包余额": "Solde du portefeuille",
+    "转入": "Transférer",
+    "转入 SOL": "Transférer SOL",
+    "从国库转出": "Depuis la trésorerie",
+    "转入金额 (SOL)": "Montant du transfert (SOL)",
+    "转账成功": "Transfert réussi",
+    "转账失败": "Échec du transfert",
+    "获取用户列表失败": "Échec de la récupération de la liste des utilisateurs",
+    "确认转账": "Confirmer le transfert"
   }
 }
