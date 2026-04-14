@@ -3863,6 +3863,15 @@
     "转账成功": "Transfert réussi",
     "转账失败": "Échec du transfert",
     "获取用户列表失败": "Échec de la récupération de la liste des utilisateurs",
-    "确认转账": "Confirmer le transfert"
+    "确认转账": "Confirmer le transfert",
+    "交易明细": "Historique des transactions",
+    "查看交易": "Voir les transactions",
+    "暂无交易记录": "Aucune transaction",
+    "获取交易明细失败": "Échec du chargement des transactions",
+    "点击上方按钮查看最近 3 个月交易记录": "Cliquez sur le bouton ci-dessus pour voir les transactions des 3 derniers mois",
+    "收入": "Reçu",
+    "支出": "Envoyé",
+    "发送方": "Expéditeur",
+    "接收方": "Destinataire"
   }
 }

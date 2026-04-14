@@ -8,8 +8,9 @@ import {
   Toast,
   Banner,
   Tag,
+  Empty,
 } from '@douyinfe/semi-ui';
-import { Copy, Wallet, CheckCircle, AlertCircle } from 'lucide-react';
+import { Copy, Wallet, CheckCircle, AlertCircle, FileText } from 'lucide-react';
 import { API, showError } from '../../helpers';
 
 const { Title, Text, Paragraph } = Typography;
@@ -19,6 +20,8 @@ export default function WalletPage() {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [wallet, setWallet] = useState(null);
+  const [txLoading, setTxLoading] = useState(false);
+  const [transactions, setTransactions] = useState(null);
 
   const fetchWallet = useCallback(async () => {
     setLoading(true);
@@ -62,6 +65,26 @@ export default function WalletPage() {
       navigator.clipboard.writeText(wallet.solana_address);
       Toast.success(t('已复制到剪贴板'));
     }
+  };
+
+  const fetchTransactions = async () => {
+    setTxLoading(true);
+    try {
+      const res = await API.get('/api/user/wallet/transactions');
+      const { success, data } = res.data;
+      if (success) {
+        setTransactions(data || []);
+      }
+    } catch (_e) {
+      showError(t('获取交易明细失败'));
+    } finally {
+      setTxLoading(false);
+    }
+  };
+
+  const truncateAddress = (address) => {
+    if (!address || address.length <= 12) return address || '';
+    return `${address.slice(0, 6)}...${address.slice(-6)}`;
   };
 
   if (loading) {
@@ -162,6 +185,74 @@ export default function WalletPage() {
           </div>
         )}
       </Card>
+
+      {/* Transaction History */}
+      {wallet.status === 'created' && (
+        <Card style={{ marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <Text strong>
+              <FileText size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+              {t('交易明细')}
+            </Text>
+            <Button
+              size='small'
+              theme='light'
+              loading={txLoading}
+              onClick={fetchTransactions}
+            >
+              {transactions === null ? t('查看交易') : t('刷新')}
+            </Button>
+          </div>
+
+          {txLoading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
+              <Spin />
+            </div>
+          ) : transactions === null ? (
+            <Text type='tertiary' size='small'>
+              {t('点击上方按钮查看最近 3 个月交易记录')}
+            </Text>
+          ) : transactions.length === 0 ? (
+            <Empty title={t('暂无交易记录')} style={{ padding: 16 }} />
+          ) : (
+            <div>
+              {transactions.map((tx) => {
+                const isReceive = tx.to === wallet.solana_address;
+                const time = tx.block_time
+                  ? new Date(tx.block_time * 1000).toLocaleString()
+                  : '—';
+                return (
+                  <div
+                    key={tx.signature}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '10px 0',
+                      borderBottom: '1px solid var(--semi-color-border)',
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                        <Tag color={isReceive ? 'green' : 'red'} size='small'>
+                          {isReceive ? t('收入') : t('支出')}
+                        </Tag>
+                        <Text size='small' type='tertiary'>{time}</Text>
+                      </div>
+                      <Text style={{ fontFamily: 'monospace', fontSize: 12 }} type='tertiary'>
+                        {isReceive ? t('发送方') : t('接收方')}: {truncateAddress(isReceive ? tx.from : tx.to)}
+                      </Text>
+                    </div>
+                    <Text strong style={{ fontSize: 16, color: isReceive ? 'var(--semi-color-success)' : 'var(--semi-color-danger)' }}>
+                      {isReceive ? '+' : '-'}{tx.amount.toFixed(4)} SOL
+                    </Text>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </Card>
+      )}
 
       <Banner
         type='info'

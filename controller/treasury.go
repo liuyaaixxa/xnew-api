@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
+	"time"
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/model"
@@ -267,4 +269,278 @@ func TransferToUser(c *gin.Context) {
 		"success": true,
 		"message": "transfer successful",
 	})
+}
+
+// getSolanaRPCURL returns the Solana RPC endpoint for the configured cluster.
+func getSolanaRPCURL() string {
+	switch setting.OpenfortSolanaCluster {
+	case "mainnet", "mainnet-beta":
+		return "https://api.mainnet-beta.solana.com"
+	case "testnet":
+		return "https://api.testnet.solana.com"
+	default:
+		return "https://api.devnet.solana.com"
+	}
+}
+
+type solanaAccountKey struct {
+	Pubkey string `json:"pubkey"`
+}
+
+type solanaSignature struct {
+	Signature string  `json:"signature"`
+	Slot      uint64  `json:"slot"`
+	BlockTime *int64  `json:"blockTime"`
+	Err       any     `json:"err"`
+	Memo      *string `json:"memo"`
+}
+
+type solanaTransactionItem struct {
+	Signature string  `json:"signature"`
+	BlockTime *int64  `json:"block_time"`
+	From      string  `json:"from"`
+	To        string  `json:"to"`
+	Amount    float64 `json:"amount"`
+	Status    string  `json:"status"`
+}
+
+// GetAddressTransactions queries Solana RPC for recent transactions of a given address.
+// Admin endpoint: GET /api/treasury/transactions?address=xxx
+func GetAddressTransactions(c *gin.Context) {
+	address := c.Query("address")
+	if address == "" {
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": "address is required"})
+		return
+	}
+
+	items, err := fetchSolanaTransactions(address)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": fmt.Sprintf("failed to fetch transactions: %v", err)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": items})
+}
+
+// GetMyTransactions queries Solana RPC for recent transactions of the current user's wallet.
+// User endpoint: GET /api/user/wallet/transactions
+func GetMyTransactions(c *gin.Context) {
+	userId := c.GetInt("id")
+	user, err := model.GetUserById(userId, false)
+	if err != nil || user.SolanaAddress == "" {
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": "wallet not found"})
+		return
+	}
+
+	items, err := fetchSolanaTransactions(user.SolanaAddress)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": fmt.Sprintf("failed to fetch transactions: %v", err)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": items})
+}
+
+// fetchSolanaTransactions fetches the last 3 months of SOL transfer transactions for an address.
+func fetchSolanaTransactions(address string) ([]solanaTransactionItem, error) {
+	rpcURL := getSolanaRPCURL()
+
+	// Step 1: getSignaturesForAddress (last 3 months, max 50 results)
+	threeMonthsAgo := time.Now().AddDate(0, -3, 0).Unix()
+	sigReq := solanaRPCRequest{
+		JSONRPC: "2.0",
+		ID:      1,
+		Method:  "getSignaturesForAddress",
+		Params: []any{
+			address,
+			map[string]any{"limit": 50},
+		},
+	}
+	sigBody, err := common.Marshal(sigReq)
+	if err != nil {
+		return nil, fmt.Errorf("marshal signatures request: %w", err)
+	}
+
+	resp, err := http.Post(rpcURL, "application/json", bytes.NewReader(sigBody))
+	if err != nil {
+		return nil, fmt.Errorf("signatures RPC call: %w", err)
+	}
+	defer resp.Body.Close()
+	respBody, _ := io.ReadAll(resp.Body)
+
+	var sigResp struct {
+		Result []solanaSignature `json:"result"`
+		Error  *struct {
+			Message string `json:"message"`
+		} `json:"error"`
+	}
+	if err := common.Unmarshal(respBody, &sigResp); err != nil {
+		return nil, fmt.Errorf("parse signatures response: %w", err)
+	}
+	if sigResp.Error != nil {
+		return nil, fmt.Errorf("RPC error: %s", sigResp.Error.Message)
+	}
+
+	// Filter by time (last 3 months)
+	var sigs []solanaSignature
+	for _, sig := range sigResp.Result {
+		if sig.BlockTime != nil && *sig.BlockTime >= threeMonthsAgo {
+			sigs = append(sigs, sig)
+		}
+	}
+
+	if len(sigs) == 0 {
+		return []solanaTransactionItem{}, nil
+	}
+
+	// Step 2: getTransaction for each signature to extract transfer details
+	items := make([]solanaTransactionItem, 0, len(sigs))
+	for _, sig := range sigs {
+		item := parseSolanaTransaction(rpcURL, sig, address)
+		if item != nil {
+			items = append(items, *item)
+		}
+	}
+
+	return items, nil
+}
+
+// parseSolanaTransaction fetches and parses a single transaction to extract SOL transfer info.
+func parseSolanaTransaction(rpcURL string, sig solanaSignature, ownerAddress string) *solanaTransactionItem {
+	txReq := solanaRPCRequest{
+		JSONRPC: "2.0",
+		ID:      1,
+		Method:  "getTransaction",
+		Params: []any{
+			sig.Signature,
+			map[string]any{
+				"encoding":                       "jsonParsed",
+				"maxSupportedTransactionVersion": 0,
+			},
+		},
+	}
+	txBody, err := common.Marshal(txReq)
+	if err != nil {
+		return nil
+	}
+
+	resp, err := http.Post(rpcURL, "application/json", bytes.NewReader(txBody))
+	if err != nil {
+		return nil
+	}
+	defer resp.Body.Close()
+	respBody, _ := io.ReadAll(resp.Body)
+
+	var txResp struct {
+		Result *struct {
+			Meta *struct {
+				Err            any      `json:"err"`
+				PreBalances    []uint64 `json:"preBalances"`
+				PostBalances   []uint64 `json:"postBalances"`
+			} `json:"meta"`
+			Transaction struct {
+				Message struct {
+					AccountKeys []solanaAccountKey `json:"accountKeys"`
+				} `json:"message"`
+			} `json:"transaction"`
+		} `json:"result"`
+	}
+	if err := common.Unmarshal(respBody, &txResp); err != nil || txResp.Result == nil || txResp.Result.Meta == nil {
+		return nil
+	}
+
+	tx := txResp.Result
+	meta := tx.Meta
+	accountKeys := tx.Transaction.Message.AccountKeys
+
+	status := "success"
+	if sig.Err != nil || meta.Err != nil {
+		status = "failed"
+	}
+
+	// Find the owner's index and determine direction + counterparty
+	ownerIdx := -1
+	for i, ak := range accountKeys {
+		if ak.Pubkey == ownerAddress {
+			ownerIdx = i
+			break
+		}
+	}
+	if ownerIdx < 0 || ownerIdx >= len(meta.PreBalances) || ownerIdx >= len(meta.PostBalances) {
+		return nil
+	}
+
+	// Calculate balance change in lamports (post - pre)
+	preBal := meta.PreBalances[ownerIdx]
+	postBal := meta.PostBalances[ownerIdx]
+	var diffLamports int64
+	if postBal >= preBal {
+		diffLamports = int64(postBal - preBal)
+	} else {
+		diffLamports = -int64(preBal - postBal)
+	}
+
+	if diffLamports == 0 {
+		return nil
+	}
+
+	amountSOL := math.Abs(float64(diffLamports)) / 1e9
+	from := ""
+	to := ""
+
+	if diffLamports > 0 {
+		// Received SOL
+		to = ownerAddress
+		// Find sender: the account with the largest balance decrease
+		from = findCounterparty(accountKeys, meta.PreBalances, meta.PostBalances, ownerIdx, true)
+	} else {
+		// Sent SOL
+		from = ownerAddress
+		// Find receiver: the account with the largest balance increase
+		to = findCounterparty(accountKeys, meta.PreBalances, meta.PostBalances, ownerIdx, false)
+	}
+
+	return &solanaTransactionItem{
+		Signature: sig.Signature,
+		BlockTime: sig.BlockTime,
+		From:      from,
+		To:        to,
+		Amount:    amountSOL,
+		Status:    status,
+	}
+}
+
+// findCounterparty finds the most likely counterparty in a transaction.
+// If looking for sender (owner received), find the account with biggest decrease.
+// If looking for receiver (owner sent), find the account with biggest increase.
+func findCounterparty(accountKeys []solanaAccountKey, pre, post []uint64, skipIdx int, findDecreaser bool) string {
+	bestIdx := -1
+	var bestDiff int64
+
+	for i := range accountKeys {
+		if i == skipIdx || i >= len(pre) || i >= len(post) {
+			continue
+		}
+		var diff int64
+		if findDecreaser {
+			// looking for who decreased the most
+			if pre[i] > post[i] {
+				diff = int64(pre[i] - post[i])
+			}
+		} else {
+			// looking for who increased the most
+			if post[i] > pre[i] {
+				diff = int64(post[i] - pre[i])
+			}
+		}
+		if diff > bestDiff {
+			bestDiff = diff
+			bestIdx = i
+		}
+	}
+
+	if bestIdx >= 0 {
+		return accountKeys[bestIdx].Pubkey
+	}
+	return ""
 }

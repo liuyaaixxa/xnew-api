@@ -12,8 +12,10 @@ import {
   InputNumber,
   Select,
   Toast,
+  SideSheet,
+  Empty,
 } from '@douyinfe/semi-ui';
-import { Landmark, Copy, RefreshCw, Send } from 'lucide-react';
+import { Landmark, Copy, RefreshCw, Send, FileText } from 'lucide-react';
 import { API, showError } from '../../helpers';
 
 const { Title, Text, Paragraph } = Typography;
@@ -39,6 +41,14 @@ export default function TreasuryPage() {
     user: null,
     amount: 0,
     loading: false,
+  });
+
+  // Transaction drawer state
+  const [txDrawer, setTxDrawer] = useState({
+    visible: false,
+    user: null,
+    loading: false,
+    transactions: [],
   });
 
   const fetchTreasury = useCallback(async (isRefresh = false) => {
@@ -130,6 +140,25 @@ export default function TreasuryPage() {
     });
   };
 
+  const openTxDrawer = async (user) => {
+    setTxDrawer({ visible: true, user, loading: true, transactions: [] });
+    try {
+      const res = await API.get(`/api/treasury/transactions?address=${user.solana_address}`);
+      const { success, data } = res.data;
+      if (success) {
+        setTxDrawer((prev) => ({ ...prev, loading: false, transactions: data || [] }));
+      } else {
+        setTxDrawer((prev) => ({ ...prev, loading: false }));
+      }
+    } catch (_e) {
+      setTxDrawer((prev) => ({ ...prev, loading: false }));
+    }
+  };
+
+  const closeTxDrawer = () => {
+    setTxDrawer({ visible: false, user: null, loading: false, transactions: [] });
+  };
+
   const handleTransfer = async () => {
     if (!transferModal.user || !transferModal.amount) return;
 
@@ -196,16 +225,27 @@ export default function TreasuryPage() {
       title: t('操作'),
       key: 'action',
       render: (_text, record) => (
-        <Button
-          icon={<Send size={14} />}
-          size='small'
-          theme='light'
-          type='primary'
-          disabled={!record.solana_address}
-          onClick={() => openTransferModal(record)}
-        >
-          {t('转入')}
-        </Button>
+        <div style={{ display: 'flex', gap: 4 }}>
+          <Button
+            icon={<Send size={14} />}
+            size='small'
+            theme='light'
+            type='primary'
+            disabled={!record.solana_address}
+            onClick={() => openTransferModal(record)}
+          >
+            {t('转入')}
+          </Button>
+          <Button
+            icon={<FileText size={14} />}
+            size='small'
+            theme='light'
+            disabled={!record.solana_address}
+            onClick={() => openTxDrawer(record)}
+          >
+            {t('交易明细')}
+          </Button>
+        </div>
       ),
     },
   ];
@@ -394,6 +434,85 @@ export default function TreasuryPage() {
           />
         </div>
       </Modal>
+
+      {/* Transaction History Drawer */}
+      <SideSheet
+        title={
+          txDrawer.user
+            ? `${t('交易明细')} — ${txDrawer.user.username}`
+            : t('交易明细')
+        }
+        visible={txDrawer.visible}
+        onCancel={closeTxDrawer}
+        placement='right'
+        width={520}
+      >
+        {txDrawer.loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
+            <Spin />
+          </div>
+        ) : txDrawer.transactions.length === 0 ? (
+          <Empty
+            title={t('暂无交易记录')}
+            style={{ padding: 40 }}
+          />
+        ) : (
+          <div>
+            {txDrawer.transactions.map((tx) => {
+              const isReceive = tx.to === txDrawer.user?.solana_address;
+              const time = tx.block_time
+                ? new Date(tx.block_time * 1000).toLocaleString()
+                : '—';
+              return (
+                <Card
+                  key={tx.signature}
+                  style={{ marginBottom: 12 }}
+                  bodyStyle={{ padding: 12 }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <Tag color={isReceive ? 'green' : 'red'} size='small'>
+                      {isReceive ? t('收入') : t('支出')}
+                    </Tag>
+                    <Tag color={tx.status === 'success' ? 'green' : 'red'} size='small'>
+                      {tx.status === 'success' ? t('成功') : t('失败')}
+                    </Tag>
+                  </div>
+                  <div style={{ marginBottom: 6 }}>
+                    <Text strong style={{ fontSize: 18 }}>
+                      {isReceive ? '+' : '-'}{tx.amount.toFixed(4)} SOL
+                    </Text>
+                  </div>
+                  <div style={{ marginBottom: 4 }}>
+                    <Text type='secondary' size='small'>{t('发送方')}: </Text>
+                    <Text style={{ fontFamily: 'monospace', fontSize: 12 }}>
+                      {truncateAddress(tx.from)}
+                    </Text>
+                  </div>
+                  <div style={{ marginBottom: 4 }}>
+                    <Text type='secondary' size='small'>{t('接收方')}: </Text>
+                    <Text style={{ fontFamily: 'monospace', fontSize: 12 }}>
+                      {truncateAddress(tx.to)}
+                    </Text>
+                  </div>
+                  <div style={{ marginBottom: 4 }}>
+                    <Text type='secondary' size='small'>{t('时间')}: </Text>
+                    <Text size='small'>{time}</Text>
+                  </div>
+                  <div>
+                    <Text type='secondary' size='small'>Tx: </Text>
+                    <Text
+                      style={{ fontFamily: 'monospace', fontSize: 11 }}
+                      copyable
+                    >
+                      {truncateAddress(tx.signature)}
+                    </Text>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </SideSheet>
     </div>
   );
 }

@@ -4391,6 +4391,15 @@
     "转账成功": "Chuyển thành công",
     "转账失败": "Chuyển thất bại",
     "获取用户列表失败": "Không thể lấy danh sách người dùng",
-    "确认转账": "Xác nhận chuyển"
+    "确认转账": "Xác nhận chuyển",
+    "交易明细": "Chi tiết giao dịch",
+    "查看交易": "Xem giao dịch",
+    "暂无交易记录": "Không có giao dịch",
+    "获取交易明细失败": "Không thể tải giao dịch",
+    "点击上方按钮查看最近 3 个月交易记录": "Nhấn nút phía trên để xem giao dịch trong 3 tháng gần đây",
+    "收入": "Nhận",
+    "支出": "Gửi",
+    "发送方": "Người gửi",
+    "接收方": "Người nhận"
   }
 }

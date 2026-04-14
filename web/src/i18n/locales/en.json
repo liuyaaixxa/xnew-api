@@ -3899,6 +3899,15 @@
     "转账成功": "Transfer successful",
     "转账失败": "Transfer failed",
     "获取用户列表失败": "Failed to get user list",
-    "确认转账": "Confirm Transfer"
+    "确认转账": "Confirm Transfer",
+    "交易明细": "Transaction History",
+    "查看交易": "View Transactions",
+    "暂无交易记录": "No transactions",
+    "获取交易明细失败": "Failed to fetch transactions",
+    "点击上方按钮查看最近 3 个月交易记录": "Click the button above to view transactions from the last 3 months",
+    "收入": "Received",
+    "支出": "Sent",
+    "发送方": "From",
+    "接收方": "To"
   }
 }

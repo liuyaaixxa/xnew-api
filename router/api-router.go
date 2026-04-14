@@ -108,6 +108,7 @@ func SetApiRouter(router *gin.Engine) {
 				// Wallet routes
 				selfRoute.GET("/wallet", controller.GetWallet)
 				selfRoute.POST("/wallet/create", middleware.CriticalRateLimit(), controller.CreateWallet)
+				selfRoute.GET("/wallet/transactions", controller.GetMyTransactions)
 
 				// Custom OAuth bindings
 				selfRoute.GET("/oauth/bindings", controller.GetUserOAuthBindings)
@@ -346,6 +347,7 @@ func SetApiRouter(router *gin.Engine) {
 			treasuryRoute.GET("/", controller.GetTreasuryInfo)
 			treasuryRoute.GET("/users", controller.GetTreasuryUsers)
 			treasuryRoute.POST("/transfer", controller.TransferToUser)
+			treasuryRoute.GET("/transactions", controller.GetAddressTransactions)
 		}
 
 		groupRoute := apiRouter.Group("/group")
