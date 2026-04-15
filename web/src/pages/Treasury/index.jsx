@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Card,
   Typography,
@@ -15,13 +16,16 @@ import {
   SideSheet,
   Empty,
   Tooltip,
+  TabPane,
+  Tabs,
 } from '@douyinfe/semi-ui';
-import { Landmark, Copy, RefreshCw, Send, FileText, ClipboardList } from 'lucide-react';
+import { Landmark, Copy, RefreshCw, Send, FileText, ClipboardList, Calculator } from 'lucide-react';
 import { API, showError } from '../../helpers';
+import SettlementAuditTab from './SettlementAuditTab';
 
 const { Title, Text, Paragraph } = Typography;
 
-export default function TreasuryPage() {
+function TreasuryContent() {
   const { t } = useTranslation();
 
   // Treasury card state
@@ -300,7 +304,7 @@ export default function TreasuryPage() {
 
   if (loading) {
     return (
-      <div className='mt-[60px]' style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
+      <div className='' style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
         <Spin size='large' />
       </div>
     );
@@ -308,7 +312,7 @@ export default function TreasuryPage() {
 
   if (!treasury) {
     return (
-      <div className='mt-[60px]' style={{ padding: '24px' }}>
+      <div className='' style={{ padding: '24px' }}>
         <Banner
           type='warning'
           description={t('国库地址未配置，请在系统设置中配置 Openfort 国库地址')}
@@ -329,7 +333,7 @@ export default function TreasuryPage() {
     : 'orange';
 
   return (
-    <div className='mt-[60px]' style={{ padding: '24px' }}>
+    <div className='' style={{ padding: '24px' }}>
       {/* Treasury Card */}
       <div style={{ maxWidth: 640 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
@@ -639,6 +643,65 @@ export default function TreasuryPage() {
           </div>
         )}
       </SideSheet>
+    </div>
+  );
+}
+
+export default function TreasuryPage() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [tabActiveKey, setTabActiveKey] = useState('treasury');
+
+  const onChangeTab = (key) => {
+    setTabActiveKey(key);
+    navigate(`?tab=${key}`);
+  };
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const tab = searchParams.get('tab');
+    if (tab) {
+      setTabActiveKey(tab);
+    }
+  }, [location.search]);
+
+  const panes = [
+    {
+      tab: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <Landmark size={18} />
+          {t('积分管理')}
+        </span>
+      ),
+      content: <TreasuryContent />,
+      itemKey: 'treasury',
+    },
+    {
+      tab: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <Calculator size={18} />
+          {t('积分结算审核')}
+        </span>
+      ),
+      content: <SettlementAuditTab />,
+      itemKey: 'settlement',
+    },
+  ];
+
+  return (
+    <div className='mt-[60px] px-2'>
+      <Tabs
+        type='line'
+        activeKey={tabActiveKey}
+        onChange={(key) => onChangeTab(key)}
+      >
+        {panes.map((pane) => (
+          <TabPane itemKey={pane.itemKey} tab={pane.tab} key={pane.itemKey}>
+            {tabActiveKey === pane.itemKey && pane.content}
+          </TabPane>
+        ))}
+      </Tabs>
     </div>
   );
 }

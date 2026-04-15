@@ -110,6 +110,12 @@ func SetApiRouter(router *gin.Engine) {
 				selfRoute.POST("/wallet/create", middleware.CriticalRateLimit(), controller.CreateWallet)
 				selfRoute.GET("/wallet/transactions", controller.GetMyTransactions)
 
+				// Settlement routes
+				selfRoute.GET("/settlement/pending", controller.GetSettlementPending)
+				selfRoute.POST("/settlement/apply", middleware.CriticalRateLimit(), controller.ApplySettlement)
+				selfRoute.GET("/settlement/orders", controller.GetSettlementOrders)
+				selfRoute.DELETE("/settlement/order/:id", controller.DeleteSettlementOrder)
+
 				// Custom OAuth bindings
 				selfRoute.GET("/oauth/bindings", controller.GetUserOAuthBindings)
 				selfRoute.DELETE("/oauth/bindings/:provider_id", controller.UnbindCustomOAuth)
@@ -349,6 +355,12 @@ func SetApiRouter(router *gin.Engine) {
 			treasuryRoute.POST("/transfer", controller.TransferToUser)
 			treasuryRoute.GET("/transactions", controller.GetAddressTransactions)
 			treasuryRoute.GET("/logs", controller.GetTreasuryLogs)
+
+			// Settlement audit routes
+			treasuryRoute.GET("/settlements", controller.AdminGetSettlements)
+			treasuryRoute.POST("/settlement/:id/approve", controller.AdminApproveSettlement)
+			treasuryRoute.POST("/settlement/:id/reject", controller.AdminRejectSettlement)
+			treasuryRoute.POST("/settlement/:id/settle", controller.AdminSettleSettlement)
 		}
 
 		groupRoute := apiRouter.Group("/group")

@@ -114,6 +114,7 @@ func InitOptionMap() {
 	common.OptionMap["OpenfortShieldPublishableKey"] = setting.OpenfortShieldPublishableKey
 	common.OptionMap["OpenfortShieldSecretKey"] = setting.OpenfortShieldSecretKey
 	common.OptionMap["OpenfortEncryptionShare"] = setting.OpenfortEncryptionShare
+	common.OptionMap["SettlementTokenRate"] = strconv.FormatFloat(setting.SettlementTokenRate, 'f', -1, 64)
 	common.OptionMap["TopupGroupRatio"] = common.TopupGroupRatio2JSONString()
 	common.OptionMap["Chats"] = setting.Chats2JsonString()
 	common.OptionMap["AutoGroups"] = setting.AutoGroups2JsonString()
@@ -527,6 +528,8 @@ func updateOptionMap(key string, value string) (err error) {
 		err = operation_setting.AutomaticDisableStatusCodesFromString(value)
 	case "AutomaticRetryStatusCodes":
 		err = operation_setting.AutomaticRetryStatusCodesFromString(value)
+	case "SettlementTokenRate":
+		setting.SettlementTokenRate, _ = strconv.ParseFloat(value, 64)
 	case "StreamCacheQueueLength":
 		setting.StreamCacheQueueLength, _ = strconv.Atoi(value)
 	case "PayMethods":

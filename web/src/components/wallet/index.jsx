@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Card,
   Typography,
@@ -9,13 +10,16 @@ import {
   Banner,
   Tag,
   Empty,
+  TabPane,
+  Tabs,
 } from '@douyinfe/semi-ui';
-import { Copy, Wallet, CheckCircle, AlertCircle, FileText } from 'lucide-react';
+import { Copy, Wallet, CheckCircle, AlertCircle, FileText, Calculator } from 'lucide-react';
 import { API, showError } from '../../helpers';
+import SettlementTab from './SettlementTab';
 
-const { Title, Text, Paragraph } = Typography;
+const { Text, Paragraph } = Typography;
 
-export default function WalletPage() {
+function WalletContent() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -89,7 +93,7 @@ export default function WalletPage() {
 
   if (loading) {
     return (
-      <div className='mt-[60px]' style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
+      <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
         <Spin size='large' />
       </div>
     );
@@ -97,7 +101,7 @@ export default function WalletPage() {
 
   if (!wallet?.enabled) {
     return (
-      <div className='mt-[60px]' style={{ padding: '24px' }}>
+      <div style={{ padding: '24px' }}>
         <Banner
           type='info'
           description={t('管理员尚未配置积分钱包功能')}
@@ -107,12 +111,7 @@ export default function WalletPage() {
   }
 
   return (
-    <div className='mt-[60px]' style={{ padding: '24px', maxWidth: 640 }}>
-      <Title heading={4} style={{ marginBottom: 24 }}>
-        <Wallet size={22} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-        {t('积分钱包')}
-      </Title>
-
+    <div style={{ padding: '24px', maxWidth: 640 }}>
       <Card style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
           <Text strong style={{ marginRight: 8 }}>{t('钱包状态')}</Text>
@@ -259,6 +258,65 @@ export default function WalletPage() {
         description={t('积分钱包用于接收平台积分奖励。钱包地址是您在平台上的唯一标识。')}
         style={{ marginTop: 16 }}
       />
+    </div>
+  );
+}
+
+export default function WalletPage() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [tabActiveKey, setTabActiveKey] = useState('wallet');
+
+  const onChangeTab = (key) => {
+    setTabActiveKey(key);
+    navigate(`?tab=${key}`);
+  };
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const tab = searchParams.get('tab');
+    if (tab) {
+      setTabActiveKey(tab);
+    }
+  }, [location.search]);
+
+  const panes = [
+    {
+      tab: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <Wallet size={18} />
+          {t('积分钱包')}
+        </span>
+      ),
+      content: <WalletContent />,
+      itemKey: 'wallet',
+    },
+    {
+      tab: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <Calculator size={18} />
+          {t('积分结算')}
+        </span>
+      ),
+      content: <SettlementTab />,
+      itemKey: 'settlement',
+    },
+  ];
+
+  return (
+    <div className='mt-[60px] px-2'>
+      <Tabs
+        type='line'
+        activeKey={tabActiveKey}
+        onChange={(key) => onChangeTab(key)}
+      >
+        {panes.map((pane) => (
+          <TabPane itemKey={pane.itemKey} tab={pane.tab} key={pane.itemKey}>
+            {tabActiveKey === pane.itemKey && pane.content}
+          </TabPane>
+        ))}
+      </Tabs>
     </div>
   );
 }

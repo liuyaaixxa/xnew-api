@@ -283,6 +283,7 @@ func migrateDB() error {
 		&DeviceToken{},
 		&UserChannel{},
 		&TreasuryLog{},
+		&SettlementOrder{},
 	)
 	if err != nil {
 		return err
