@@ -4434,7 +4434,9 @@
     "输出 Token": "Token đầu ra",
     "总 Token": "Tổng token",
     "积分收益": "Điểm thu được",
+    "积分账号": "Tài khoản điểm",
     "已驳回": "Đã từ chối",
-    "审核通过": "Đã duyệt"
+    "审核通过": "Đã duyệt",
+    "此操作不可撤销，积分将从国库转入用户钱包。": "Thao tác này không thể hoàn tác. Điểm sẽ được chuyển từ kho bạc vào ví người dùng."
   }
 }

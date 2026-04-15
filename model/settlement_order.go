@@ -34,6 +34,9 @@ type SettlementOrder struct {
 	SettledTime     int64   `json:"settled_time" gorm:"bigint;default:0"`
 	CreatedTime     int64   `json:"created_time" gorm:"bigint"`
 	UpdatedTime     int64   `json:"updated_time" gorm:"bigint"`
+
+	// Join fields (not stored in DB)
+	SolanaAddress string `json:"solana_address" gorm:"-"`
 }
 
 func (SettlementOrder) TableName() string {
@@ -184,7 +187,31 @@ func GetAllSettlementOrders(startIdx int, num int, status *int) ([]*SettlementOr
 	}
 	query.Count(&total)
 	err := query.Order("id desc").Limit(num).Offset(startIdx).Find(&orders).Error
-	return orders, total, err
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Fill in solana_address from users table
+	if len(orders) > 0 {
+		userIds := make([]int, 0, len(orders))
+		for _, o := range orders {
+			userIds = append(userIds, o.UserId)
+		}
+		var users []struct {
+			Id            int    `gorm:"column:id"`
+			SolanaAddress string `gorm:"column:solana_address"`
+		}
+		DB.Model(&User{}).Where("id IN ?", userIds).Select("id, solana_address").Find(&users)
+		addrMap := make(map[int]string, len(users))
+		for _, u := range users {
+			addrMap[u.Id] = u.SolanaAddress
+		}
+		for _, o := range orders {
+			o.SolanaAddress = addrMap[o.UserId]
+		}
+	}
+
+	return orders, total, nil
 }
 
 // UpdateSettlementOrderStatus updates the status (and related fields) of a settlement order

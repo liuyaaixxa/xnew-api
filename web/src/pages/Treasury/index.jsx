@@ -651,7 +651,7 @@ export default function TreasuryPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const [tabActiveKey, setTabActiveKey] = useState('treasury');
+  const [tabActiveKey, setTabActiveKey] = useState('settlement');
 
   const onChangeTab = (key) => {
     setTabActiveKey(key);
@@ -670,22 +670,22 @@ export default function TreasuryPage() {
     {
       tab: (
         <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          <Landmark size={18} />
-          {t('积分管理')}
-        </span>
-      ),
-      content: <TreasuryContent />,
-      itemKey: 'treasury',
-    },
-    {
-      tab: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
           <Calculator size={18} />
           {t('积分结算审核')}
         </span>
       ),
       content: <SettlementAuditTab />,
       itemKey: 'settlement',
+    },
+    {
+      tab: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <Landmark size={18} />
+          {t('积分管理')}
+        </span>
+      ),
+      content: <TreasuryContent />,
+      itemKey: 'treasury',
     },
   ];
 

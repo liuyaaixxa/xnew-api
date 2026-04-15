@@ -10,6 +10,7 @@ import {
   Modal,
   Input,
   Tooltip,
+  Banner,
 } from '@douyinfe/semi-ui';
 import { Check, X, Send } from 'lucide-react';
 import { API, showError } from '../../helpers';
@@ -92,13 +93,22 @@ export default function SettlementAuditTab() {
     }
   };
 
-  const handleSettle = async (id) => {
+  const handleSettle = async (record) => {
     Modal.confirm({
       title: t('确认转入积分'),
-      content: t('确定要将积分转入用户钱包吗？此操作不可撤销。'),
+      content: (
+        <div style={{ lineHeight: 2 }}>
+          <div><Text type='secondary'>{t('结算单号')}：</Text><Text style={{ fontFamily: 'monospace' }}>{record.order_no}</Text></div>
+          <div><Text type='secondary'>{t('用户')}：</Text><Text strong>{record.username}</Text></div>
+          <div><Text type='secondary'>{t('总 Token')}：</Text><Text strong>{record.total_tokens?.toLocaleString()}</Text></div>
+          <div><Text type='secondary'>{t('积分收益')}：</Text><Text strong style={{ color: 'var(--semi-color-success)', fontSize: 16 }}>{record.total_points?.toFixed(4)} SOL</Text></div>
+          <div><Text type='secondary'>{t('积分账号')}：</Text><Text style={{ fontFamily: 'monospace', fontSize: 13 }}>{record.solana_address || t('未创建')}</Text></div>
+          <Banner type='warning' description={t('此操作不可撤销，积分将从国库转入用户钱包。')} style={{ marginTop: 12 }} />
+        </div>
+      ),
       onOk: async () => {
         try {
-          const res = await API.post(`/api/treasury/settlement/${id}/settle`);
+          const res = await API.post(`/api/treasury/settlement/${record.id}/settle`);
           const { success, message } = res.data;
           if (success) {
             Toast.success(t('积分已转入'));
@@ -208,7 +218,7 @@ export default function SettlementAuditTab() {
                 size='small'
                 theme='solid'
                 type='primary'
-                onClick={() => handleSettle(record.id)}
+                onClick={() => handleSettle(record)}
               />
             </Tooltip>
           );
