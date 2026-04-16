@@ -111,6 +111,7 @@ func SetApiRouter(router *gin.Engine) {
 				selfRoute.GET("/wallet/transactions", controller.GetMyTransactions)
 
 				// Settlement routes
+				selfRoute.GET("/settlement/dashboard", controller.GetSettlementDashboard)
 				selfRoute.GET("/settlement/pending", controller.GetSettlementPending)
 				selfRoute.POST("/settlement/apply", middleware.CriticalRateLimit(), controller.ApplySettlement)
 				selfRoute.GET("/settlement/orders", controller.GetSettlementOrders)

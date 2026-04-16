@@ -10,6 +10,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetSettlementDashboard returns a lightweight summary for the dashboard card
+func GetSettlementDashboard(c *gin.Context) {
+	userId := c.GetInt("id")
+	totalPoints, totalTokens, err := model.GetUserSettlementDashboard(userId)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "failed to get settlement summary: " + err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data": gin.H{
+			"total_points": totalPoints,
+			"total_tokens": totalTokens,
+		},
+	})
+}
+
 // GetSettlementPending returns unsettled token stats for the current user
 func GetSettlementPending(c *gin.Context) {
 	userId := c.GetInt("id")

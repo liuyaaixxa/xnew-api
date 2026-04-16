@@ -246,6 +246,28 @@ func GetUserSettlementSummary(userId int) (float64, error) {
 	return *totalPoints, nil
 }
 
+// GetUserSettlementDashboard returns total settled points and tokens for a user (for dashboard card)
+func GetUserSettlementDashboard(userId int) (totalPoints float64, totalTokens int64, err error) {
+	var result struct {
+		TotalPoints *float64 `gorm:"column:total_points"`
+		TotalTokens *int64   `gorm:"column:total_tokens"`
+	}
+	err = DB.Model(&SettlementOrder{}).
+		Where("user_id = ? AND status = ?", userId, SettlementStatusCompleted).
+		Select("COALESCE(SUM(total_points), 0) as total_points, COALESCE(SUM(total_tokens), 0) as total_tokens").
+		Scan(&result).Error
+	if err != nil {
+		return 0, 0, err
+	}
+	if result.TotalPoints != nil {
+		totalPoints = *result.TotalPoints
+	}
+	if result.TotalTokens != nil {
+		totalTokens = *result.TotalTokens
+	}
+	return totalPoints, totalTokens, nil
+}
+
 // HasPendingSettlement checks if user has any pending/reviewing/settling orders
 func HasPendingSettlement(userId int) (bool, error) {
 	var count int64

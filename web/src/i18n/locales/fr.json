@@ -3910,6 +3910,8 @@
     "总 Token": "Total tokens",
     "积分收益": "Points gagnés",
     "积分账号": "Compte de points",
+    "积分余额": "Solde de points",
+    "贡献Token": "Tokens contribués",
     "已驳回": "Rejeté",
     "审核通过": "Approuvé",
     "此操作不可撤销，积分将从国库转入用户钱包。": "Cette action est irréversible. Les points seront transférés du trésor au portefeuille de l'utilisateur."

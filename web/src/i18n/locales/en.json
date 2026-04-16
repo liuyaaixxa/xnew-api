@@ -3946,6 +3946,8 @@
     "总 Token": "Total Tokens",
     "积分收益": "Points Earned",
     "积分账号": "Points Account",
+    "积分余额": "Points Balance",
+    "贡献Token": "Contributed Tokens",
     "已驳回": "Rejected",
     "审核通过": "Approved",
     "此操作不可撤销，积分将从国库转入用户钱包。": "This action is irreversible. Points will be transferred from treasury to user wallet."
