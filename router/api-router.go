@@ -65,6 +65,7 @@ func SetApiRouter(router *gin.Engine) {
 			userRoute.POST("/epay/notify", controller.EpayNotify)
 			userRoute.GET("/epay/notify", controller.EpayNotify)
 			userRoute.GET("/groups", controller.GetUserGroups)
+			userRoute.POST("/desktop-auth/exchange", middleware.CriticalRateLimit(), controller.DesktopAuthExchange)
 
 			selfRoute := userRoute.Group("/")
 			selfRoute.Use(middleware.UserAuth())
@@ -75,6 +76,7 @@ func SetApiRouter(router *gin.Engine) {
 				selfRoute.PUT("/self", controller.UpdateSelf)
 				selfRoute.DELETE("/self", controller.DeleteSelf)
 				selfRoute.GET("/token", controller.GenerateAccessToken)
+				selfRoute.POST("/desktop-auth/authorize", controller.DesktopAuthAuthorize)
 				selfRoute.GET("/passkey", controller.PasskeyStatus)
 				selfRoute.POST("/passkey/register/begin", controller.PasskeyRegisterBegin)
 				selfRoute.POST("/passkey/register/finish", controller.PasskeyRegisterFinish)

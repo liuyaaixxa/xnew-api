@@ -256,7 +256,8 @@ const LoginForm = () => {
               centered: true,
             });
           }
-          navigate('/console');
+          const nextUrl = searchParams.get('next');
+          navigate(nextUrl || '/console');
         } else {
           showError(message);
         }
@@ -457,7 +458,8 @@ const LoginForm = () => {
         setUserData(finish.data);
         updateAPI();
         showSuccess('登录成功！');
-        navigate('/console');
+        const nextUrl = searchParams.get('next');
+        navigate(nextUrl || '/console');
       } else {
         showError(finish.message || 'Passkey 登录失败，请重试');
       }
@@ -492,7 +494,8 @@ const LoginForm = () => {
     setUserData(data);
     updateAPI();
     showSuccess('登录成功！');
-    navigate('/console');
+    const nextUrl = searchParams.get('next');
+    navigate(nextUrl || '/console');
   };
 
   // 返回登录页面
