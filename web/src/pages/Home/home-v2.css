@@ -804,25 +804,61 @@ html.dark .hv2-dl-icon {
 .hv2-footer-inner {
   max-width: 1200px;
   margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 3rem;
+  padding-bottom: 2rem;
 }
 
-.hv2-footer-links {
-  display: flex;
-  gap: 1.75rem;
+.hv2-footer-brand {
+  text-align: left;
 }
 
-.hv2-footer-links a {
+.hv2-footer-brand .hv2-logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--hv2-accent, #2563eb);
+  margin-bottom: 0.5rem;
+}
+
+.hv2-footer-brand p {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.hv2-footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hv2-footer-col h4 {
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hv2-footer-col a {
   color: #64748b;
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   transition: color 0.2s;
 }
 
-.hv2-footer-links a:hover {
+.hv2-footer-col a:hover {
   color: #94a3b8;
+}
+
+.hv2-footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 1.5rem;
+  text-align: center;
 }
 
 .hv2-footer-copy {
@@ -855,9 +891,8 @@ html.dark .hv2-dl-icon {
     gap: 2.5rem;
   }
 
-  .hv2-footer-inner {
-    flex-direction: column;
-    gap: 1.25rem;
+  .hv2-footer-columns {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

@@ -431,12 +431,30 @@ const HomeV2 = () => {
           {/* ── Footer ── */}
           <footer className='hv2-footer hv2-reveal'>
             <div className='hv2-footer-inner'>
-              <div className='hv2-footer-links'>
+              <div className='hv2-footer-brand'>
+                <div className='hv2-logo'>Teniu.AI</div>
+                <p>{t('全球去中心化 GPU 共享网络，让闲置算力创造价值。')}</p>
+              </div>
+              <div className='hv2-footer-col'>
+                <h4>{t('产品')}</h4>
+                <Link to='/pricing'>{t('模型广场')}</Link>
                 <Link to='/docs'>{t('文档')}</Link>
+                <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases' target='_blank' rel='noreferrer'>{t('下载客户端')}</a>
+              </div>
+              <div className='hv2-footer-col'>
+                <h4>{t('公司')}</h4>
                 <Link to='/about'>{t('关于我们')}</Link>
                 <Link to='/privacy'>{t('隐私政策')}</Link>
                 <Link to='/tos'>{t('服务条款')}</Link>
               </div>
+              <div className='hv2-footer-col'>
+                <h4>{t('社区')}</h4>
+                <a href='https://github.com/liuyaaixxa/xnew-api' target='_blank' rel='noreferrer'>GitHub</a>
+                <a href='https://discord.gg/teniuai' target='_blank' rel='noreferrer'>Discord</a>
+                <a href='https://x.com/TeniuAI' target='_blank' rel='noreferrer'>X (Twitter)</a>
+              </div>
+            </div>
+            <div className='hv2-footer-bottom'>
               <p className='hv2-footer-copy'>&copy; 2026 Teniu.AI. All rights reserved.</p>
             </div>
           </footer>

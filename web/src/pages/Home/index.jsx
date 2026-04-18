@@ -359,13 +359,33 @@ const Home = () => {
           {/* Footer */}
           <footer className='lp-footer'>
             <div className='lp-footer-content'>
-              <div className='lp-footer-links'>
-                <Link to='/docs'>{t('文档')}</Link>
-                <Link to='/about'>{t('关于我们')}</Link>
-                <Link to='/privacy'>{t('隐私政策')}</Link>
-                <Link to='/tos'>{t('服务条款')}</Link>
+              <div className='lp-footer-brand'>
+                <div className='lp-logo'>Teniu.AI</div>
+                <p>{t('全球去中心化 GPU 共享网络，让闲置算力创造价值。')}</p>
               </div>
-              <p className='lp-footer-copy'>&copy; 2026 Teniu.AI. All rights reserved.</p>
+              <div className='lp-footer-columns'>
+                <div className='lp-footer-col'>
+                  <h4>{t('产品')}</h4>
+                  <Link to='/pricing'>{t('模型广场')}</Link>
+                  <Link to='/docs'>{t('文档')}</Link>
+                  <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases' target='_blank' rel='noreferrer'>{t('下载客户端')}</a>
+                </div>
+                <div className='lp-footer-col'>
+                  <h4>{t('公司')}</h4>
+                  <Link to='/about'>{t('关于我们')}</Link>
+                  <Link to='/privacy'>{t('隐私政策')}</Link>
+                  <Link to='/tos'>{t('服务条款')}</Link>
+                </div>
+                <div className='lp-footer-col'>
+                  <h4>{t('社区')}</h4>
+                  <a href='https://github.com/liuyaaixxa/xnew-api' target='_blank' rel='noreferrer'>GitHub</a>
+                  <a href='https://discord.gg/teniuai' target='_blank' rel='noreferrer'>Discord</a>
+                  <a href='https://x.com/TeniuAI' target='_blank' rel='noreferrer'>X (Twitter)</a>
+                </div>
+              </div>
+              <div className='lp-footer-bottom'>
+                <p className='lp-footer-copy'>&copy; 2026 Teniu.AI. All rights reserved.</p>
+              </div>
             </div>
           </footer>
         </div>
