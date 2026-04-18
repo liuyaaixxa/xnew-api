@@ -162,16 +162,8 @@ jobs:
               --name xnew-api \
               --restart always \
               --network host \
-              -e TZ=Asia/Shanghai \
-              -e FRONTEND_BASE_URL=https://teniuapi.online \
-              -e SQL_DSN="root:teniuapi666@tcp(127.0.0.1:3306)/xnew-api?charset=utf8mb4&parseTime=True&loc=Local" \
+              -e SQL_DSN="root:teniuapi!666@tcp(127.0.0.1:3306)/xnew-api?charset=utf8mb4&parseTime=True&loc=Local" \
               -e REDIS_CONN_STRING="redis://127.0.0.1:6379" \
-              -e SYNC_FREQUENCY=60 \
-              -e MEMORY_CACHE_ENABLED=true \
-              -e CHANNEL_UPDATE_FREQUENCY=30 \
-              -e BATCH_UPDATE_ENABLED=true \
-              -e BATCH_UPDATE_INTERVAL=5 \
-              -v /opt/new-api/data:/data \
               liuyaaixx/xnew-api:latest
 
             echo "==> Waiting for container to start..."
@@ -179,6 +171,9 @@ jobs:
 
             echo "==> Container status:"
             sudo docker ps --filter name=xnew-api --format "table {{.ID}}\t{{.Status}}\t{{.Ports}}"
+
+            echo "==> Health check..."
+            curl -sf http://localhost:3000/api/status | head -c 100 || echo "WARNING: health check failed"
 
             echo "==> Cleaning up old images..."
             sudo docker image prune -f
