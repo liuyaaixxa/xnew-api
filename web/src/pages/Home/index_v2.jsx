@@ -309,11 +309,11 @@ const HomeV2 = () => {
                   </div>
                   <h3>macOS</h3>
                   <p>{t('适用于 macOS 10.15+')}</p>
-                  <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-arm64.dmg' target='_blank' rel='noreferrer' className='hv2-dl-main-btn'>DMG · ARM64</a>
+                  <a href='/api/download/mac-arm64' className='hv2-dl-main-btn'>DMG · ARM64</a>
                   <div className='hv2-dl-links'>
-                    <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-x64.dmg' target='_blank' rel='noreferrer' className='hv2-dl-link'>DMG · x64</a>
-                    <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-arm64.AppImage' target='_blank' rel='noreferrer' className='hv2-dl-link'>AppImage · ARM64</a>
-                    <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-x86_64.AppImage' target='_blank' rel='noreferrer' className='hv2-dl-link'>AppImage · x64</a>
+                    <a href='/api/download/mac-x64' className='hv2-dl-link'>DMG · x64</a>
+                    <a href='/api/download/linux-arm64-appimage' className='hv2-dl-link'>AppImage · ARM64</a>
+                    <a href='/api/download/linux-x86_64-appimage' className='hv2-dl-link'>AppImage · x64</a>
                   </div>
                 </div>
                 <div className='hv2-dl-card'>
@@ -324,11 +324,11 @@ const HomeV2 = () => {
                   </div>
                   <h3>Windows</h3>
                   <p>{t('适用于 Windows 10+')}</p>
-                  <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-x64-setup.exe' target='_blank' rel='noreferrer' className='hv2-dl-main-btn'>Setup · x64</a>
+                  <a href='/api/download/win-x64' className='hv2-dl-main-btn'>Setup · x64</a>
                   <div className='hv2-dl-links'>
-                    <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-x64-portable.exe' target='_blank' rel='noreferrer' className='hv2-dl-link'>Portable · x64</a>
-                    <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-arm64-setup.exe' target='_blank' rel='noreferrer' className='hv2-dl-link'>Setup · ARM64</a>
-                    <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-arm64-portable.exe' target='_blank' rel='noreferrer' className='hv2-dl-link'>Portable · ARM64</a>
+                    <a href='/api/download/win-x64-portable' className='hv2-dl-link'>Portable · x64</a>
+                    <a href='/api/download/win-arm64' className='hv2-dl-link'>Setup · ARM64</a>
+                    <a href='/api/download/win-arm64-portable' className='hv2-dl-link'>Portable · ARM64</a>
                   </div>
                 </div>
                 <div className='hv2-dl-card'>
@@ -339,16 +339,16 @@ const HomeV2 = () => {
                   </div>
                   <h3>Linux</h3>
                   <p>{t('支持 Ubuntu、Debian、CentOS 等')}</p>
-                  <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-amd64.deb' target='_blank' rel='noreferrer' className='hv2-dl-main-btn'>DEB · amd64</a>
+                  <a href='/api/download/linux-amd64-deb' className='hv2-dl-main-btn'>DEB · amd64</a>
                   <div className='hv2-dl-links'>
-                    <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-arm64.deb' target='_blank' rel='noreferrer' className='hv2-dl-link'>DEB · arm64</a>
-                    <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-aarch64.deb' target='_blank' rel='noreferrer' className='hv2-dl-link'>DEB · aarch64</a>
-                    <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-x86_64.rpm' target='_blank' rel='noreferrer' className='hv2-dl-link'>RPM · x86_64</a>
+                    <a href='/api/download/linux-arm64-deb' className='hv2-dl-link'>DEB · arm64</a>
+                    <a href='/api/download/linux-aarch64-deb' className='hv2-dl-link'>DEB · aarch64</a>
+                    <a href='/api/download/linux-x86_64-rpm' className='hv2-dl-link'>RPM · x86_64</a>
                   </div>
                 </div>
               </div>
               <div className='hv2-dl-universal'>
-                <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-x64.zip' target='_blank' rel='noreferrer' className='hv2-dl-zip'>
+                <a href='/api/download/mac-x64-zip' className='hv2-dl-zip'>
                   {t('通用版本下载')} (ZIP · x64)
                 </a>
               </div>

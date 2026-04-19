@@ -2569,6 +2569,8 @@
     "用户信息端点": "User Info Endpoint",
     "用户信息缺失": "User information missing",
     "用户最大令牌数量": "Maximum Tokens per User",
+    "TeniuLink Node 版本号": "TeniuLink Node Version",
+    "用于首页下载链接的动态版本号，修改后下载链接自动指向新版本": "Version for homepage download links. Changes take effect automatically.",
     "用户分组": "Your default group",
     "用户分组和额度管理": "User Group and Quota Management",
     "用户分组配置": "User group configuration",

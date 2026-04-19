@@ -19,6 +19,7 @@ var platformMap = map[string]string{
 	"win-arm64-portable":    "Teniulink-Node-%s-arm64-portable.exe",
 	"linux-amd64-deb":       "Teniulink-Node-%s-amd64.deb",
 	"linux-arm64-deb":       "Teniulink-Node-%s-arm64.deb",
+	"linux-aarch64-deb":     "Teniulink-Node-%s-aarch64.deb",
 	"linux-x86_64-rpm":      "Teniulink-Node-%s-x86_64.rpm",
 	"linux-aarch64-rpm":     "Teniulink-Node-%s-aarch64.rpm",
 	"linux-x86_64-appimage": "Teniulink-Node-%s-x86_64.AppImage",

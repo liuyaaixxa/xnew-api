@@ -2680,6 +2680,8 @@
     "用户信息更新成功！": "Cập nhật thông tin người dùng thành công!",
     "用户信息缺失": "Thiếu thông tin người dùng",
     "用户最大令牌数量": "Số token tối đa mỗi người dùng",
+    "TeniuLink Node 版本号": "Phiên bản TeniuLink Node",
+    "用于首页下载链接的动态版本号，修改后下载链接自动指向新版本": "Phiên bản cho liên kết tải về trên trang chủ. Thay đổi có hiệu lực tự động.",
     "用户分组": "Nhóm người dùng",
     "用户分组和额度管理": "Quản lý nhóm người dùng và hạn ngạch",
     "用户分组设置": "Cài đặt nhóm người dùng",

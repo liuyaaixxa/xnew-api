@@ -2549,6 +2549,8 @@
     "用户信息更新成功！": "Informations utilisateur mises à jour avec succès !",
     "用户信息缺失": "Informations utilisateur manquantes",
     "用户最大令牌数量": "Nombre maximal de jetons par utilisateur",
+    "TeniuLink Node 版本号": "Version de TeniuLink Node",
+    "用于首页下载链接的动态版本号，修改后下载链接自动指向新版本": "Version pour les liens de téléchargement. Les modifications prennent effet automatiquement.",
     "用户分组": "Votre groupe par défaut",
     "用户分组和额度管理": "Groupes et quotas",
     "用户分组配置": "Configuration du groupe d'utilisateurs",
