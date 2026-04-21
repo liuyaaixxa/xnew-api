@@ -33,6 +33,7 @@ import {
 import { API, showError, showSuccess, renderQuota } from '../../helpers';
 import { getCurrencyConfig } from '../../helpers/render';
 import { RefreshCw, Sparkles } from 'lucide-react';
+import { SiPaypal } from 'react-icons/si';
 import SubscriptionPurchaseModal from './modals/SubscriptionPurchaseModal';
 import {
   formatSubscriptionDuration,
@@ -40,13 +41,6 @@ import {
 } from '../../helpers/subscriptionFormat';
 
 const { Text } = Typography;
-
-// 过滤易支付方式
-function getEpayMethods(payMethods = []) {
-  return (payMethods || []).filter(
-    (m) => m?.type && m.type !== 'stripe' && m.type !== 'creem',
-  );
-}
 
 // 提交易支付表单
 function submitEpayForm({ url, params }) {
@@ -74,7 +68,6 @@ const SubscriptionPlansCard = ({
   loading = false,
   plans = [],
   payMethods = [],
-  enableOnlineTopUp = false,
   enableStripeTopUp = false,
   enableCreemTopUp = false,
   billingPreference,
@@ -87,14 +80,17 @@ const SubscriptionPlansCard = ({
   const [open, setOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [paying, setPaying] = useState(false);
-  const [selectedEpayMethod, setSelectedEpayMethod] = useState('');
+  const [selectedPayMethod, setSelectedPayMethod] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
-  const epayMethods = useMemo(() => getEpayMethods(payMethods), [payMethods]);
+  // 过滤支付方式（排除 creem，保留 PayPal、支付宝、微信等）
+  const filteredPayMethods = useMemo(() => {
+    return (payMethods || []).filter((m) => m?.type && m.type !== 'creem');
+  }, [payMethods]);
 
   const openBuy = (p) => {
     setSelectedPlan(p);
-    setSelectedEpayMethod(epayMethods?.[0]?.type || '');
+    setSelectedPayMethod(filteredPayMethods?.[0]?.type || '');
     setOpen(true);
   };
 
@@ -113,78 +109,64 @@ const SubscriptionPlansCard = ({
     }
   };
 
-  const payStripe = async () => {
-    if (!selectedPlan?.plan?.stripe_price_id) {
-      showError(t('该套餐未配置 Stripe'));
-      return;
-    }
-    setPaying(true);
-    try {
-      const res = await API.post('/api/subscription/stripe/pay', {
-        plan_id: selectedPlan.plan.id,
-      });
-      if (res.data?.message === 'success') {
-        window.open(res.data.data?.pay_link, '_blank');
-        showSuccess(t('已打开支付页面'));
-        closeBuy();
-      } else {
-        const errorMsg =
-          typeof res.data?.data === 'string'
-            ? res.data.data
-            : res.data?.message || t('支付失败');
-        showError(errorMsg);
-      }
-    } catch (e) {
-      showError(t('支付请求失败'));
-    } finally {
-      setPaying(false);
-    }
-  };
-
-  const payCreem = async () => {
-    if (!selectedPlan?.plan?.creem_product_id) {
-      showError(t('该套餐未配置 Creem'));
-      return;
-    }
-    setPaying(true);
-    try {
-      const res = await API.post('/api/subscription/creem/pay', {
-        plan_id: selectedPlan.plan.id,
-      });
-      if (res.data?.message === 'success') {
-        window.open(res.data.data?.checkout_url, '_blank');
-        showSuccess(t('已打开支付页面'));
-        closeBuy();
-      } else {
-        const errorMsg =
-          typeof res.data?.data === 'string'
-            ? res.data.data
-            : res.data?.message || t('支付失败');
-        showError(errorMsg);
-      }
-    } catch (e) {
-      showError(t('支付请求失败'));
-    } finally {
-      setPaying(false);
-    }
-  };
-
-  const payEpay = async () => {
-    if (!selectedEpayMethod) {
+  // 统一的支付处理函数
+  const handlePay = async (payMethod) => {
+    if (!payMethod) {
       showError(t('请选择支付方式'));
       return;
     }
     setPaying(true);
     try {
-      const res = await API.post('/api/subscription/epay/pay', {
-        plan_id: selectedPlan.plan.id,
-        payment_method: selectedEpayMethod,
-      });
-      if (res.data?.message === 'success') {
-        submitEpayForm({ url: res.data.url, params: res.data.data });
-        showSuccess(t('已发起支付'));
-        closeBuy();
+      let res;
+      if (payMethod === 'stripe') {
+        if (!selectedPlan?.plan?.stripe_price_id) {
+          showError(t('该套餐未配置 Stripe'));
+          return;
+        }
+        res = await API.post('/api/subscription/stripe/pay', {
+          plan_id: selectedPlan.plan.id,
+        });
+        if (res.data?.message === 'success') {
+          window.open(res.data.data?.pay_link, '_blank');
+          showSuccess(t('已打开支付页面'));
+          closeBuy();
+        }
+      } else if (payMethod === 'paypal') {
+        res = await API.post('/api/subscription/paypal/pay', {
+          plan_id: selectedPlan.plan.id,
+        });
+        if (res.data?.message === 'success') {
+          window.open(res.data.data?.payment_url, '_blank');
+          showSuccess(t('已打开支付页面'));
+          closeBuy();
+        }
+      } else if (payMethod === 'creem') {
+        if (!selectedPlan?.plan?.creem_product_id) {
+          showError(t('该套餐未配置 Creem'));
+          return;
+        }
+        res = await API.post('/api/subscription/creem/pay', {
+          plan_id: selectedPlan.plan.id,
+        });
+        if (res.data?.message === 'success') {
+          window.open(res.data.data?.checkout_url, '_blank');
+          showSuccess(t('已打开支付页面'));
+          closeBuy();
+        }
       } else {
+        // 易支付（支付宝、微信等）
+        res = await API.post('/api/subscription/epay/pay', {
+          plan_id: selectedPlan.plan.id,
+          payment_method: payMethod,
+        });
+        if (res.data?.message === 'success') {
+          submitEpayForm({ url: res.data.url, params: res.data.data });
+          showSuccess(t('已发起支付'));
+          closeBuy();
+        }
+      }
+      // 处理失败情况
+      if (res && res.data?.message !== 'success') {
         const errorMsg =
           typeof res.data?.data === 'string'
             ? res.data.data
@@ -659,10 +641,9 @@ const SubscriptionPlansCard = ({
         onCancel={closeBuy}
         selectedPlan={selectedPlan}
         paying={paying}
-        selectedEpayMethod={selectedEpayMethod}
-        setSelectedEpayMethod={setSelectedEpayMethod}
-        epayMethods={epayMethods}
-        enableOnlineTopUp={enableOnlineTopUp}
+        selectedPayMethod={selectedPayMethod}
+        setSelectedPayMethod={setSelectedPayMethod}
+        payMethods={filteredPayMethods}
         enableStripeTopUp={enableStripeTopUp}
         enableCreemTopUp={enableCreemTopUp}
         purchaseLimitInfo={
@@ -673,9 +654,7 @@ const SubscriptionPlansCard = ({
               }
             : null
         }
-        onPayStripe={payStripe}
-        onPayCreem={payCreem}
-        onPayEpay={payEpay}
+        onPay={handlePay}
       />
     </>
   );

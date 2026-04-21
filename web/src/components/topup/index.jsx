@@ -77,6 +77,9 @@ const TopUp = () => {
   const [waffoPayMethods, setWaffoPayMethods] = useState([]);
   const [waffoMinTopUp, setWaffoMinTopUp] = useState(1);
 
+  // PayPal 相关状态
+  const [enablePayPalTopUp, setEnablePayPalTopUp] = useState(false);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
   const [payWay, setPayWay] = useState('');
@@ -163,6 +166,34 @@ const TopUp = () => {
         showError(t('管理员未开启Stripe充值！'));
         return;
       }
+    } else if (payment === 'paypal') {
+      // PayPal 支付直接跳转，不需要确认模态框
+      if (topUpCount < minTopUp) {
+        showError(t('充值数量不能小于') + minTopUp);
+        return;
+      }
+      setPayWay(payment);
+      setPaymentLoading(true);
+      try {
+        const res = await API.post('/api/user/paypal/pay', {
+          amount: parseInt(topUpCount),
+        });
+        if (res !== undefined) {
+          const { success, message, data } = res.data;
+          if (success && data?.payment_url) {
+            window.open(data.payment_url, '_blank');
+          } else {
+            showError(data || message || t('支付请求失败'));
+          }
+        } else {
+          showError(res);
+        }
+      } catch (err) {
+        showError(t('支付请求失败'));
+      } finally {
+        setPaymentLoading(false);
+      }
+      return;
     } else {
       if (!enableOnlineTopUp) {
         showError(t('管理员未开启在线充值！'));
@@ -496,6 +527,11 @@ const TopUp = () => {
           setEnableWaffoTopUp(enableWaffoTopUp);
           setWaffoPayMethods(data.waffo_pay_methods || []);
           setWaffoMinTopUp(data.waffo_min_topup || 1);
+
+          // PayPal 状态
+          const enablePayPalTopUpVal = data.enable_paypal_topup || false;
+          setEnablePayPalTopUp(enablePayPalTopUpVal);
+
           setMinTopUp(minTopUpValue);
           setTopUpCount(minTopUpValue);
 
@@ -577,6 +613,16 @@ const TopUp = () => {
       setOpenHistory(true);
       searchParams.delete('show_history');
       setSearchParams(searchParams, { replace: true });
+    }
+    // 处理 PayPal 订阅支付成功回调
+    if (searchParams.get('subscription_success') === 'true') {
+      showSuccess(t('订阅支付成功'));
+      searchParams.delete('subscription_success');
+      setSearchParams(searchParams, { replace: true });
+      // 刷新订阅数据
+      getSubscriptionPlans().then();
+      getSubscriptionSelf().then();
+      getUserQuota().then();
     }
   }, []);
 

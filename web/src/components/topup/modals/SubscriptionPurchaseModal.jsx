@@ -28,8 +28,8 @@ import {
   Divider,
   Tooltip,
 } from '@douyinfe/semi-ui';
-import { Crown, CalendarClock, Package } from 'lucide-react';
-import { SiStripe } from 'react-icons/si';
+import { Crown, CalendarClock, Package, CreditCard } from 'lucide-react';
+import { SiStripe, SiPaypal, SiAlipay, SiWechat } from 'react-icons/si';
 import { IconCreditCard } from '@douyinfe/semi-icons';
 import { renderQuota } from '../../../helpers';
 import { getCurrencyConfig } from '../../../helpers/render';
@@ -40,22 +40,35 @@ import {
 
 const { Text } = Typography;
 
+// 渲染支付方式图标
+const renderPayMethodIcon = (type, size = 14) => {
+  switch (type) {
+    case 'alipay':
+      return <SiAlipay size={size} color='#1677FF' />;
+    case 'wxpay':
+      return <SiWechat size={size} color='#07C160' />;
+    case 'stripe':
+      return <SiStripe size={size} color='#635BFF' />;
+    case 'paypal':
+      return <SiPaypal size={size} color='#003087' />;
+    default:
+      return <CreditCard size={size} />;
+  }
+};
+
 const SubscriptionPurchaseModal = ({
   t,
   visible,
   onCancel,
   selectedPlan,
   paying,
-  selectedEpayMethod,
-  setSelectedEpayMethod,
-  epayMethods = [],
-  enableOnlineTopUp = false,
+  selectedPayMethod,
+  setSelectedPayMethod,
+  payMethods = [],
   enableStripeTopUp = false,
   enableCreemTopUp = false,
   purchaseLimitInfo = null,
-  onPayStripe,
-  onPayCreem,
-  onPayEpay,
+  onPay,
 }) => {
   const plan = selectedPlan?.plan;
   const totalAmount = Number(plan?.total_amount || 0);
@@ -68,12 +81,61 @@ const SubscriptionPurchaseModal = ({
   // 只有当管理员开启支付网关 AND 套餐配置了对应的支付ID时才显示
   const hasStripe = enableStripeTopUp && !!plan?.stripe_price_id;
   const hasCreem = enableCreemTopUp && !!plan?.creem_product_id;
-  const hasEpay = enableOnlineTopUp && epayMethods.length > 0;
-  const hasAnyPayment = hasStripe || hasCreem || hasEpay;
+  const hasAnyPayment = payMethods.length > 0 || hasStripe || hasCreem;
   const purchaseLimit = Number(purchaseLimitInfo?.limit || 0);
   const purchaseCount = Number(purchaseLimitInfo?.count || 0);
   const purchaseLimitReached =
     purchaseLimit > 0 && purchaseCount >= purchaseLimit;
+
+  // 构建统一的支付方式列表（下拉选项）
+  const allPayMethods = [];
+  // 添加易支付方式（支付宝、微信、PayPal 等）
+  payMethods.forEach((m) => {
+    if (m.type === 'stripe' && hasStripe) {
+      allPayMethods.push({ ...m, label: m.name || 'Stripe' });
+    } else if (m.type !== 'stripe' && m.type !== 'creem') {
+      allPayMethods.push({ ...m, label: m.name || m.type });
+    }
+  });
+  // 如果有 Stripe 但不在 payMethods 中，手动添加
+  if (hasStripe && !payMethods.find((m) => m.type === 'stripe')) {
+    allPayMethods.push({ type: 'stripe', name: 'Stripe', label: 'Stripe' });
+  }
+
+  // 渲染下拉选项（带图标和hover效果）
+  const renderOptionItem = (option) => {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          padding: '10px 16px',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          transition: 'background-color 0.2s',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'var(--semi-color-fill-1)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent';
+        }}
+        onClick={() => setSelectedPayMethod(option.value)}
+      >
+        {renderPayMethodIcon(option.value)}
+        <span style={{ fontWeight: 500 }}>{option.label}</span>
+      </div>
+    );
+  };
+
+  // 渲染选中项显示
+  const renderSelectedItem = (option) => (
+    <div className='flex items-center gap-2'>
+      {renderPayMethodIcon(option.value)}
+      <span>{option.label}</span>
+    </div>
+  );
 
   return (
     <Modal
@@ -185,61 +247,49 @@ const SubscriptionPurchaseModal = ({
                 {t('选择支付方式')}：
               </Text>
 
-              {/* Stripe / Creem */}
-              {(hasStripe || hasCreem) && (
-                <div className='flex gap-2'>
-                  {hasStripe && (
-                    <Button
-                      theme='light'
-                      className='flex-1'
-                      icon={<SiStripe size={14} color='#635BFF' />}
-                      onClick={onPayStripe}
-                      loading={paying}
-                      disabled={purchaseLimitReached}
-                    >
-                      Stripe
-                    </Button>
-                  )}
-                  {hasCreem && (
-                    <Button
-                      theme='light'
-                      className='flex-1'
-                      icon={<IconCreditCard />}
-                      onClick={onPayCreem}
-                      loading={paying}
-                      disabled={purchaseLimitReached}
-                    >
-                      Creem
-                    </Button>
-                  )}
-                </div>
-              )}
-
-              {/* 易支付 */}
-              {hasEpay && (
+              {/* 统一的支付方式下拉选择 + 支付按钮 */}
+              {allPayMethods.length > 0 && (
                 <div className='flex gap-2'>
                   <Select
-                    value={selectedEpayMethod}
-                    onChange={setSelectedEpayMethod}
+                    value={selectedPayMethod}
+                    onChange={setSelectedPayMethod}
                     style={{ flex: 1 }}
                     size='default'
                     placeholder={t('选择支付方式')}
-                    optionList={epayMethods.map((m) => ({
+                    renderSelectedItem={renderSelectedItem}
+                    renderOptionItem={renderOptionItem}
+                    optionList={allPayMethods.map((m) => ({
                       value: m.type,
-                      label: m.name || m.type,
+                      label: m.label || m.name,
+                      ...m,
                     }))}
                     disabled={purchaseLimitReached}
+                    dropdownStyle={{ padding: '8px' }}
                   />
                   <Button
                     theme='solid'
                     type='primary'
-                    onClick={onPayEpay}
+                    onClick={() => onPay(selectedPayMethod)}
                     loading={paying}
-                    disabled={!selectedEpayMethod || purchaseLimitReached}
+                    disabled={!selectedPayMethod || purchaseLimitReached}
                   >
                     {t('支付')}
                   </Button>
                 </div>
+              )}
+
+              {/* Creem 单独按钮（如果有） */}
+              {hasCreem && (
+                <Button
+                  theme='light'
+                  className='w-full'
+                  icon={<IconCreditCard />}
+                  onClick={() => onPay('creem')}
+                  loading={paying}
+                  disabled={purchaseLimitReached}
+                >
+                  Creem
+                </Button>
               )}
             </div>
           ) : (

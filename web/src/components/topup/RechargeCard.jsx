@@ -35,7 +35,7 @@ import {
   Tabs,
   TabPane,
 } from '@douyinfe/semi-ui';
-import { SiAlipay, SiWechat, SiStripe } from 'react-icons/si';
+import { SiAlipay, SiWechat, SiStripe, SiPaypal } from 'react-icons/si';
 import {
   CreditCard,
   Coins,
@@ -57,6 +57,7 @@ const RechargeCard = ({
   enableOnlineTopUp,
   enableStripeTopUp,
   enableCreemTopUp,
+  enablePayPalTopUp,
   creemProducts,
   creemPreTopUp,
   presetAmounts,
@@ -298,8 +299,9 @@ const RechargeCard = ({
                           {payMethods.filter(m => m.type !== 'waffo').map((payMethod) => {
                             const minTopupVal = Number(payMethod.min_topup) || 0;
                             const isStripe = payMethod.type === 'stripe';
+                            const isPayPal = payMethod.type === 'paypal';
                             const disabled =
-                              (!enableOnlineTopUp && !isStripe) ||
+                              (!enableOnlineTopUp && !isStripe && !isPayPal) ||
                               (!enableStripeTopUp && isStripe) ||
                               minTopupVal > Number(topUpCount || 0);
 
@@ -320,6 +322,8 @@ const RechargeCard = ({
                                     <SiWechat size={18} color='#07C160' />
                                   ) : payMethod.type === 'stripe' ? (
                                     <SiStripe size={18} color='#635BFF' />
+                                  ) : payMethod.type === 'paypal' ? (
+                                    <SiPaypal size={18} color='#003087' />
                                   ) : (
                                     <CreditCard
                                       size={18}
@@ -658,7 +662,6 @@ const RechargeCard = ({
                 loading={subscriptionLoading}
                 plans={subscriptionPlans}
                 payMethods={payMethods}
-                enableOnlineTopUp={enableOnlineTopUp}
                 enableStripeTopUp={enableStripeTopUp}
                 enableCreemTopUp={enableCreemTopUp}
                 billingPreference={billingPreference}
