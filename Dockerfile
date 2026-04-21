@@ -28,8 +28,20 @@ RUN go build -ldflags "-s -w -X 'github.com/QuantumNous/new-api/common.Version=$
 FROM debian:bookworm-slim@sha256:f06537653ac770703bc45b4b113475bd402f451e85223f0f2837acbf89ab020a
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates tzdata libasan8 wget \
-    && rm -rf /var/lib/apt/lists/* \
+    && apt-get install -y --no-install-recommends ca-certificates tzdata libasan8 wget curl gnupg \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && npm install -g \
+       @openfort/cli \
+       @solana/kit \
+       @solana-program/system \
+       @solana-program/compute-budget \
+       @solana-program/token \
+       @solana/kora \
+       @solana/transaction-confirmation \
+    && apt-get purge -y gnupg \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/* /root/.npm \
     && update-ca-certificates
 
 COPY --from=builder2 /build/new-api /

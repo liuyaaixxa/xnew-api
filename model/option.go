@@ -105,6 +105,16 @@ func InitOptionMap() {
 	common.OptionMap["WaffoUnitPrice"] = strconv.FormatFloat(setting.WaffoUnitPrice, 'f', -1, 64)
 	common.OptionMap["WaffoMinTopUp"] = strconv.Itoa(setting.WaffoMinTopUp)
 	common.OptionMap["WaffoPayMethods"] = setting.WaffoPayMethods2JsonString()
+	common.OptionMap["OpenfortApiKey"] = setting.OpenfortApiKey
+	common.OptionMap["OpenfortPublishableKey"] = setting.OpenfortPublishableKey
+	common.OptionMap["OpenfortWalletSecret"] = setting.OpenfortWalletSecret
+	common.OptionMap["OpenfortTreasuryAccountId"] = setting.OpenfortTreasuryAccountId
+	common.OptionMap["OpenfortTreasuryAddress"] = setting.OpenfortTreasuryAddress
+	common.OptionMap["OpenfortSolanaCluster"] = setting.OpenfortSolanaCluster
+	common.OptionMap["OpenfortShieldPublishableKey"] = setting.OpenfortShieldPublishableKey
+	common.OptionMap["OpenfortShieldSecretKey"] = setting.OpenfortShieldSecretKey
+	common.OptionMap["OpenfortEncryptionShare"] = setting.OpenfortEncryptionShare
+	common.OptionMap["SettlementTokenRate"] = strconv.FormatFloat(setting.SettlementTokenRate, 'f', -1, 64)
 	common.OptionMap["PayPalClientId"] = setting.PayPalClientId
 	common.OptionMap["PayPalClientSecret"] = setting.PayPalClientSecret
 	common.OptionMap["PayPalSandbox"] = strconv.FormatBool(setting.PayPalSandbox)
@@ -144,6 +154,7 @@ func InitOptionMap() {
 	common.OptionMap["AudioRatio"] = ratio_setting.AudioRatio2JSONString()
 	common.OptionMap["AudioCompletionRatio"] = ratio_setting.AudioCompletionRatio2JSONString()
 	common.OptionMap["TopUpLink"] = common.TopUpLink
+	common.OptionMap["TeniulinkNodeVersion"] = common.TeniulinkNodeVersion
 	//common.OptionMap["ChatLink"] = common.ChatLink
 	//common.OptionMap["ChatLink2"] = common.ChatLink2
 	common.OptionMap["QuotaPerUnit"] = strconv.FormatFloat(common.QuotaPerUnit, 'f', -1, 64)
@@ -408,6 +419,24 @@ func updateOptionMap(key string, value string) (err error) {
 		setting.WaffoUnitPrice, _ = strconv.ParseFloat(value, 64)
 	case "WaffoMinTopUp":
 		setting.WaffoMinTopUp, _ = strconv.Atoi(value)
+	case "OpenfortApiKey":
+		setting.OpenfortApiKey = value
+	case "OpenfortPublishableKey":
+		setting.OpenfortPublishableKey = value
+	case "OpenfortWalletSecret":
+		setting.OpenfortWalletSecret = value
+	case "OpenfortTreasuryAccountId":
+		setting.OpenfortTreasuryAccountId = value
+	case "OpenfortTreasuryAddress":
+		setting.OpenfortTreasuryAddress = value
+	case "OpenfortSolanaCluster":
+		setting.OpenfortSolanaCluster = value
+	case "OpenfortShieldPublishableKey":
+		setting.OpenfortShieldPublishableKey = value
+	case "OpenfortShieldSecretKey":
+		setting.OpenfortShieldSecretKey = value
+	case "OpenfortEncryptionShare":
+		setting.OpenfortEncryptionShare = value
 	case "PayPalClientId":
 		setting.PayPalClientId = value
 	case "PayPalClientSecret":
@@ -494,6 +523,8 @@ func updateOptionMap(key string, value string) (err error) {
 		err = ratio_setting.UpdateAudioRatioByJSONString(value)
 	case "AudioCompletionRatio":
 		err = ratio_setting.UpdateAudioCompletionRatioByJSONString(value)
+	case "TeniulinkNodeVersion":
+		common.TeniulinkNodeVersion = value
 	case "TopUpLink":
 		common.TopUpLink = value
 	//case "ChatLink":
@@ -512,6 +543,8 @@ func updateOptionMap(key string, value string) (err error) {
 		err = operation_setting.AutomaticDisableStatusCodesFromString(value)
 	case "AutomaticRetryStatusCodes":
 		err = operation_setting.AutomaticRetryStatusCodesFromString(value)
+	case "SettlementTokenRate":
+		setting.SettlementTokenRate, _ = strconv.ParseFloat(value, 64)
 	case "StreamCacheQueueLength":
 		setting.StreamCacheQueueLength, _ = strconv.Atoi(value)
 	case "PayMethods":

@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 
 import { useMemo } from 'react';
-import { Wallet, Activity, Zap, Gauge } from 'lucide-react';
+import { Wallet, Activity, Zap, Gauge, Award } from 'lucide-react';
 import {
   IconMoneyExchangeStroked,
   IconHistogram,
@@ -28,6 +28,8 @@ import {
   IconStopwatchStroked,
   IconTypograph,
   IconSend,
+  IconGift,
+  IconServer,
 } from '@douyinfe/semi-icons';
 import { renderQuota } from '../../helpers';
 import { createSectionTitle } from '../../helpers/dashboard';
@@ -41,6 +43,7 @@ export const useDashboardStats = (
   performanceMetrics,
   navigate,
   t,
+  settlementSummary,
 ) => {
   const groupedStatsData = useMemo(
     () => [
@@ -132,6 +135,28 @@ export const useDashboardStats = (
           },
         ],
       },
+      {
+        title: createSectionTitle(Award, t('积分收益')),
+        color: 'bg-emerald-50',
+        items: [
+          {
+            title: t('积分余额'),
+            value: (settlementSummary?.total_points ?? 0).toFixed(4) + ' SOL',
+            icon: <IconGift />,
+            avatarColor: 'green',
+            trendData: [],
+            trendColor: '#10b981',
+          },
+          {
+            title: t('贡献Token'),
+            value: (settlementSummary?.total_tokens ?? 0).toLocaleString(),
+            icon: <IconServer />,
+            avatarColor: 'teal',
+            trendData: [],
+            trendColor: '#14b8a6',
+          },
+        ],
+      },
     ],
     [
       userState?.user?.quota,
@@ -144,6 +169,7 @@ export const useDashboardStats = (
       performanceMetrics,
       navigate,
       t,
+      settlementSummary,
     ],
   );
 

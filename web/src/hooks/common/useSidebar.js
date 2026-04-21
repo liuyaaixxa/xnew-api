@@ -43,6 +43,7 @@ export const DEFAULT_ADMIN_CONFIG = {
   personal: {
     enabled: true,
     topup: true,
+    wallet: true,
     personal: true,
   },
   admin: {
@@ -54,6 +55,7 @@ export const DEFAULT_ADMIN_CONFIG = {
     redemption: true,
     user: true,
     subscription: true,
+    treasury: true,
     setting: true,
   },
 };

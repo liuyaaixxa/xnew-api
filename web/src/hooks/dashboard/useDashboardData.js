@@ -76,6 +76,9 @@ export const useDashboardData = (userState, userDispatch, statusState) => {
     tpm: [],
   });
 
+  // ========== 积分结算数据 ==========
+  const [settlementSummary, setSettlementSummary] = useState({ total_points: 0, total_tokens: 0 });
+
   // ========== Uptime 数据 ==========
   const [uptimeData, setUptimeData] = useState([]);
   const [uptimeLoading, setUptimeLoading] = useState(false);
@@ -223,11 +226,24 @@ export const useDashboardData = (userState, userDispatch, statusState) => {
     }
   }, [userDispatch]);
 
+  const loadSettlementSummary = useCallback(async () => {
+    try {
+      const res = await API.get('/api/user/settlement/dashboard');
+      const { success, data } = res.data;
+      if (success) {
+        setSettlementSummary(data);
+      }
+    } catch (_e) {
+      // silently ignore — card will show 0
+    }
+  }, []);
+
   const refresh = useCallback(async () => {
     const data = await loadQuotaData();
     await loadUptimeData();
+    await loadSettlementSummary();
     return data;
-  }, [loadQuotaData, loadUptimeData]);
+  }, [loadQuotaData, loadUptimeData, loadSettlementSummary]);
 
   const handleSearchConfirm = useCallback(
     async (updateChartDataCallback) => {
@@ -251,9 +267,10 @@ export const useDashboardData = (userState, userDispatch, statusState) => {
   useEffect(() => {
     if (!initialized.current) {
       getUserData();
+      loadSettlementSummary();
       initialized.current = true;
     }
-  }, [getUserData]);
+  }, [getUserData, loadSettlementSummary]);
 
   return {
     // 基础状态
@@ -293,6 +310,9 @@ export const useDashboardData = (userState, userDispatch, statusState) => {
     uptimeLoading,
     activeUptimeTab,
     setActiveUptimeTab,
+
+    // 积分结算
+    settlementSummary,
 
     // 计算值
     timeOptions,

@@ -705,21 +705,62 @@
   margin: 0 auto;
 }
 
-.lp-footer-links {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-bottom: 1.5rem;
+.lp-footer-brand {
+  margin-bottom: 2rem;
+  text-align: left;
 }
 
-.lp-footer-links a {
+.lp-footer-brand .lp-logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--lp-accent-green);
+  margin-bottom: 0.5rem;
+}
+
+.lp-footer-brand p {
+  color: var(--lp-text-muted);
+  font-size: 0.875rem;
+  max-width: 300px;
+}
+
+.lp-footer-columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.lp-footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lp-footer-col h4 {
+  color: var(--lp-text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lp-footer-col a {
   color: var(--lp-text-muted);
   text-decoration: none;
+  font-size: 0.875rem;
   transition: color 0.3s;
 }
 
-.lp-footer-links a:hover {
+.lp-footer-col a:hover {
   color: var(--lp-accent-green);
+}
+
+.lp-footer-bottom {
+  border-top: 1px solid var(--lp-border-color);
+  padding-top: 1.5rem;
+  text-align: center;
 }
 
 .lp-footer-copy {

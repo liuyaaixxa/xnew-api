@@ -47,6 +47,8 @@ import ModelPage from './pages/Model';
 import ModelDeploymentPage from './pages/ModelDeployment';
 import Playground from './pages/Playground';
 import Subscription from './pages/Subscription';
+import Wallet from './pages/Wallet';
+import Treasury from './pages/Treasury';
 import OAuth2Callback from './components/auth/OAuth2Callback';
 import PersonalSetting from './components/settings/PersonalSetting';
 import Setup from './pages/Setup';
@@ -60,6 +62,7 @@ const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const LandingPrivacy = lazy(() => import('./pages/PrivacyPolicy/LandingPrivacy'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const Docs = lazy(() => import('./pages/Docs'));
+const DesktopAuth = lazy(() => import('./pages/DesktopAuth'));
 
 function DynamicOAuth2Callback() {
   const { provider } = useParams();
@@ -231,6 +234,14 @@ function App() {
           }
         />
         <Route
+          path='/desktop-auth'
+          element={
+            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <DesktopAuth />
+            </Suspense>
+          }
+        />
+        <Route
           path='/oauth/github'
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
@@ -298,6 +309,26 @@ function App() {
                 <TopUp />
               </Suspense>
             </PrivateRoute>
+          }
+        />
+        <Route
+          path='/console/wallet'
+          element={
+            <PrivateRoute>
+              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+                <Wallet />
+              </Suspense>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path='/console/treasury'
+          element={
+            <AdminRoute>
+              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+                <Treasury />
+              </Suspense>
+            </AdminRoute>
           }
         />
         <Route

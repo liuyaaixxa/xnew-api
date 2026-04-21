@@ -240,11 +240,11 @@ const Home = () => {
                 </div>
                 <h3>macOS</h3>
                 <p>{t('适用于 macOS 10.15+')}</p>
-                <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-arm64.dmg' target='_blank' rel='noreferrer' className='lp-download-btn'>DMG · ARM64</a>
+                <a href='/api/download/mac-arm64' className='lp-download-btn'>DMG · ARM64</a>
                 <div className='lp-download-links'>
-                  <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-x64.dmg' target='_blank' rel='noreferrer' className='lp-download-link'>DMG · x64</a>
-                  <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-arm64.AppImage' target='_blank' rel='noreferrer' className='lp-download-link'>AppImage · ARM64</a>
-                  <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-x86_64.AppImage' target='_blank' rel='noreferrer' className='lp-download-link'>AppImage · x64</a>
+                  <a href='/api/download/mac-x64' className='lp-download-link'>DMG · x64</a>
+                  <a href='/api/download/mac-arm64-zip' className='lp-download-link'>ZIP · ARM64</a>
+                  <a href='/api/download/mac-x64-zip' className='lp-download-link'>ZIP · x64</a>
                 </div>
               </div>
               <div className='lp-download-card'>
@@ -255,11 +255,11 @@ const Home = () => {
                 </div>
                 <h3>Windows</h3>
                 <p>{t('适用于 Windows 10+')}</p>
-                <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-x64-setup.exe' target='_blank' rel='noreferrer' className='lp-download-btn'>Setup · x64</a>
+                <a href='/api/download/win-x64' className='lp-download-btn'>Setup · x64</a>
                 <div className='lp-download-links'>
-                  <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-x64-portable.exe' target='_blank' rel='noreferrer' className='lp-download-link'>Portable · x64</a>
-                  <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-arm64-setup.exe' target='_blank' rel='noreferrer' className='lp-download-link'>Setup · ARM64</a>
-                  <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-arm64-portable.exe' target='_blank' rel='noreferrer' className='lp-download-link'>Portable · ARM64</a>
+                  <a href='/api/download/win-x64-portable' className='lp-download-link'>Portable · x64</a>
+                  <a href='/api/download/win-arm64' className='lp-download-link'>Setup · ARM64</a>
+                  <a href='/api/download/win-arm64-portable' className='lp-download-link'>Portable · ARM64</a>
                 </div>
               </div>
               <div className='lp-download-card'>
@@ -270,16 +270,16 @@ const Home = () => {
                 </div>
                 <h3>Linux</h3>
                 <p>{t('支持 Ubuntu、Debian、CentOS 等')}</p>
-                <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-amd64.deb' target='_blank' rel='noreferrer' className='lp-download-btn'>DEB · amd64</a>
+                <a href='/api/download/linux-amd64-deb' className='lp-download-btn'>DEB · amd64</a>
                 <div className='lp-download-links'>
-                  <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-arm64.deb' target='_blank' rel='noreferrer' className='lp-download-link'>DEB · arm64</a>
-                  <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-aarch64.deb' target='_blank' rel='noreferrer' className='lp-download-link'>DEB · aarch64</a>
-                  <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-x86_64.rpm' target='_blank' rel='noreferrer' className='lp-download-link'>RPM · x86_64</a>
+                  <a href='/api/download/linux-arm64-deb' className='lp-download-link'>DEB · arm64</a>
+                  <a href='/api/download/linux-x86_64-rpm' className='lp-download-link'>RPM · x86_64</a>
+                  <a href='/api/download/linux-aarch64-rpm' className='lp-download-link'>RPM · aarch64</a>
                 </div>
               </div>
             </div>
             <div className='lp-download-universal'>
-              <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-x64.zip' target='_blank' rel='noreferrer' className='lp-download-zip-link'>
+              <a href='/api/download/mac-x64-zip' className='lp-download-zip-link'>
                 {t('通用版本下载')} (ZIP · x64)
               </a>
             </div>
@@ -359,13 +359,33 @@ const Home = () => {
           {/* Footer */}
           <footer className='lp-footer'>
             <div className='lp-footer-content'>
-              <div className='lp-footer-links'>
-                <Link to='/docs'>{t('文档')}</Link>
-                <Link to='/about'>{t('关于我们')}</Link>
-                <Link to='/privacy'>{t('隐私政策')}</Link>
-                <Link to='/tos'>{t('服务条款')}</Link>
+              <div className='lp-footer-brand'>
+                <div className='lp-logo'>Teniu.AI</div>
+                <p>{t('全球去中心化 GPU 共享网络，让闲置算力创造价值。')}</p>
               </div>
-              <p className='lp-footer-copy'>&copy; 2026 Teniu.AI. All rights reserved.</p>
+              <div className='lp-footer-columns'>
+                <div className='lp-footer-col'>
+                  <h4>{t('产品')}</h4>
+                  <Link to='/pricing'>{t('模型广场')}</Link>
+                  <Link to='/docs'>{t('文档')}</Link>
+                  <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases' target='_blank' rel='noreferrer'>{t('下载客户端')}</a>
+                </div>
+                <div className='lp-footer-col'>
+                  <h4>{t('公司')}</h4>
+                  <Link to='/about'>{t('关于我们')}</Link>
+                  <Link to='/privacy'>{t('隐私政策')}</Link>
+                  <Link to='/tos'>{t('服务条款')}</Link>
+                </div>
+                <div className='lp-footer-col'>
+                  <h4>{t('社区')}</h4>
+                  <a href='https://github.com/liuyaaixxa/xnew-api' target='_blank' rel='noreferrer'>GitHub</a>
+                  <a href='https://discord.gg/teniuai' target='_blank' rel='noreferrer'>Discord</a>
+                  <a href='https://x.com/TeniuAI' target='_blank' rel='noreferrer'>X (Twitter)</a>
+                </div>
+              </div>
+              <div className='lp-footer-bottom'>
+                <p className='lp-footer-copy'>&copy; 2026 Teniu.AI. All rights reserved.</p>
+              </div>
             </div>
           </footer>
         </div>

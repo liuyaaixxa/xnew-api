@@ -282,6 +282,8 @@ func migrateDB() error {
 		&UserOAuthBinding{},
 		&DeviceToken{},
 		&UserChannel{},
+		&TreasuryLog{},
+		&SettlementOrder{},
 		&WithdrawalDetail{},
 		&WithdrawalRecord{},
 		&WithdrawalPaymentRecord{},

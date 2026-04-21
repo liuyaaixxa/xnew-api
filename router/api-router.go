@@ -25,6 +25,7 @@ func SetApiRouter(router *gin.Engine) {
 		apiRouter.GET("/models", middleware.UserAuth(), controller.DashboardListModels)
 		apiRouter.GET("/status/test", middleware.AdminAuth(), controller.TestStatus)
 		apiRouter.GET("/notice", controller.GetNotice)
+		apiRouter.GET("/download/:platform", controller.DownloadRedirect)
 		apiRouter.GET("/user-agreement", controller.GetUserAgreement)
 		apiRouter.GET("/privacy-policy", controller.GetPrivacyPolicy)
 		apiRouter.GET("/about", controller.GetAbout)
@@ -70,6 +71,7 @@ func SetApiRouter(router *gin.Engine) {
 			userRoute.POST("/epay/notify", controller.EpayNotify)
 			userRoute.GET("/epay/notify", controller.EpayNotify)
 			userRoute.GET("/groups", controller.GetUserGroups)
+			userRoute.POST("/desktop-auth/exchange", middleware.CriticalRateLimit(), controller.DesktopAuthExchange)
 
 			selfRoute := userRoute.Group("/")
 			selfRoute.Use(middleware.UserAuth())
@@ -80,6 +82,7 @@ func SetApiRouter(router *gin.Engine) {
 				selfRoute.PUT("/self", controller.UpdateSelf)
 				selfRoute.DELETE("/self", controller.DeleteSelf)
 				selfRoute.GET("/token", controller.GenerateAccessToken)
+				selfRoute.POST("/desktop-auth/authorize", controller.DesktopAuthAuthorize)
 				selfRoute.GET("/passkey", controller.PasskeyStatus)
 				selfRoute.POST("/passkey/register/begin", controller.PasskeyRegisterBegin)
 				selfRoute.POST("/passkey/register/finish", controller.PasskeyRegisterFinish)
@@ -118,6 +121,18 @@ func SetApiRouter(router *gin.Engine) {
 				// Check-in routes
 				selfRoute.GET("/checkin", controller.GetCheckinStatus)
 				selfRoute.POST("/checkin", middleware.TurnstileCheck(), controller.DoCheckin)
+
+				// Wallet routes
+				selfRoute.GET("/wallet", controller.GetWallet)
+				selfRoute.POST("/wallet/create", middleware.CriticalRateLimit(), controller.CreateWallet)
+				selfRoute.GET("/wallet/transactions", controller.GetMyTransactions)
+
+				// Settlement routes
+				selfRoute.GET("/settlement/dashboard", controller.GetSettlementDashboard)
+				selfRoute.GET("/settlement/pending", controller.GetSettlementPending)
+				selfRoute.POST("/settlement/apply", middleware.CriticalRateLimit(), controller.ApplySettlement)
+				selfRoute.GET("/settlement/orders", controller.GetSettlementOrders)
+				selfRoute.DELETE("/settlement/order/:id", controller.DeleteSettlementOrder)
 
 				// Custom OAuth bindings
 				selfRoute.GET("/oauth/bindings", controller.GetUserOAuthBindings)
@@ -353,6 +368,22 @@ func SetApiRouter(router *gin.Engine) {
 		{
 			logRoute.GET("/token", middleware.TokenAuthReadOnly(), controller.GetLogByKey)
 		}
+		treasuryRoute := apiRouter.Group("/treasury")
+		treasuryRoute.Use(middleware.AdminAuth())
+		{
+			treasuryRoute.GET("/", controller.GetTreasuryInfo)
+			treasuryRoute.GET("/users", controller.GetTreasuryUsers)
+			treasuryRoute.POST("/transfer", controller.TransferToUser)
+			treasuryRoute.GET("/transactions", controller.GetAddressTransactions)
+			treasuryRoute.GET("/logs", controller.GetTreasuryLogs)
+
+			// Settlement audit routes
+			treasuryRoute.GET("/settlements", controller.AdminGetSettlements)
+			treasuryRoute.POST("/settlement/:id/approve", controller.AdminApproveSettlement)
+			treasuryRoute.POST("/settlement/:id/reject", controller.AdminRejectSettlement)
+			treasuryRoute.POST("/settlement/:id/settle", controller.AdminSettleSettlement)
+		}
+
 		groupRoute := apiRouter.Group("/group")
 		groupRoute.Use(middleware.AdminAuth())
 		{

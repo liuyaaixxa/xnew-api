@@ -49,6 +49,8 @@ const routerMap = {
   deployment: '/console/deployment',
   playground: '/console/playground',
   personal: '/console/personal',
+  wallet: '/console/wallet',
+  treasury: '/console/treasury',
   'user-channel': '/console/user-channel',
   'user-channel-review': '/console/user-channel-review',
 };
@@ -137,6 +139,11 @@ const SiderBar = ({ onNavigate = () => {} }) => {
         to: '/topup',
       },
       {
+        text: t('积分钱包'),
+        itemKey: 'wallet',
+        to: '/wallet',
+      },
+      {
         text: t('个人设置'),
         itemKey: 'personal',
         to: '/personal',
@@ -194,6 +201,12 @@ const SiderBar = ({ onNavigate = () => {} }) => {
         text: t('用户管理'),
         itemKey: 'user',
         to: '/user',
+        className: isAdmin() ? '' : 'tableHiddle',
+      },
+      {
+        text: t('积分管理'),
+        itemKey: 'treasury',
+        to: '/treasury',
         className: isAdmin() ? '' : 'tableHiddle',
       },
       {

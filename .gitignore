@@ -30,12 +30,15 @@ data/
 .gocache-temp
 .gopath
 
+# Git worktrees
+.worktrees/
+
 # Playwright MCP local config
 .playwright-mcp/
 
 # Test screenshots
 test-*.png
 
-# PRD documents and OpenSpec changes (local development only)
-docs/prd/
+# Docs directory (local development only)
+docs/
 openspec/
