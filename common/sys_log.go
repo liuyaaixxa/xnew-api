@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // LogWriterMu protects concurrent access to gin.DefaultWriter/gin.DefaultErrorWriter
@@ -14,33 +16,62 @@ import (
 // acquire Lock when swapping writers and closing old files.
 var LogWriterMu sync.RWMutex
 
+// sysZapLogger emits structured JSON for SysLog/SysError/FatalLog. It writes
+// only to stdout/stderr — file-level duplication is handled by the logger
+// package's gin writers. Its core isn't rebuilt on rotation because
+// stdout/stderr stay stable for the process lifetime.
+var sysZapLogger *zap.Logger
+
+func init() {
+	encoderCfg := zapcore.EncoderConfig{
+		TimeKey:        "ts",
+		LevelKey:       "level",
+		MessageKey:     "msg",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.LowercaseLevelEncoder,
+		EncodeTime:     zapcore.RFC3339TimeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+	}
+
+	stdoutCore := zapcore.NewCore(
+		zapcore.NewJSONEncoder(encoderCfg),
+		zapcore.AddSync(os.Stdout),
+		zap.LevelEnablerFunc(func(l zapcore.Level) bool { return l < zapcore.ErrorLevel }),
+	)
+	stderrCore := zapcore.NewCore(
+		zapcore.NewJSONEncoder(encoderCfg),
+		zapcore.AddSync(os.Stderr),
+		zap.LevelEnablerFunc(func(l zapcore.Level) bool { return l >= zapcore.ErrorLevel }),
+	)
+
+	service := os.Getenv("SERVICE_NAME")
+	if service == "" {
+		service = "xnew-api"
+	}
+	sysZapLogger = zap.New(zapcore.NewTee(stdoutCore, stderrCore)).
+		With(zap.String("service", service), zap.String("source", "sys"))
+}
+
 func SysLog(s string) {
-	t := time.Now()
-	LogWriterMu.RLock()
-	_, _ = fmt.Fprintf(gin.DefaultWriter, "[SYS] %v | %s \n", t.Format("2006/01/02 - 15:04:05"), s)
-	LogWriterMu.RUnlock()
+	sysZapLogger.Info(s)
 }
 
 func SysError(s string) {
-	t := time.Now()
-	LogWriterMu.RLock()
-	_, _ = fmt.Fprintf(gin.DefaultErrorWriter, "[SYS] %v | %s \n", t.Format("2006/01/02 - 15:04:05"), s)
-	LogWriterMu.RUnlock()
+	sysZapLogger.Error(s)
 }
 
 func FatalLog(v ...any) {
-	t := time.Now()
-	LogWriterMu.RLock()
-	_, _ = fmt.Fprintf(gin.DefaultErrorWriter, "[FATAL] %v | %v \n", t.Format("2006/01/02 - 15:04:05"), v)
-	LogWriterMu.RUnlock()
-	os.Exit(1)
+	sysZapLogger.Fatal(fmt.Sprint(v...))
 }
 
+// LogStartupSuccess prints the ANSI-colored banner as plain text. This
+// bypasses zap on purpose: the banner is a one-shot human-facing welcome
+// message, not operational data — pushing it through Loki would only clutter
+// queries with meaningless boilerplate.
 func LogStartupSuccess(startTime time.Time, port string) {
 	duration := time.Since(startTime)
 	durationMs := duration.Milliseconds()
 
-	// Get network IPs
 	networkIps := GetNetworkIps()
 
 	LogWriterMu.RLock()
