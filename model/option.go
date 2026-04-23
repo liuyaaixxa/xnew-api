@@ -76,6 +76,9 @@ func InitOptionMap() {
 	common.OptionMap["CustomCallbackAddress"] = ""
 	common.OptionMap["EpayId"] = ""
 	common.OptionMap["EpayKey"] = ""
+	common.OptionMap["EpayCallbackAllowedIPs"] = ""
+	common.OptionMap["EpayCallbackMaxOrderAgeSeconds"] = strconv.Itoa(operation_setting.EpayCallbackMaxOrderAgeSeconds)
+	common.OptionMap["EpayAutoTopUpThreshold"] = strconv.FormatFloat(operation_setting.EpayAutoTopUpThreshold, 'f', -1, 64)
 	common.OptionMap["Price"] = strconv.FormatFloat(operation_setting.Price, 'f', -1, 64)
 	common.OptionMap["USDExchangeRate"] = strconv.FormatFloat(operation_setting.USDExchangeRate, 'f', -1, 64)
 	common.OptionMap["MinTopUp"] = strconv.Itoa(operation_setting.MinTopUp)
@@ -359,6 +362,12 @@ func updateOptionMap(key string, value string) (err error) {
 		operation_setting.EpayId = value
 	case "EpayKey":
 		operation_setting.EpayKey = value
+	case "EpayCallbackAllowedIPs":
+		operation_setting.EpayCallbackAllowedIPs = value
+	case "EpayCallbackMaxOrderAgeSeconds":
+		operation_setting.EpayCallbackMaxOrderAgeSeconds, _ = strconv.Atoi(value)
+	case "EpayAutoTopUpThreshold":
+		operation_setting.EpayAutoTopUpThreshold, _ = strconv.ParseFloat(value, 64)
 	case "Price":
 		operation_setting.Price, _ = strconv.ParseFloat(value, 64)
 	case "USDExchangeRate":

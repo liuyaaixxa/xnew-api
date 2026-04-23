@@ -2,7 +2,6 @@ package controller
 
 import (
 	"fmt"
-	"log"
 	"net/url"
 	"strconv"
 	"sync"
@@ -20,6 +19,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
 	"github.com/shopspring/decimal"
+	"go.uber.org/zap"
 )
 
 func GetTopUpInfo(c *gin.Context) {
@@ -281,12 +281,29 @@ func UnlockOrder(tradeNo string) {
 }
 
 func EpayNotify(c *gin.Context) {
-	var params map[string]string
+	clientIP := c.ClientIP()
+	zl := logger.L().With(
+		zap.String("handler", "EpayNotify"),
+		zap.String("client_ip", clientIP),
+		zap.String("method", c.Request.Method),
+	)
 
+	// Guard 1: source IP whitelist — first line of defense. When the whitelist
+	// is empty this is a no-op, preserving pre-hardening behavior.
+	if allowed, reason := CheckCallbackIPAllowed(clientIP, operation_setting.EpayCallbackAllowedIPs); !allowed {
+		zl.Warn("epay callback IP not allowed",
+			zap.String("reason", reason),
+			zap.String("configured_whitelist", operation_setting.EpayCallbackAllowedIPs),
+		)
+		_, _ = c.Writer.Write([]byte("fail"))
+		return
+	}
+
+	// Parse params from POST form or GET query.
+	var params map[string]string
 	if c.Request.Method == "POST" {
-		// POST 请求：从 POST body 解析参数
 		if err := c.Request.ParseForm(); err != nil {
-			log.Println("易支付回调POST解析失败:", err)
+			zl.Error("epay callback POST parse failed", zap.Error(err))
 			_, _ = c.Writer.Write([]byte("fail"))
 			return
 		}
@@ -295,7 +312,6 @@ func EpayNotify(c *gin.Context) {
 			return r
 		}, map[string]string{})
 	} else {
-		// GET 请求：从 URL Query 解析参数
 		params = lo.Reduce(lo.Keys(c.Request.URL.Query()), func(r map[string]string, t string, i int) map[string]string {
 			r[t] = c.Request.URL.Query().Get(t)
 			return r
@@ -303,66 +319,123 @@ func EpayNotify(c *gin.Context) {
 	}
 
 	if len(params) == 0 {
-		log.Println("易支付回调参数为空")
+		zl.Warn("epay callback rejected: empty params")
 		_, _ = c.Writer.Write([]byte("fail"))
 		return
 	}
+
+	// Include trade_no in all subsequent logs so Loki queries like
+	// `| json | trade_no="USR12NO..."` can follow the full lifecycle.
+	incomingTradeNo := params["out_trade_no"]
+	zl = zl.With(zap.String("trade_no", incomingTradeNo))
+
 	client := GetEpayClient()
 	if client == nil {
-		log.Println("易支付回调失败 未找到配置信息")
-		_, err := c.Writer.Write([]byte("fail"))
-		if err != nil {
-			log.Println("易支付回调写入失败")
-		}
-		return
-	}
-	verifyInfo, err := client.Verify(params)
-	if err == nil && verifyInfo.VerifyStatus {
-		_, err := c.Writer.Write([]byte("success"))
-		if err != nil {
-			log.Println("易支付回调写入失败")
-		}
-	} else {
-		_, err := c.Writer.Write([]byte("fail"))
-		if err != nil {
-			log.Println("易支付回调写入失败")
-		}
-		log.Println("易支付回调签名验证失败")
+		zl.Warn("epay callback rejected: payment not configured")
+		_, _ = c.Writer.Write([]byte("fail"))
 		return
 	}
 
-	if verifyInfo.TradeStatus == epay.StatusTradeSuccess {
-		log.Println(verifyInfo)
-		LockOrder(verifyInfo.ServiceTradeNo)
-		defer UnlockOrder(verifyInfo.ServiceTradeNo)
-		topUp := model.GetTopUpByTradeNo(verifyInfo.ServiceTradeNo)
-		if topUp == nil {
-			log.Printf("易支付回调未找到订单: %v", verifyInfo)
+	// Guard 2: MD5 signature verification (existing behavior).
+	verifyInfo, err := client.Verify(params)
+	if err != nil || !verifyInfo.VerifyStatus {
+		zl.Error("epay callback signature invalid",
+			zap.Error(err),
+			zap.Bool("sig_valid", verifyInfo.VerifyStatus),
+		)
+		_, _ = c.Writer.Write([]byte("fail"))
+		return
+	}
+
+	// Only TRADE_SUCCESS callbacks are actionable. Other statuses (e.g. TRADE_REFUND)
+	// are recorded but not crediting quota.
+	if verifyInfo.TradeStatus != epay.StatusTradeSuccess {
+		zl.Warn("epay callback non-success trade status",
+			zap.String("trade_status", verifyInfo.TradeStatus),
+		)
+		// Still reply success so the gateway doesn't retry forever.
+		_, _ = c.Writer.Write([]byte("success"))
+		return
+	}
+
+	// Everything past this point is an order we intend to credit, so respond
+	// success EARLY so the gateway stops retrying even if our DB work is slow.
+	// The ack is idempotent-safe because LockOrder + status transition protects
+	// the critical section below.
+	_, _ = c.Writer.Write([]byte("success"))
+
+	LockOrder(verifyInfo.ServiceTradeNo)
+	defer UnlockOrder(verifyInfo.ServiceTradeNo)
+
+	topUp := model.GetTopUpByTradeNo(verifyInfo.ServiceTradeNo)
+	if topUp == nil {
+		zl.Warn("epay callback order not found")
+		return
+	}
+
+	zl = zl.With(zap.Int("user_id", topUp.UserId), zap.Float64("money", topUp.Money))
+
+	// Guard 3: idempotency + visibility. Any non-pending status gets logged
+	// rather than silently dropped, so replays and post-refund callbacks leave
+	// a paper trail.
+	if topUp.Status != common.TopUpStatusPending {
+		zl.Warn("epay callback hit non-pending order",
+			zap.String("current_status", topUp.Status),
+		)
+		return
+	}
+
+	// Guard 4: trade_no must encode the same user_id as the order row.
+	if ok, parsed := CheckTradeNoOwnership(verifyInfo.ServiceTradeNo, topUp.UserId); !ok {
+		zl.Error("epay callback trade_no user mismatch",
+			zap.Int("parsed_user_id", parsed),
+		)
+		return
+	}
+
+	// Guard 5: staleness — if the order was created too long ago, treat the
+	// callback as a replay attempt and refuse to credit.
+	if valid, age := CheckOrderAge(topUp.CreateTime, time.Now().Unix(), operation_setting.EpayCallbackMaxOrderAgeSeconds); !valid {
+		zl.Error("epay callback order expired",
+			zap.Int64("order_age_seconds", age),
+			zap.Int("max_age_seconds", operation_setting.EpayCallbackMaxOrderAgeSeconds),
+		)
+		return
+	}
+
+	// Guard 6: large orders require human review. Below threshold, auto-credit
+	// as before.
+	if ShouldPendingReview(topUp.Money, operation_setting.EpayAutoTopUpThreshold) {
+		topUp.Status = common.TopUpStatusPendingReview
+		if err := topUp.Update(); err != nil {
+			zl.Error("failed to mark order pending_review", zap.Error(err))
 			return
 		}
-		if topUp.Status == "pending" {
-			topUp.Status = "success"
-			err := topUp.Update()
-			if err != nil {
-				log.Printf("易支付回调更新订单失败: %v", topUp)
-				return
-			}
-			//user, _ := model.GetUserById(topUp.UserId, false)
-			//user.Quota += topUp.Amount * 500000
-			dAmount := decimal.NewFromInt(int64(topUp.Amount))
-			dQuotaPerUnit := decimal.NewFromFloat(common.QuotaPerUnit)
-			quotaToAdd := int(dAmount.Mul(dQuotaPerUnit).IntPart())
-			err = model.IncreaseUserQuota(topUp.UserId, quotaToAdd, true)
-			if err != nil {
-				log.Printf("易支付回调更新用户失败: %v", topUp)
-				return
-			}
-			log.Printf("易支付回调更新用户成功 %v", topUp)
-			model.RecordLog(topUp.UserId, model.LogTypeTopup, fmt.Sprintf("使用在线充值成功，充值金额: %v，支付金额：%f", logger.LogQuota(quotaToAdd), topUp.Money))
-		}
-	} else {
-		log.Printf("易支付异常回调: %v", verifyInfo)
+		zl.Warn("large topup pending review",
+			zap.Float64("threshold", operation_setting.EpayAutoTopUpThreshold),
+		)
+		model.RecordLog(topUp.UserId, model.LogTypeTopup,
+			fmt.Sprintf("大额充值已提交人工审核，金额：$%.2f，订单号：%s", topUp.Money, topUp.TradeNo))
+		return
 	}
+
+	// Happy path — credit the user.
+	topUp.Status = common.TopUpStatusSuccess
+	topUp.CompleteTime = common.GetTimestamp()
+	if err := topUp.Update(); err != nil {
+		zl.Error("failed to mark order success", zap.Error(err))
+		return
+	}
+	dAmount := decimal.NewFromInt(int64(topUp.Amount))
+	dQuotaPerUnit := decimal.NewFromFloat(common.QuotaPerUnit)
+	quotaToAdd := int(dAmount.Mul(dQuotaPerUnit).IntPart())
+	if err := model.IncreaseUserQuota(topUp.UserId, quotaToAdd, true); err != nil {
+		zl.Error("failed to increase user quota", zap.Error(err), zap.Int("quota_to_add", quotaToAdd))
+		return
+	}
+	zl.Info("epay callback credit success", zap.Int("quota_added", quotaToAdd))
+	model.RecordLog(topUp.UserId, model.LogTypeTopup,
+		fmt.Sprintf("使用在线充值成功，充值金额: %v，支付金额：%f", logger.LogQuota(quotaToAdd), topUp.Money))
 }
 
 func RequestAmount(c *gin.Context) {
@@ -461,6 +534,81 @@ func AdminCompleteTopUp(c *gin.Context) {
 		common.ApiError(c, err)
 		return
 	}
+	common.ApiSuccess(c, nil)
+}
+
+// GetPendingReviewTopUps 管理员查询 pending_review 订单列表（分页）。
+func GetPendingReviewTopUps(c *gin.Context) {
+	pageInfo := common.GetPageQuery(c)
+	topups, total, err := model.GetPendingReviewTopUps(pageInfo)
+	if err != nil {
+		common.ApiError(c, err)
+		return
+	}
+	pageInfo.SetTotal(int(total))
+	pageInfo.SetItems(topups)
+	common.ApiSuccess(c, pageInfo)
+}
+
+type AdminReviewTopUpRequest struct {
+	TradeNo string `json:"trade_no"`
+	Reason  string `json:"reason"`
+}
+
+// ApprovePendingReviewTopUp 审核通过：置 success + 增加 quota。
+// 通过 LockOrder 防止并发审核与并发回调互相覆盖。
+func ApprovePendingReviewTopUp(c *gin.Context) {
+	var req AdminReviewTopUpRequest
+	if err := c.ShouldBindJSON(&req); err != nil || req.TradeNo == "" {
+		common.ApiErrorMsg(c, "参数错误")
+		return
+	}
+	adminID := c.GetInt("id")
+
+	LockOrder(req.TradeNo)
+	defer UnlockOrder(req.TradeNo)
+
+	zl := logger.L().With(
+		zap.String("handler", "ApprovePendingReviewTopUp"),
+		zap.Int("admin_id", adminID),
+		zap.String("trade_no", req.TradeNo),
+	)
+
+	if err := model.ApprovePendingReviewTopUp(req.TradeNo); err != nil {
+		zl.Error("approve pending review topup failed", zap.Error(err))
+		common.ApiError(c, err)
+		return
+	}
+	zl.Info("topup approved by admin")
+	common.ApiSuccess(c, nil)
+}
+
+// RejectPendingReviewTopUp 审核拒绝：置 rejected，不加 quota，不退款。
+// reason 是管理员填写的原因，会写入用户可见的日志。
+func RejectPendingReviewTopUp(c *gin.Context) {
+	var req AdminReviewTopUpRequest
+	if err := c.ShouldBindJSON(&req); err != nil || req.TradeNo == "" {
+		common.ApiErrorMsg(c, "参数错误")
+		return
+	}
+	adminID := c.GetInt("id")
+
+	LockOrder(req.TradeNo)
+	defer UnlockOrder(req.TradeNo)
+
+	zl := logger.L().With(
+		zap.String("handler", "RejectPendingReviewTopUp"),
+		zap.Int("admin_id", adminID),
+		zap.String("trade_no", req.TradeNo),
+		zap.String("reason", req.Reason),
+	)
+
+	if err := model.RejectPendingReviewTopUp(req.TradeNo, req.Reason); err != nil {
+		zl.Error("reject pending review topup failed", zap.Error(err))
+		common.ApiError(c, err)
+		return
+	}
+	zl.Info("topup rejected by admin")
 	common.ApiSuccess(c, nil)
 }
 

@@ -17,6 +17,20 @@ var Price = 7.3
 var MinTopUp = 1
 var USDExchangeRate = 7.3
 
+// EpayCallbackAllowedIPs — 易支付回调来源 IP 白名单（逗号分隔，支持 CIDR）。
+// 空字符串 = 不做 IP 校验（向后兼容）。例：
+//   "150.158.151.80,203.0.113.5" 或 "150.158.0.0/16"
+var EpayCallbackAllowedIPs = ""
+
+// EpayCallbackMaxOrderAgeSeconds — 回调到达时订单的最大年龄（秒）。
+// 超过则视为重放攻击拒绝。0 = 不做时效校验（向后兼容）。
+var EpayCallbackMaxOrderAgeSeconds = 0
+
+// EpayAutoTopUpThreshold — 自动到账金额上限（单位：同 top_ups.money，即充值美元数）。
+// 超过此值的订单进入 pending_review 状态，需管理员人工审核。
+// 0 = 不做阈值校验（向后兼容）。
+var EpayAutoTopUpThreshold float64 = 0
+
 var PayMethods = []map[string]string{
 	{
 		"name":  "支付宝",

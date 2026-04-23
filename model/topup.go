@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/logger"
@@ -235,7 +236,140 @@ func SearchAllTopUps(keyword string, pageInfo *common.PageInfo) (topups []*TopUp
 	return topups, total, nil
 }
 
-// ManualCompleteTopUp 管理员手动完成订单并给用户充值
+// GetPendingReviewTopUps returns all top_ups in `pending_review` status,
+// joined with the corresponding username for admin review UI convenience.
+// Pagination follows the same pattern as GetAllTopUps.
+func GetPendingReviewTopUps(pageInfo *common.PageInfo) (topups []*TopUp, total int64, err error) {
+	tx := DB.Begin()
+	if tx.Error != nil {
+		return nil, 0, tx.Error
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err = tx.Model(&TopUp{}).Where("status = ?", common.TopUpStatusPendingReview).Count(&total).Error; err != nil {
+		tx.Rollback()
+		return nil, 0, err
+	}
+
+	if err = tx.Where("status = ?", common.TopUpStatusPendingReview).Order("id desc").
+		Limit(pageInfo.GetPageSize()).Offset(pageInfo.GetStartIdx()).
+		Find(&topups).Error; err != nil {
+		tx.Rollback()
+		return nil, 0, err
+	}
+
+	if err = tx.Commit().Error; err != nil {
+		return nil, 0, err
+	}
+	return topups, total, nil
+}
+
+// ApprovePendingReviewTopUp transitions a pending_review order to success
+// and credits the user's quota — atomically via a DB transaction with a
+// CAS check on the status column. Returns an error describing the reason
+// (order missing / wrong status) so callers can surface 4xx responses.
+func ApprovePendingReviewTopUp(tradeNo string) error {
+	if tradeNo == "" {
+		return errors.New("未提供订单号")
+	}
+	refCol := "`trade_no`"
+	if common.UsingPostgreSQL {
+		refCol = `"trade_no"`
+	}
+
+	var userId int
+	var quotaToAdd int
+	var payMoney float64
+
+	err := DB.Transaction(func(tx *gorm.DB) error {
+		topUp := &TopUp{}
+		if err := tx.Set("gorm:query_option", "FOR UPDATE").Where(refCol+" = ?", tradeNo).First(topUp).Error; err != nil {
+			return errors.New("订单不存在")
+		}
+		if topUp.Status != common.TopUpStatusPendingReview {
+			return fmt.Errorf("订单状态非 pending_review（当前: %s），拒绝审核", topUp.Status)
+		}
+
+		dAmount := decimal.NewFromInt(topUp.Amount)
+		dQuotaPerUnit := decimal.NewFromFloat(common.QuotaPerUnit)
+		quotaToAdd = int(dAmount.Mul(dQuotaPerUnit).IntPart())
+		if quotaToAdd <= 0 {
+			return errors.New("无效的充值额度")
+		}
+
+		topUp.CompleteTime = common.GetTimestamp()
+		topUp.Status = common.TopUpStatusSuccess
+		if err := tx.Save(topUp).Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&User{}).Where("id = ?", topUp.UserId).
+			Update("quota", gorm.Expr("quota + ?", quotaToAdd)).Error; err != nil {
+			return err
+		}
+		userId = topUp.UserId
+		payMoney = topUp.Money
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	RecordLog(userId, LogTypeTopup, fmt.Sprintf("管理员审核通过：充值金额 %v，支付金额 $%.2f",
+		logger.FormatQuota(quotaToAdd), payMoney))
+	return nil
+}
+
+// RejectPendingReviewTopUp transitions a pending_review order to rejected.
+// Does NOT refund money (the payment processor holds that) and does NOT
+// credit quota. `reason` is recorded in the user-visible log.
+func RejectPendingReviewTopUp(tradeNo string, reason string) error {
+	if tradeNo == "" {
+		return errors.New("未提供订单号")
+	}
+	refCol := "`trade_no`"
+	if common.UsingPostgreSQL {
+		refCol = `"trade_no"`
+	}
+
+	var userId int
+	var payMoney float64
+
+	err := DB.Transaction(func(tx *gorm.DB) error {
+		topUp := &TopUp{}
+		if err := tx.Set("gorm:query_option", "FOR UPDATE").Where(refCol+" = ?", tradeNo).First(topUp).Error; err != nil {
+			return errors.New("订单不存在")
+		}
+		if topUp.Status != common.TopUpStatusPendingReview {
+			return fmt.Errorf("订单状态非 pending_review（当前: %s），拒绝审核", topUp.Status)
+		}
+
+		topUp.CompleteTime = common.GetTimestamp()
+		topUp.Status = common.TopUpStatusRejected
+		if err := tx.Save(topUp).Error; err != nil {
+			return err
+		}
+		userId = topUp.UserId
+		payMoney = topUp.Money
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	trimmed := strings.TrimSpace(reason)
+	logMsg := fmt.Sprintf("管理员拒绝充值审核：金额 $%.2f", payMoney)
+	if trimmed != "" {
+		logMsg += "，原因：" + trimmed
+	}
+	RecordLog(userId, LogTypeTopup, logMsg)
+	return nil
+}
+
+
 func ManualCompleteTopUp(tradeNo string) error {
 	if tradeNo == "" {
 		return errors.New("未提供订单号")
