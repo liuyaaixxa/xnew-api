@@ -111,7 +111,7 @@ const TopupHistoryModal = ({ visible, onCancel, t }) => {
     setPage(1);
   };
 
-  // 管理员补单
+  // 管理员补单（正常支付流程后的补救）
   const handleAdminComplete = async (tradeNo) => {
     try {
       const res = await API.post('/api/user/topup/complete', {
@@ -134,75 +134,6 @@ const TopupHistoryModal = ({ visible, onCancel, t }) => {
       title: t('确认补单'),
       content: t('是否将该订单标记为成功并为用户入账？'),
       onOk: () => handleAdminComplete(tradeNo),
-    });
-  };
-
-  // 管理员审核通过：大额订单走这里
-  const handleApproveReview = async (tradeNo) => {
-    try {
-      const res = await API.post('/api/user/topup/approve', {
-        trade_no: tradeNo,
-      });
-      const { success, message } = res.data;
-      if (success) {
-        Toast.success({ content: t('审核通过，已入账') });
-        await loadTopups(page, pageSize);
-      } else {
-        Toast.error({ content: message || t('审核失败') });
-      }
-    } catch (e) {
-      Toast.error({ content: t('审核失败') });
-    }
-  };
-
-  const confirmApprove = (tradeNo) => {
-    Modal.confirm({
-      title: t('确认审核通过'),
-      content: t(
-        '通过后将立即给用户账户加上对应额度，此操作不可撤销。',
-      ),
-      onOk: () => handleApproveReview(tradeNo),
-    });
-  };
-
-  // 管理员审核拒绝
-  const handleRejectReview = async (tradeNo, reason) => {
-    try {
-      const res = await API.post('/api/user/topup/reject', {
-        trade_no: tradeNo,
-        reason: reason || '',
-      });
-      const { success, message } = res.data;
-      if (success) {
-        Toast.success({ content: t('已拒绝') });
-        await loadTopups(page, pageSize);
-      } else {
-        Toast.error({ content: message || t('操作失败') });
-      }
-    } catch (e) {
-      Toast.error({ content: t('操作失败') });
-    }
-  };
-
-  const confirmReject = (tradeNo) => {
-    let reason = '';
-    Modal.confirm({
-      title: t('拒绝充值审核'),
-      content: (
-        <div>
-          <div className='mb-2'>
-            {t('请输入拒绝原因（会写入用户可见日志）：')}
-          </div>
-          <Input.TextArea
-            rows={3}
-            placeholder={t('例如：金额异常，疑似伪造回调')}
-            onChange={(v) => {
-              reason = v;
-            }}
-          />
-        </div>
-      ),
-      onOk: () => handleRejectReview(tradeNo, reason),
     });
   };
 
@@ -299,29 +230,8 @@ const TopupHistoryModal = ({ visible, onCancel, t }) => {
               </Button>
             );
           }
-          if (record.status === 'pending_review') {
-            actions.push(
-              <Button
-                key='approve'
-                size='small'
-                type='primary'
-                theme='solid'
-                onClick={() => confirmApprove(record.trade_no)}
-                style={{ marginRight: 8 }}
-              >
-                {t('通过')}
-              </Button>,
-              <Button
-                key='reject'
-                size='small'
-                type='danger'
-                theme='outline'
-                onClick={() => confirmReject(record.trade_no)}
-              >
-                {t('拒绝')}
-              </Button>,
-            );
-          }
+          // pending_review 订单的审核入口在管理员侧栏「账单管理」页面，
+          // 这里不再重复提供，避免两处操作路径引起混淆。
           return actions.length > 0 ? <>{actions}</> : null;
         },
       });

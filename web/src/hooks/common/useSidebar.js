@@ -53,6 +53,7 @@ export const DEFAULT_ADMIN_CONFIG = {
     models: true,
     deployment: true,
     redemption: true,
+    'topup-admin': true,
     user: true,
     subscription: true,
     treasury: true,
