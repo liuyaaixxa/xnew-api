@@ -18,12 +18,6 @@ import (
 
 const UserNameMaxLength = 20
 
-var (
-	ErrDatabase              = errors.New("database error")
-	ErrInvalidCredentials    = errors.New("invalid credentials")
-	ErrUserEmptyCredentials  = errors.New("empty credentials")
-)
-
 // User if you add sensitive fields, don't forget to clean them in setupLogin function.
 // Otherwise, the sensitive information will be saved on local storage in plain text!
 type User struct {
