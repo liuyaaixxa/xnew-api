@@ -32,7 +32,6 @@ import {
   Col,
   Spin,
   Tooltip,
-  Tag,
   Tabs,
   TabPane,
 } from '@douyinfe/semi-ui';
