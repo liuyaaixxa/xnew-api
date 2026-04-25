@@ -1,0 +1,92 @@
+// Alloy configuration for shipping Docker container logs to Grafana Cloud Loki.
+//
+// How it works:
+//   1. discovery.docker lists every running container via the local Docker
+//      socket.
+//   2. discovery.relabel filters that list to just the `xnew-api` container
+//      (adjust the regex if we add more services to this host).
+//   3. loki.source.docker tails each matched container's stdout/stderr —
+//      Docker stores them as newline-delimited JSON at
+//      /var/lib/docker/containers/<id>/<id>-json.log, which is what Alloy
+//      reads through the Docker API.
+//   4. loki.process runs a `json` stage on each line so Loki receives
+//      already-parsed fields (level, msg, request_id, service). This makes
+//      LogQL queries `| json | level="error"` work directly.
+//   5. loki.write ships batches to Grafana Cloud over HTTPS basic auth.
+//
+// Environment variables the host must provide:
+//   LOKI_URL       — e.g. https://logs-prod-042.grafana.net/loki/api/v1/push
+//   LOKI_USER      — numeric Loki user id from Grafana Cloud Stack page
+//   LOKI_PASSWORD  — Access Policy token with `logs:write` scope
+//   ENVIRONMENT    — optional; defaults to "prod" if unset
+
+discovery.docker "containers" {
+	host = "unix:///var/run/docker.sock"
+}
+
+// Keep only the xnew-api container. If you add more containers to this host
+// and want them shipped too, extend or remove this filter.
+discovery.relabel "xnew_api" {
+	targets = discovery.docker.containers.targets
+
+	rule {
+		source_labels = ["__meta_docker_container_name"]
+		regex         = "/xnew-api"
+		action        = "keep"
+	}
+
+	// Surface the container name as a label so Grafana can display it.
+	// Labels stay low-cardinality: one per container, not per request.
+	rule {
+		source_labels = ["__meta_docker_container_name"]
+		target_label  = "container"
+		regex         = "/(.*)"
+		replacement   = "$1"
+	}
+}
+
+loki.source.docker "containers" {
+	host       = "unix:///var/run/docker.sock"
+	targets    = discovery.relabel.xnew_api.output
+	forward_to = [loki.process.parse_json.receiver]
+
+	labels = {
+		job = "xnew-api",
+		env = coalesce(sys.env("ENVIRONMENT"), "prod"),
+	}
+}
+
+// Parse the JSON payload so Grafana indexes fields (level, msg, etc.)
+// without the user needing `| json` in every query. We DO NOT promote
+// dynamic fields like request_id or user_id into Loki labels because
+// high-cardinality labels destroy Loki's index performance; they stay in
+// the payload and are queried with `| json | request_id="..."`.
+loki.process "parse_json" {
+	forward_to = [loki.write.grafanacloud.receiver]
+
+	stage.json {
+		expressions = {
+			level = "level",
+			ts    = "ts",
+		}
+	}
+
+	// Promote `level` to a label: it's low cardinality (info/warn/error/debug)
+	// and makes alerting rules (`sum by (level) (rate(...))`) cheap.
+	stage.labels {
+		values = {
+			level = "",
+		}
+	}
+}
+
+loki.write "grafanacloud" {
+	endpoint {
+		url = sys.env("LOKI_URL")
+
+		basic_auth {
+			username = sys.env("LOKI_USER")
+			password = sys.env("LOKI_PASSWORD")
+		}
+	}
+}

@@ -143,12 +143,27 @@ jobs:
     needs: [create_manifests]
     runs-on: ubuntu-latest
     steps:
+      - name: Check out (for alloy config)
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 1
+
+      - name: Copy alloy config to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "deploy/alloy-config.alloy"
+          target: "/home/${{ secrets.EC2_USER }}/xnew-api/"
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: LOKI_URL,LOKI_USER,LOKI_PASSWORD
           script: |
             echo "==> Pulling latest image..."
             sudo docker pull liuyaaixx/xnew-api:latest
@@ -177,7 +192,33 @@ jobs:
             echo "==> Health check..."
             curl -sf http://localhost:3000/api/status | head -c 100 || echo "WARNING: health check failed"
 
+            echo "==> (Re)starting alloy log shipper..."
+            sudo docker stop alloy || true
+            sudo docker rm alloy || true
+
+            if [ -n "${LOKI_URL:-}" ] && [ -n "${LOKI_USER:-}" ] && [ -n "${LOKI_PASSWORD:-}" ]; then
+              sudo docker pull grafana/alloy:latest
+              sudo docker run -d \
+                --name alloy \
+                --restart always \
+                -v /home/${{ secrets.EC2_USER }}/xnew-api/deploy/alloy-config.alloy:/etc/alloy/config.alloy:ro \
+                -v /var/run/docker.sock:/var/run/docker.sock \
+                -e LOKI_URL="${LOKI_URL}" \
+                -e LOKI_USER="${LOKI_USER}" \
+                -e LOKI_PASSWORD="${LOKI_PASSWORD}" \
+                -e ENVIRONMENT="prod" \
+                grafana/alloy:latest \
+                run --server.http.listen-addr=0.0.0.0:12345 /etc/alloy/config.alloy
+              echo "==> alloy started; it should begin shipping xnew-api logs to Loki within 30s."
+            else
+              echo "==> Skipping alloy: LOKI_* secrets not set on this repo."
+            fi
+
             echo "==> Cleaning up old images..."
             sudo docker image prune -f
 
             echo "==> Deploy complete!"
+        env:
+          LOKI_URL: ${{ secrets.LOKI_URL }}
+          LOKI_USER: ${{ secrets.LOKI_USER }}
+          LOKI_PASSWORD: ${{ secrets.LOKI_PASSWORD }}

@@ -9,12 +9,14 @@ import (
 
 	"github.com/Calcium-Ion/go-epay/epay"
 	"github.com/QuantumNous/new-api/common"
+	"github.com/QuantumNous/new-api/logger"
 	"github.com/QuantumNous/new-api/model"
 	"github.com/QuantumNous/new-api/service"
 	"github.com/QuantumNous/new-api/setting/operation_setting"
 	"github.com/QuantumNous/new-api/setting/system_setting"
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
+	"go.uber.org/zap"
 )
 
 type SubscriptionEpayPayRequest struct {
@@ -112,11 +114,24 @@ func SubscriptionRequestEpay(c *gin.Context) {
 }
 
 func SubscriptionEpayNotify(c *gin.Context) {
-	var params map[string]string
+	clientIP := c.ClientIP()
+	zl := logger.L().With(
+		zap.String("handler", "SubscriptionEpayNotify"),
+		zap.String("client_ip", clientIP),
+		zap.String("method", c.Request.Method),
+	)
 
+	// Guard 1: source IP whitelist (shared setting with topup callback).
+	if allowed, reason := CheckCallbackIPAllowed(clientIP, operation_setting.EpayCallbackAllowedIPs); !allowed {
+		zl.Warn("subscription epay callback IP not allowed", zap.String("reason", reason))
+		_, _ = c.Writer.Write([]byte("fail"))
+		return
+	}
+
+	var params map[string]string
 	if c.Request.Method == "POST" {
-		// POST 请求：从 POST body 解析参数
 		if err := c.Request.ParseForm(); err != nil {
+			zl.Error("subscription epay callback POST parse failed", zap.Error(err))
 			_, _ = c.Writer.Write([]byte("fail"))
 			return
 		}
@@ -125,7 +140,6 @@ func SubscriptionEpayNotify(c *gin.Context) {
 			return r
 		}, map[string]string{})
 	} else {
-		// GET 请求：从 URL Query 解析参数
 		params = lo.Reduce(lo.Keys(c.Request.URL.Query()), func(r map[string]string, t string, i int) map[string]string {
 			r[t] = c.Request.URL.Query().Get(t)
 			return r
@@ -133,35 +147,80 @@ func SubscriptionEpayNotify(c *gin.Context) {
 	}
 
 	if len(params) == 0 {
+		zl.Warn("subscription epay callback rejected: empty params")
+		_, _ = c.Writer.Write([]byte("fail"))
+		return
+	}
+	zl = zl.With(zap.String("trade_no", params["out_trade_no"]))
+
+	client := GetEpayClient()
+	if client == nil {
+		zl.Warn("subscription epay callback rejected: payment not configured")
 		_, _ = c.Writer.Write([]byte("fail"))
 		return
 	}
 
-	client := GetEpayClient()
-	if client == nil {
-		_, _ = c.Writer.Write([]byte("fail"))
-		return
-	}
+	// Guard 2: MD5 signature.
 	verifyInfo, err := client.Verify(params)
 	if err != nil || !verifyInfo.VerifyStatus {
+		zl.Error("subscription epay callback signature invalid",
+			zap.Error(err),
+			zap.Bool("sig_valid", verifyInfo.VerifyStatus),
+		)
 		_, _ = c.Writer.Write([]byte("fail"))
 		return
 	}
 
 	if verifyInfo.TradeStatus != epay.StatusTradeSuccess {
+		zl.Warn("subscription epay callback non-success trade status",
+			zap.String("trade_status", verifyInfo.TradeStatus))
 		_, _ = c.Writer.Write([]byte("fail"))
 		return
 	}
+
+	// Ack early to stop gateway retries; the critical section below is
+	// protected by LockOrder + status transition inside CompleteSubscriptionOrder.
+	_, _ = c.Writer.Write([]byte("success"))
 
 	LockOrder(verifyInfo.ServiceTradeNo)
 	defer UnlockOrder(verifyInfo.ServiceTradeNo)
 
-	if err := model.CompleteSubscriptionOrder(verifyInfo.ServiceTradeNo, common.GetJsonString(verifyInfo)); err != nil {
-		_, _ = c.Writer.Write([]byte("fail"))
+	order := model.GetSubscriptionOrderByTradeNo(verifyInfo.ServiceTradeNo)
+	if order == nil {
+		zl.Warn("subscription epay callback order not found")
+		return
+	}
+	zl = zl.With(zap.Int("user_id", order.UserId), zap.Float64("money", order.Money))
+
+	// Guard 3: idempotency observation.
+	if order.Status != common.TopUpStatusPending {
+		zl.Warn("subscription epay callback hit non-pending order",
+			zap.String("current_status", order.Status))
 		return
 	}
 
-	_, _ = c.Writer.Write([]byte("success"))
+	// Guard 4: trade_no user ownership (SUBUSR prefix variant).
+	if ok, parsed := CheckSubscriptionTradeNoOwnership(verifyInfo.ServiceTradeNo, order.UserId); !ok {
+		zl.Error("subscription epay callback trade_no user mismatch",
+			zap.Int("parsed_user_id", parsed))
+		return
+	}
+
+	// Guard 5: order staleness.
+	if valid, age := CheckOrderAge(order.CreateTime, time.Now().Unix(), operation_setting.EpayCallbackMaxOrderAgeSeconds); !valid {
+		zl.Error("subscription epay callback order expired",
+			zap.Int64("order_age_seconds", age),
+			zap.Int("max_age_seconds", operation_setting.EpayCallbackMaxOrderAgeSeconds))
+		return
+	}
+
+	// Subscription orders have fixed pricing per plan, so large-amount review
+	// doesn't apply — plan amounts are admin-curated. Proceed to completion.
+	if err := model.CompleteSubscriptionOrder(verifyInfo.ServiceTradeNo, common.GetJsonString(verifyInfo)); err != nil {
+		zl.Error("subscription epay callback complete failed", zap.Error(err))
+		return
+	}
+	zl.Info("subscription epay callback completed")
 }
 
 // SubscriptionEpayReturn handles browser return after payment.

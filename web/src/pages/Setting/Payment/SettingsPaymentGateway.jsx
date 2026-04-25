@@ -43,6 +43,9 @@ export default function SettingsPaymentGateway(props) {
     PayMethods: '',
     AmountOptions: '',
     AmountDiscount: '',
+    EpayCallbackAllowedIPs: '',
+    EpayCallbackMaxOrderAgeSeconds: 0,
+    EpayAutoTopUpThreshold: 0,
   });
   const [originInputs, setOriginInputs] = useState({});
   const formApiRef = useRef(null);
@@ -66,6 +69,15 @@ export default function SettingsPaymentGateway(props) {
         PayMethods: props.options.PayMethods || '',
         AmountOptions: props.options.AmountOptions || '',
         AmountDiscount: props.options.AmountDiscount || '',
+        EpayCallbackAllowedIPs: props.options.EpayCallbackAllowedIPs || '',
+        EpayCallbackMaxOrderAgeSeconds:
+          props.options.EpayCallbackMaxOrderAgeSeconds !== undefined
+            ? parseInt(props.options.EpayCallbackMaxOrderAgeSeconds)
+            : 0,
+        EpayAutoTopUpThreshold:
+          props.options.EpayAutoTopUpThreshold !== undefined
+            ? parseFloat(props.options.EpayAutoTopUpThreshold)
+            : 0,
       };
 
       // 美化 JSON 展示
@@ -178,6 +190,27 @@ export default function SettingsPaymentGateway(props) {
         options.push({
           key: 'payment_setting.amount_discount',
           value: inputs.AmountDiscount,
+        });
+      }
+      if (originInputs['EpayCallbackAllowedIPs'] !== inputs.EpayCallbackAllowedIPs) {
+        options.push({
+          key: 'EpayCallbackAllowedIPs',
+          value: inputs.EpayCallbackAllowedIPs,
+        });
+      }
+      if (
+        originInputs['EpayCallbackMaxOrderAgeSeconds'] !==
+        inputs.EpayCallbackMaxOrderAgeSeconds
+      ) {
+        options.push({
+          key: 'EpayCallbackMaxOrderAgeSeconds',
+          value: String(inputs.EpayCallbackMaxOrderAgeSeconds ?? 0),
+        });
+      }
+      if (originInputs['EpayAutoTopUpThreshold'] !== inputs.EpayAutoTopUpThreshold) {
+        options.push({
+          key: 'EpayAutoTopUpThreshold',
+          value: String(inputs.EpayAutoTopUpThreshold ?? 0),
         });
       }
 
@@ -319,6 +352,48 @@ export default function SettingsPaymentGateway(props) {
                 autosize
                 extraText={t(
                   '设置不同充值金额对应的折扣，键为充值金额，值为折扣率，例如：{"100": 0.95, "200": 0.9, "500": 0.85}',
+                )}
+              />
+            </Col>
+          </Row>
+
+          <Row
+            gutter={{ xs: 8, sm: 16, md: 24, lg: 24, xl: 24, xxl: 24 }}
+            style={{ marginTop: 16 }}
+          >
+            <Col span={24}>
+              <Text strong>{t('回调安全设置')}</Text>
+            </Col>
+            <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+              <Form.Input
+                field='EpayCallbackAllowedIPs'
+                label={t('回调来源 IP 白名单')}
+                placeholder={t(
+                  '逗号分隔，支持 CIDR，例如：150.158.151.80,203.0.113.0/24。留空=不校验',
+                )}
+                extraText={t(
+                  '只允许指定 IP 发送支付回调。用户下单本身不受限，只限制支付平台通知回源。',
+                )}
+              />
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+              <Form.InputNumber
+                field='EpayCallbackMaxOrderAgeSeconds'
+                label={t('订单最大有效时长（秒）')}
+                placeholder={t('例如 1800（30 分钟），0 = 不校验')}
+                extraText={t(
+                  '超过此时长的订单拒绝回调，防止历史签名被重放',
+                )}
+              />
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+              <Form.InputNumber
+                field='EpayAutoTopUpThreshold'
+                precision={2}
+                label={t('自动到账金额上限（美元）')}
+                placeholder={t('例如 500，0 = 无上限（全部自动到账）')}
+                extraText={t(
+                  '超过此金额的订单不自动到账，转为人工审核',
                 )}
               />
             </Col>

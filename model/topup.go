@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/logger"
@@ -104,6 +105,14 @@ func Recharge(referenceId string, customerId string) (err error) {
 	return nil
 }
 
+// topUpQueryWindowSeconds 限制充值记录查询的时间窗口（秒）。
+const topUpQueryWindowSeconds int64 = 30 * 24 * 60 * 60
+
+// topUpQueryCutoff 返回允许查询的最早 create_time（秒级 Unix 时间戳）。
+func topUpQueryCutoff() int64 {
+	return common.GetTimestamp() - topUpQueryWindowSeconds
+}
+
 func GetUserTopUps(userId int, pageInfo *common.PageInfo) (topups []*TopUp, total int64, err error) {
 	// Start transaction
 	tx := DB.Begin()
@@ -116,15 +125,17 @@ func GetUserTopUps(userId int, pageInfo *common.PageInfo) (topups []*TopUp, tota
 		}
 	}()
 
+	cutoff := topUpQueryCutoff()
+
 	// Get total count within transaction
-	err = tx.Model(&TopUp{}).Where("user_id = ?", userId).Count(&total).Error
+	err = tx.Model(&TopUp{}).Where("user_id = ? AND create_time >= ?", userId, cutoff).Count(&total).Error
 	if err != nil {
 		tx.Rollback()
 		return nil, 0, err
 	}
 
 	// Get paginated topups within same transaction
-	err = tx.Where("user_id = ?", userId).Order("id desc").Limit(pageInfo.GetPageSize()).Offset(pageInfo.GetStartIdx()).Find(&topups).Error
+	err = tx.Where("user_id = ? AND create_time >= ?", userId, cutoff).Order("id desc").Limit(pageInfo.GetPageSize()).Offset(pageInfo.GetStartIdx()).Find(&topups).Error
 	if err != nil {
 		tx.Rollback()
 		return nil, 0, err
@@ -138,7 +149,7 @@ func GetUserTopUps(userId int, pageInfo *common.PageInfo) (topups []*TopUp, tota
 	return topups, total, nil
 }
 
-// GetAllTopUps 获取全平台的充值记录（管理员使用）
+// GetAllTopUps 获取全平台的充值记录（管理员使用，不限制时间窗口）
 func GetAllTopUps(pageInfo *common.PageInfo) (topups []*TopUp, total int64, err error) {
 	tx := DB.Begin()
 	if tx.Error != nil {
@@ -167,6 +178,10 @@ func GetAllTopUps(pageInfo *common.PageInfo) (topups []*TopUp, total int64, err 
 	return topups, total, nil
 }
 
+// searchTopUpCountHardLimit 搜索充值记录时 COUNT 的安全上限，
+// 防止对超大表执行无界 COUNT 触发 DoS。
+const searchTopUpCountHardLimit = 10000
+
 // SearchUserTopUps 按订单号搜索某用户的充值记录
 func SearchUserTopUps(userId int, keyword string, pageInfo *common.PageInfo) (topups []*TopUp, total int64, err error) {
 	tx := DB.Begin()
@@ -179,20 +194,26 @@ func SearchUserTopUps(userId int, keyword string, pageInfo *common.PageInfo) (to
 		}
 	}()
 
-	query := tx.Model(&TopUp{}).Where("user_id = ?", userId)
+	query := tx.Model(&TopUp{}).Where("user_id = ? AND create_time >= ?", userId, topUpQueryCutoff())
 	if keyword != "" {
-		like := "%%" + keyword + "%%"
-		query = query.Where("trade_no LIKE ?", like)
+		pattern, perr := sanitizeLikePattern(keyword)
+		if perr != nil {
+			tx.Rollback()
+			return nil, 0, perr
+		}
+		query = query.Where("trade_no LIKE ? ESCAPE '!'", pattern)
 	}
 
-	if err = query.Count(&total).Error; err != nil {
+	if err = query.Limit(searchTopUpCountHardLimit).Count(&total).Error; err != nil {
 		tx.Rollback()
-		return nil, 0, err
+		common.SysError("failed to count search topups: " + err.Error())
+		return nil, 0, errors.New("搜索充值记录失败")
 	}
 
 	if err = query.Order("id desc").Limit(pageInfo.GetPageSize()).Offset(pageInfo.GetStartIdx()).Find(&topups).Error; err != nil {
 		tx.Rollback()
-		return nil, 0, err
+		common.SysError("failed to search topups: " + err.Error())
+		return nil, 0, errors.New("搜索充值记录失败")
 	}
 
 	if err = tx.Commit().Error; err != nil {
@@ -201,7 +222,7 @@ func SearchUserTopUps(userId int, keyword string, pageInfo *common.PageInfo) (to
 	return topups, total, nil
 }
 
-// SearchAllTopUps 按订单号搜索全平台充值记录（管理员使用）
+// SearchAllTopUps 按订单号搜索全平台充值记录（管理员使用，不限制时间窗口）
 func SearchAllTopUps(keyword string, pageInfo *common.PageInfo) (topups []*TopUp, total int64, err error) {
 	tx := DB.Begin()
 	if tx.Error != nil {
@@ -215,16 +236,54 @@ func SearchAllTopUps(keyword string, pageInfo *common.PageInfo) (topups []*TopUp
 
 	query := tx.Model(&TopUp{})
 	if keyword != "" {
-		like := "%%" + keyword + "%%"
-		query = query.Where("trade_no LIKE ?", like)
+		pattern, perr := sanitizeLikePattern(keyword)
+		if perr != nil {
+			tx.Rollback()
+			return nil, 0, perr
+		}
+		query = query.Where("trade_no LIKE ? ESCAPE '!'", pattern)
 	}
 
-	if err = query.Count(&total).Error; err != nil {
+	if err = query.Limit(searchTopUpCountHardLimit).Count(&total).Error; err != nil {
+		tx.Rollback()
+		common.SysError("failed to count search topups: " + err.Error())
+		return nil, 0, errors.New("搜索充值记录失败")
+	}
+
+	if err = query.Order("id desc").Limit(pageInfo.GetPageSize()).Offset(pageInfo.GetStartIdx()).Find(&topups).Error; err != nil {
+		tx.Rollback()
+		common.SysError("failed to search topups: " + err.Error())
+		return nil, 0, errors.New("搜索充值记录失败")
+	}
+
+	if err = tx.Commit().Error; err != nil {
+		return nil, 0, err
+	}
+	return topups, total, nil
+}
+
+// GetPendingReviewTopUps returns all top_ups in `pending_review` status,
+// joined with the corresponding username for admin review UI convenience.
+// Pagination follows the same pattern as GetAllTopUps.
+func GetPendingReviewTopUps(pageInfo *common.PageInfo) (topups []*TopUp, total int64, err error) {
+	tx := DB.Begin()
+	if tx.Error != nil {
+		return nil, 0, tx.Error
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err = tx.Model(&TopUp{}).Where("status = ?", common.TopUpStatusPendingReview).Count(&total).Error; err != nil {
 		tx.Rollback()
 		return nil, 0, err
 	}
 
-	if err = query.Order("id desc").Limit(pageInfo.GetPageSize()).Offset(pageInfo.GetStartIdx()).Find(&topups).Error; err != nil {
+	if err = tx.Where("status = ?", common.TopUpStatusPendingReview).Order("id desc").
+		Limit(pageInfo.GetPageSize()).Offset(pageInfo.GetStartIdx()).
+		Find(&topups).Error; err != nil {
 		tx.Rollback()
 		return nil, 0, err
 	}
@@ -235,7 +294,108 @@ func SearchAllTopUps(keyword string, pageInfo *common.PageInfo) (topups []*TopUp
 	return topups, total, nil
 }
 
-// ManualCompleteTopUp 管理员手动完成订单并给用户充值
+// ApprovePendingReviewTopUp transitions a pending_review order to success
+// and credits the user's quota — atomically via a DB transaction with a
+// CAS check on the status column. Returns an error describing the reason
+// (order missing / wrong status) so callers can surface 4xx responses.
+func ApprovePendingReviewTopUp(tradeNo string) error {
+	if tradeNo == "" {
+		return errors.New("未提供订单号")
+	}
+	refCol := "`trade_no`"
+	if common.UsingPostgreSQL {
+		refCol = `"trade_no"`
+	}
+
+	var userId int
+	var quotaToAdd int
+	var payMoney float64
+
+	err := DB.Transaction(func(tx *gorm.DB) error {
+		topUp := &TopUp{}
+		if err := tx.Set("gorm:query_option", "FOR UPDATE").Where(refCol+" = ?", tradeNo).First(topUp).Error; err != nil {
+			return errors.New("订单不存在")
+		}
+		if topUp.Status != common.TopUpStatusPendingReview {
+			return fmt.Errorf("订单状态非 pending_review（当前: %s），拒绝审核", topUp.Status)
+		}
+
+		dAmount := decimal.NewFromInt(topUp.Amount)
+		dQuotaPerUnit := decimal.NewFromFloat(common.QuotaPerUnit)
+		quotaToAdd = int(dAmount.Mul(dQuotaPerUnit).IntPart())
+		if quotaToAdd <= 0 {
+			return errors.New("无效的充值额度")
+		}
+
+		topUp.CompleteTime = common.GetTimestamp()
+		topUp.Status = common.TopUpStatusSuccess
+		if err := tx.Save(topUp).Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&User{}).Where("id = ?", topUp.UserId).
+			Update("quota", gorm.Expr("quota + ?", quotaToAdd)).Error; err != nil {
+			return err
+		}
+		userId = topUp.UserId
+		payMoney = topUp.Money
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	RecordLog(userId, LogTypeTopup, fmt.Sprintf("管理员审核通过：充值金额 %v，支付金额 $%.2f",
+		logger.FormatQuota(quotaToAdd), payMoney))
+	return nil
+}
+
+// RejectPendingReviewTopUp transitions a pending_review order to rejected.
+// Does NOT refund money (the payment processor holds that) and does NOT
+// credit quota. `reason` is recorded in the user-visible log.
+func RejectPendingReviewTopUp(tradeNo string, reason string) error {
+	if tradeNo == "" {
+		return errors.New("未提供订单号")
+	}
+	refCol := "`trade_no`"
+	if common.UsingPostgreSQL {
+		refCol = `"trade_no"`
+	}
+
+	var userId int
+	var payMoney float64
+
+	err := DB.Transaction(func(tx *gorm.DB) error {
+		topUp := &TopUp{}
+		if err := tx.Set("gorm:query_option", "FOR UPDATE").Where(refCol+" = ?", tradeNo).First(topUp).Error; err != nil {
+			return errors.New("订单不存在")
+		}
+		if topUp.Status != common.TopUpStatusPendingReview {
+			return fmt.Errorf("订单状态非 pending_review（当前: %s），拒绝审核", topUp.Status)
+		}
+
+		topUp.CompleteTime = common.GetTimestamp()
+		topUp.Status = common.TopUpStatusRejected
+		if err := tx.Save(topUp).Error; err != nil {
+			return err
+		}
+		userId = topUp.UserId
+		payMoney = topUp.Money
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	trimmed := strings.TrimSpace(reason)
+	logMsg := fmt.Sprintf("管理员拒绝充值审核：金额 $%.2f", payMoney)
+	if trimmed != "" {
+		logMsg += "，原因：" + trimmed
+	}
+	RecordLog(userId, LogTypeTopup, logMsg)
+	return nil
+}
+
+
 func ManualCompleteTopUp(tradeNo string) error {
 	if tradeNo == "" {
 		return errors.New("未提供订单号")

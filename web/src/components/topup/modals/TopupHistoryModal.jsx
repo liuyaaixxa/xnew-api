@@ -43,6 +43,9 @@ const { Text } = Typography;
 const STATUS_CONFIG = {
   success: { type: 'success', key: '成功' },
   pending: { type: 'warning', key: '待支付' },
+  pending_review: { type: 'warning', key: '审核中' },
+  rejected: { type: 'danger', key: '已拒绝' },
+  refunded: { type: 'danger', key: '已退款' },
   failed: { type: 'danger', key: '失败' },
   expired: { type: 'danger', key: '已过期' },
 };
@@ -108,7 +111,7 @@ const TopupHistoryModal = ({ visible, onCancel, t }) => {
     setPage(1);
   };
 
-  // 管理员补单
+  // 管理员补单（正常支付流程后的补救）
   const handleAdminComplete = async (tradeNo) => {
     try {
       const res = await API.post('/api/user/topup/complete', {
@@ -227,6 +230,8 @@ const TopupHistoryModal = ({ visible, onCancel, t }) => {
               </Button>
             );
           }
+          // pending_review 订单的审核入口在管理员侧栏「账单管理」页面，
+          // 这里不再重复提供，避免两处操作路径引起混淆。
           return actions.length > 0 ? <>{actions}</> : null;
         },
       });

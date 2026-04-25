@@ -51,6 +51,7 @@ const routerMap = {
   personal: '/console/personal',
   wallet: '/console/wallet',
   treasury: '/console/treasury',
+  'topup-admin': '/console/topup-admin',
   'user-channel': '/console/user-channel',
   'user-channel-review': '/console/user-channel-review',
 };
@@ -195,6 +196,12 @@ const SiderBar = ({ onNavigate = () => {} }) => {
         text: t('兑换码管理'),
         itemKey: 'redemption',
         to: '/redemption',
+        className: isAdmin() ? '' : 'tableHiddle',
+      },
+      {
+        text: t('账单管理'),
+        itemKey: 'topup-admin',
+        to: '/topup-admin',
         className: isAdmin() ? '' : 'tableHiddle',
       },
       {

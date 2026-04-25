@@ -37,6 +37,7 @@ import UserChannelReview from './pages/UserChannelReview';
 import Token from './pages/Token';
 import Redemption from './pages/Redemption';
 import TopUp from './pages/TopUp';
+import TopUpAdmin from './pages/TopUpAdmin';
 import Log from './pages/Log';
 import Chat from './pages/Chat';
 import Chat2Link from './pages/Chat2Link';
@@ -186,6 +187,14 @@ function App() {
           element={
             <AdminRoute>
               <Redemption />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path='/console/topup-admin'
+          element={
+            <AdminRoute>
+              <TopUpAdmin />
             </AdminRoute>
           }
         />

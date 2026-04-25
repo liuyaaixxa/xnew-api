@@ -3,7 +3,6 @@ package logger
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -15,6 +14,8 @@ import (
 
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 const (
@@ -33,10 +34,62 @@ var currentLogPath string
 var currentLogPathMu sync.RWMutex
 var currentLogFile *os.File
 
+// zapLogger is the process-wide structured logger. It is safe for concurrent
+// use and its underlying core is swapped atomically on log rotation.
+var (
+	zapLogger   *zap.Logger
+	zapLoggerMu sync.RWMutex
+)
+
+// ServiceName tags every log entry with a `service` field so multiple
+// services pushing to the same Loki instance can be filtered apart.
+var ServiceName = "xnew-api"
+
+func init() {
+	if v := os.Getenv("SERVICE_NAME"); v != "" {
+		ServiceName = v
+	}
+	// Bootstrap with a stdout-only logger so logs emitted before
+	// SetupLogger runs (flag parsing, env init) are still structured.
+	zapLogger = buildZapLogger(zapcore.AddSync(os.Stdout))
+}
+
 func GetCurrentLogPath() string {
 	currentLogPathMu.RLock()
 	defer currentLogPathMu.RUnlock()
 	return currentLogPath
+}
+
+// buildZapLogger constructs a zap logger that writes JSON lines to the given
+// sink. It's factored out so SetupLogger can rebuild the logger when log
+// files rotate.
+func buildZapLogger(sink zapcore.WriteSyncer) *zap.Logger {
+	encoderCfg := zapcore.EncoderConfig{
+		TimeKey:        "ts",
+		LevelKey:       "level",
+		MessageKey:     "msg",
+		CallerKey:      "",
+		StacktraceKey:  "",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.LowercaseLevelEncoder,
+		EncodeTime:     zapcore.RFC3339TimeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
+	core := zapcore.NewCore(
+		zapcore.NewJSONEncoder(encoderCfg),
+		sink,
+		zapcore.DebugLevel, // we filter via our own `loggerDebug` branch
+	)
+	return zap.New(core).With(zap.String("service", ServiceName))
+}
+
+// L returns the current process-wide structured logger. Use from new code that
+// wants typed fields; legacy code can keep using SysLog/LogInfo/etc.
+func L() *zap.Logger {
+	zapLoggerMu.RLock()
+	defer zapLoggerMu.RUnlock()
+	return zapLogger
 }
 
 func SetupLogger() {
@@ -63,14 +116,48 @@ func SetupLogger() {
 		currentLogFile = fd
 		currentLogPathMu.Unlock()
 
+		// Rebuild the zap logger to write to stdout + new file simultaneously.
+		sink := zapcore.NewMultiWriteSyncer(
+			zapcore.AddSync(os.Stdout),
+			zapcore.AddSync(fd),
+		)
+		newLogger := buildZapLogger(sink)
+		zapLoggerMu.Lock()
+		zapLogger = newLogger
+		zapLoggerMu.Unlock()
+
+		// Keep gin's access log sinks aligned with the same writers so HTTP
+		// access lines land in the same file. These are plain-text (not JSON)
+		// because gin writes its own format; Loki's `| json` filter will
+		// gracefully skip non-JSON lines.
 		common.LogWriterMu.Lock()
-		gin.DefaultWriter = io.MultiWriter(os.Stdout, fd)
-		gin.DefaultErrorWriter = io.MultiWriter(os.Stderr, fd)
+		gin.DefaultWriter = newMultiWriter(os.Stdout, fd)
+		gin.DefaultErrorWriter = newMultiWriter(os.Stderr, fd)
 		if oldFile != nil {
 			_ = oldFile.Close()
 		}
 		common.LogWriterMu.Unlock()
 	}
+}
+
+// newMultiWriter mirrors io.MultiWriter but lives here to avoid importing
+// io in call sites; keeps this file self-contained.
+func newMultiWriter(writers ...*os.File) *multiFileWriter {
+	return &multiFileWriter{writers: writers}
+}
+
+type multiFileWriter struct {
+	writers []*os.File
+}
+
+func (m *multiFileWriter) Write(p []byte) (int, error) {
+	var firstErr error
+	for _, w := range m.writers {
+		if _, err := w.Write(p); err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
+	return len(p), firstErr
 }
 
 func LogInfo(ctx context.Context, msg string) {
@@ -95,18 +182,27 @@ func LogDebug(ctx context.Context, msg string, args ...any) {
 }
 
 func logHelper(ctx context.Context, level string, msg string) {
-	id := ctx.Value(common.RequestIdKey)
-	if id == nil {
-		id = "SYSTEM"
+	var requestID string
+	if id := ctx.Value(common.RequestIdKey); id != nil {
+		requestID = fmt.Sprint(id)
+	} else {
+		requestID = "SYSTEM"
 	}
-	now := time.Now()
-	common.LogWriterMu.RLock()
-	writer := gin.DefaultErrorWriter
-	if level == loggerINFO {
-		writer = gin.DefaultWriter
+
+	logger := L().With(zap.String("request_id", requestID))
+	switch level {
+	case loggerINFO:
+		logger.Info(msg)
+	case loggerWarn:
+		logger.Warn(msg)
+	case loggerError:
+		logger.Error(msg)
+	case loggerDebug:
+		logger.Debug(msg)
+	default:
+		logger.Info(msg)
 	}
-	_, _ = fmt.Fprintf(writer, "[%s] %v | %s | %s \n", level, now.Format("2006/01/02 - 15:04:05"), id, msg)
-	common.LogWriterMu.RUnlock()
+
 	logCount++ // we don't need accurate count, so no lock here
 	if logCount > maxLogCount && !setupLogWorking {
 		logCount = 0

@@ -211,8 +211,10 @@ const (
 )
 
 const (
-	TopUpStatusPending = "pending"
-	TopUpStatusSuccess = "success"
-	TopUpStatusFailed  = "failed"
-	TopUpStatusExpired = "expired"
+	TopUpStatusPending       = "pending"
+	TopUpStatusSuccess       = "success"
+	TopUpStatusFailed        = "failed"
+	TopUpStatusExpired       = "expired"
+	TopUpStatusPendingReview = "pending_review" // 大额订单待管理员审核
+	TopUpStatusRejected      = "rejected"       // 管理员拒绝
 )
