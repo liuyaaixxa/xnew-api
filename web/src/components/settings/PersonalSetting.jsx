@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   API,
@@ -67,9 +67,7 @@ const PersonalSetting = () => {
   const [showWeChatBindModal, setShowWeChatBindModal] = useState(false);
   const [showEmailBindModal, setShowEmailBindModal] = useState(false);
   const [showAccountDeleteModal, setShowAccountDeleteModal] = useState(false);
-  const [turnstileEnabled, setTurnstileEnabled] = useState(false);
-  const [turnstileSiteKey, setTurnstileSiteKey] = useState('');
-  const [turnstileToken, setTurnstileToken] = useState('');
+  const captchaRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [disableButton, setDisableButton] = useState(false);
   const [countdown, setCountdown] = useState(30);
@@ -130,13 +128,6 @@ const PersonalSetting = () => {
     if (saved) {
       const parsed = JSON.parse(saved);
       setStatus(parsed);
-      if (parsed.turnstile_check) {
-        setTurnstileEnabled(true);
-        setTurnstileSiteKey(parsed.turnstile_site_key);
-      } else {
-        setTurnstileEnabled(false);
-        setTurnstileSiteKey('');
-      }
     }
     // Always refresh status from server to avoid stale flags (e.g., admin just enabled OAuth)
     (async () => {
@@ -146,13 +137,6 @@ const PersonalSetting = () => {
         if (success && data) {
           setStatus(data);
           setStatusData(data);
-          if (data.turnstile_check) {
-            setTurnstileEnabled(true);
-            setTurnstileSiteKey(data.turnstile_site_key);
-          } else {
-            setTurnstileEnabled(false);
-            setTurnstileSiteKey('');
-          }
         }
       } catch (e) {
         // ignore and keep local status
@@ -165,6 +149,16 @@ const PersonalSetting = () => {
       .then(setPasskeySupported)
       .catch(() => setPasskeySupported(false));
   }, []);
+
+  const captchaProvider = status?.captcha_provider || '';
+  const turnstileSiteKey = status?.turnstile_site_key || '';
+  const captchaEnabled = captchaProvider === 'builtin' || captchaProvider === 'slide' || captchaProvider === 'turnstile' || (!captchaProvider && status?.turnstile_check);
+
+  const getCaptchaQuery = () => {
+    if (!captchaRef.current) return '';
+    const p = captchaRef.current.getPayload();
+    return Object.entries(p).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+  };
 
   useEffect(() => {
     let countdownInterval = null;
@@ -448,13 +442,13 @@ const PersonalSetting = () => {
       return;
     }
     setDisableButton(true);
-    if (turnstileEnabled && turnstileToken === '') {
-      showInfo(t('请稍后几秒重试，Turnstile 正在检查用户环境！'));
+    if (captchaEnabled && !captchaRef.current?.isReady()) {
+      showInfo(t('请完成人机校验'));
       return;
     }
     setLoading(true);
     const res = await API.get(
-      `/api/verification?email=${inputs.email}&turnstile=${turnstileToken}`,
+      `/api/verification?email=${inputs.email}&${getCaptchaQuery()}`,
     );
     const { success, message } = res.data;
     if (success) {
@@ -554,7 +548,7 @@ const PersonalSetting = () => {
               <CheckinCalendar
                 t={t}
                 status={status}
-                turnstileEnabled={turnstileEnabled}
+                captchaProvider={captchaProvider}
                 turnstileSiteKey={turnstileSiteKey}
               />
             </div>
@@ -610,9 +604,9 @@ const PersonalSetting = () => {
         disableButton={disableButton}
         loading={loading}
         countdown={countdown}
-        turnstileEnabled={turnstileEnabled}
+        captchaProvider={captchaProvider}
+        captchaEnabled={captchaEnabled}
         turnstileSiteKey={turnstileSiteKey}
-        setTurnstileToken={setTurnstileToken}
       />
 
       <WeChatBindModal
@@ -633,9 +627,9 @@ const PersonalSetting = () => {
         handleInputChange={handleInputChange}
         deleteAccount={deleteAccount}
         userState={userState}
-        turnstileEnabled={turnstileEnabled}
+        captchaProvider={captchaProvider}
+        captchaEnabled={captchaEnabled}
         turnstileSiteKey={turnstileSiteKey}
-        setTurnstileToken={setTurnstileToken}
       />
 
       <ChangePasswordModal
@@ -645,9 +639,9 @@ const PersonalSetting = () => {
         inputs={inputs}
         handleInputChange={handleInputChange}
         changePassword={changePassword}
-        turnstileEnabled={turnstileEnabled}
+        captchaProvider={captchaProvider}
+        captchaEnabled={captchaEnabled}
         turnstileSiteKey={turnstileSiteKey}
-        setTurnstileToken={setTurnstileToken}
       />
 
       <SecureVerificationModal
