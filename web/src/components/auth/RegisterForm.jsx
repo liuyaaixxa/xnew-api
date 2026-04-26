@@ -32,7 +32,7 @@ import {
   onDiscordOAuthClicked,
   onCustomOAuthClicked,
 } from '../../helpers';
-import Turnstile from 'react-turnstile';
+import CaptchaWidget from '../common/CaptchaWidget';
 import {
   Button,
   Card,
@@ -85,9 +85,7 @@ const RegisterForm = () => {
   const { username, password, password2 } = inputs;
   const [userState, userDispatch] = useContext(UserContext);
   const [statusState] = useContext(StatusContext);
-  const [turnstileEnabled, setTurnstileEnabled] = useState(false);
-  const [turnstileSiteKey, setTurnstileSiteKey] = useState('');
-  const [turnstileToken, setTurnstileToken] = useState('');
+  const captchaRef = useRef(null);
   const [showWeChatLoginModal, setShowWeChatLoginModal] = useState(false);
   const [showEmailRegister, setShowEmailRegister] = useState(false);
   const [wechatLoading, setWechatLoading] = useState(false);
@@ -146,15 +144,21 @@ const RegisterForm = () => {
 
   useEffect(() => {
     setShowEmailVerification(!!status?.email_verification);
-    if (status?.turnstile_check) {
-      setTurnstileEnabled(true);
-      setTurnstileSiteKey(status.turnstile_site_key);
-    }
 
     // 从 status 获取用户协议和隐私政策的启用状态
     setHasUserAgreement(status?.user_agreement_enabled || false);
     setHasPrivacyPolicy(status?.privacy_policy_enabled || false);
   }, [status]);
+
+  const captchaProvider = status?.captcha_provider || '';
+  const turnstileSiteKey = status?.turnstile_site_key || '';
+  const captchaEnabled = captchaProvider === 'builtin' || captchaProvider === 'slide' || captchaProvider === 'turnstile' || (!captchaProvider && status?.turnstile_check);
+
+  const getCaptchaQuery = () => {
+    if (!captchaRef.current) return '';
+    const p = captchaRef.current.getPayload();
+    return Object.entries(p).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+  };
 
   useEffect(() => {
     let countdownInterval = null;
@@ -184,8 +188,8 @@ const RegisterForm = () => {
   };
 
   const onSubmitWeChatVerificationCode = async () => {
-    if (turnstileEnabled && turnstileToken === '') {
-      showInfo('请稍后几秒重试，Turnstile 正在检查用户环境！');
+    if (captchaEnabled && !captchaRef.current?.isReady()) {
+      showInfo(t('请完成人机校验'));
       return;
     }
     setWechatCodeSubmitLoading(true);
@@ -226,8 +230,8 @@ const RegisterForm = () => {
       return;
     }
     if (username && password) {
-      if (turnstileEnabled && turnstileToken === '') {
-        showInfo('请稍后几秒重试，Turnstile 正在检查用户环境！');
+      if (captchaEnabled && !captchaRef.current?.isReady()) {
+        showInfo(t('请完成人机校验'));
         return;
       }
       setRegisterLoading(true);
@@ -237,7 +241,7 @@ const RegisterForm = () => {
         }
         inputs.aff_code = affCode;
         const res = await API.post(
-          `/api/user/register?turnstile=${turnstileToken}`,
+          `/api/user/register?${getCaptchaQuery()}`,
           inputs,
         );
         const { success, message } = res.data;
@@ -257,14 +261,14 @@ const RegisterForm = () => {
 
   const sendVerificationCode = async () => {
     if (inputs.email === '') return;
-    if (turnstileEnabled && turnstileToken === '') {
-      showInfo('请稍后几秒重试，Turnstile 正在检查用户环境！');
+    if (captchaEnabled && !captchaRef.current?.isReady()) {
+      showInfo(t('请完成人机校验'));
       return;
     }
     setVerificationCodeLoading(true);
     try {
       const res = await API.get(
-        `/api/verification?email=${encodeURIComponent(inputs.email)}&turnstile=${turnstileToken}`,
+        `/api/verification?email=${encodeURIComponent(inputs.email)}&${getCaptchaQuery()}`,
       );
       const { success, message } = res.data;
       if (success) {
@@ -790,15 +794,12 @@ const RegisterForm = () => {
           : renderOAuthOptions()}
         {renderWeChatLoginModal()}
 
-        {turnstileEnabled && (
-          <div className='flex justify-center mt-6'>
-            <Turnstile
-              sitekey={turnstileSiteKey}
-              onVerify={(token) => {
-                setTurnstileToken(token);
-              }}
-            />
-          </div>
+        {captchaEnabled && (
+          <CaptchaWidget
+            ref={captchaRef}
+            provider={captchaProvider}
+            turnstileSiteKey={turnstileSiteKey}
+          />
         )}
         </div>
       </div>

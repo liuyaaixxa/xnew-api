@@ -294,6 +294,10 @@ func InitResources() error {
 	// 启动系统监控
 	common.StartSystemMonitor()
 
+	// Initialize captcha store (after Redis init)
+	common.InitCaptchaStore()
+	common.InitSlideCaptcha()
+
 	// Initialize i18n
 	err = i18n.Init()
 	if err != nil {

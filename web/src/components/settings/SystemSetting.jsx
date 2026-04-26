@@ -80,6 +80,7 @@ const SystemSetting = () => {
     TurnstileCheckEnabled: '',
     TurnstileSiteKey: '',
     TurnstileSecretKey: '',
+    CaptchaProvider: '',
     RegisterEnabled: '',
     'passkey.enabled': '',
     'passkey.rp_display_name': '',
@@ -589,6 +590,9 @@ const SystemSetting = () => {
   const submitTurnstile = async () => {
     const options = [];
 
+    if (originInputs['CaptchaProvider'] !== inputs.CaptchaProvider) {
+      options.push({ key: 'CaptchaProvider', value: inputs.CaptchaProvider });
+    }
     if (originInputs['TurnstileSiteKey'] !== inputs.TurnstileSiteKey) {
       options.push({ key: 'TurnstileSiteKey', value: inputs.TurnstileSiteKey });
     }
@@ -1598,8 +1602,35 @@ const SystemSetting = () => {
               </Card>
 
               <Card>
-                <Form.Section text={t('配置 Turnstile')}>
+                <Form.Section text={t('人机校验配置')}>
                   <Text>{t('用以支持用户校验')}</Text>
+                  <Row
+                    gutter={{ xs: 8, sm: 16, md: 24, lg: 24, xl: 24, xxl: 24 }}
+                  >
+                    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                      <Form.Select
+                        field='CaptchaProvider'
+                        label={t('验证码类型')}
+                        style={{ width: '100%' }}
+                      >
+                        <Form.Select.Option value=''>
+                          {t('向后兼容（读旧 Turnstile 开关）')}
+                        </Form.Select.Option>
+                        <Form.Select.Option value='builtin'>
+                          {t('自建图形验证码（中国友好）')}
+                        </Form.Select.Option>
+                        <Form.Select.Option value='slide'>
+                          {t('内置滑块拼图验证码')}
+                        </Form.Select.Option>
+                        <Form.Select.Option value='turnstile'>
+                          {t('Cloudflare Turnstile')}
+                        </Form.Select.Option>
+                        <Form.Select.Option value='disabled'>
+                          {t('关闭人机校验')}
+                        </Form.Select.Option>
+                      </Form.Select>
+                    </Col>
+                  </Row>
                   <Row
                     gutter={{ xs: 8, sm: 16, md: 24, lg: 24, xl: 24, xxl: 24 }}
                   >
@@ -1619,7 +1650,7 @@ const SystemSetting = () => {
                     </Col>
                   </Row>
                   <Button onClick={submitTurnstile}>
-                    {t('保存 Turnstile 设置')}
+                    {t('保存人机校验设置')}
                   </Button>
                 </Form.Section>
               </Card>

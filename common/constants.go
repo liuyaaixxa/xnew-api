@@ -98,6 +98,13 @@ var WeChatAccountQRCodeImageURL = ""
 var TurnstileSiteKey = ""
 var TurnstileSecretKey = ""
 
+// CaptchaProvider 选择人机校验实现：
+//   - ""          向后兼容：依旧读 TurnstileCheckEnabled 开关（旧站点升级零感知）
+//   - "turnstile" 显式启用 Cloudflare Turnstile（中国大陆访问不稳定）
+//   - "builtin"   使用自建图形验证码（中国友好，自托管，零外部依赖）
+//   - "disabled"  完全跳过人机校验
+var CaptchaProvider = ""
+
 var TelegramBotToken = ""
 var TelegramBotName = ""
 
