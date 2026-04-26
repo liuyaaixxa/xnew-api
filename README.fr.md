@@ -44,6 +44,8 @@
 
 <p align="center">
   <a href="#-démarrage-rapide">Démarrage rapide</a> •
+  <a href="#-architecture-du-système">Architecture du système</a> •
+  <a href="#-scénarios-utilisateur">Scénarios utilisateur</a> •
   <a href="#-fonctionnalités-clés">Fonctionnalités clés</a> •
   <a href="#-déploiement">Déploiement</a> •
   <a href="#-documentation">Documentation</a> •
@@ -58,6 +60,79 @@
 > - Ce projet est uniquement destiné à des fins d'apprentissage personnel, sans garantie de stabilité ni de support technique.
 > - Les utilisateurs doivent se conformer aux [Conditions d'utilisation](https://openai.com/policies/terms-of-use) d'OpenAI et aux **lois et réglementations applicables**, et ne doivent pas l'utiliser à des fins illégales.
 > - Conformément aux [《Mesures provisoires pour la gestion des services d'intelligence artificielle générative》](http://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm), veuillez ne fournir aucun service d'IA générative non enregistré au public en Chine.
+
+---
+
+## 🏗️ Architecture du système
+
+```mermaid
+graph TB
+    subgraph Mobile["📱 Utilisateur A — Mobile"]
+        A1["teniuChat App<br/>iOS / Android"]
+    end
+
+    subgraph Desktop["💻 Utilisateur B — Bureau"]
+        B1["Teniulink Node<br/>macOS / Windows / Linux"]
+        B2["Services IA locaux<br/>Ollama / OpenAI / DeepSeek"]
+        B3["Passerelle locale<br/>localhost:23333"]
+    end
+
+    subgraph Cloud["☁️ Plateforme cloud — teniuapi.online"]
+        C1["xnew-api<br/>API Gateway"]
+        C2["Gestion des jetons<br/>Octelium SDK"]
+        C3["Authentification<br/>JWT / OAuth / WebAuthn"]
+        C4[("Base de données<br/>SQLite / MySQL / PG")]
+    end
+
+    subgraph Upstream["🔗 Fournisseurs IA"]
+        D1["OpenAI"]
+        D2["Claude"]
+        D3["Gemini"]
+        D4["40+ autres fournisseurs"]
+    end
+
+    A1 -->|"Appel API"| C1
+    B1 -->|"Config services locaux"| B2
+    B2 -->|"Transfert proxy"| B3
+    B1 -->|"Enregistrer jeton"| C2
+    B3 -->|"Jeton d'appareil<br/>Partager vers cloud"| C1
+    C1 -->|"Authentification"| C3
+    C1 -->|"Persistance données"| C4
+    C1 -->|"Routage"| D1
+    C1 -->|"Routage"| D2
+    C1 -->|"Routage"| D3
+    C1 -->|"Routage"| D4
+```
+
+### Dépôts liés
+
+Le projet fonctionne avec trois dépôts de code collaborant ensemble :
+
+| Dépôt | Rôle | Description |
+|------|------|------|
+| **[xnew-api](https://github.com/liuyaaixxa/xnew-api)** | ☁️ Passerelle cloud | Passerelle API déployée sur [teniuapi.online](https://teniuapi.online) — accès unifié aux modèles IA, authentification, gestion des jetons, facturation |
+| **[teniu-chat](https://github.com/liuyaaixxa/teniu-chat)** | 📱 Client mobile | Application iOS / Android permettant aux utilisateurs finaux d'accéder au réseau Teniu.AI |
+| **[teniulink-node-client](https://github.com/liuyaaixxa/teniulink-node-client)** | 💻 Nœud bureau | Application de bureau qui démarre une passerelle locale intelligente et partage les services IA locaux vers le cloud |
+
+---
+
+## 👥 Scénarios utilisateur
+
+### Utilisateur A — Consommateur mobile
+
+1. S'inscrire ou se connecter via **teniuChat App** (iOS / Android)
+2. Méthodes d'authentification : GitHub / Discord / e-mail / portefeuille Openfort
+3. Parcourir les modèles IA disponibles (fournisseurs + services locaux partagés par l'utilisateur B)
+4. Appeler les modèles directement — la passerelle cloud gère l'authentification, la facturation et le routage
+
+### Utilisateur B — Fournisseur de nœud bureau
+
+1. Télécharger et lancer l'application **Teniulink Node**
+2. Configurer les services IA locaux dans le menu « Services de modèles » (OpenAI, Google, DeepSeek, Ollama, etc.)
+3. Démarrer la passerelle locale intelligente `http://localhost:23333` qui proxy tous les services configurés
+4. Se connecter au cloud [teniuapi.online](https://teniuapi.online) et créer un **jeton d'appareil**
+5. Saisir le jeton d'appareil dans Teniulink Node pour partager le service du port local `23333` vers le cloud
+6. Les autres utilisateurs (Utilisateur A) peuvent désormais consommer vos services partagés via le cloud
 
 ---
 

@@ -44,6 +44,8 @@
 
 <p align="center">
   <a href="#-快速開始">快速開始</a> •
+  <a href="#-系統架構">系統架構</a> •
+  <a href="#-使用者場景">使用者場景</a> •
   <a href="#-主要特性">主要特性</a> •
   <a href="#-部署">部署</a> •
   <a href="#-文件">文件</a> •
@@ -58,6 +60,79 @@
 > - 本項目僅供個人學習使用，不保證穩定性，且不提供任何技術支援
 > - 使用者必須在遵循 OpenAI 的 [使用條款](https://openai.com/policies/terms-of-use) 以及**法律法規**的情況下使用，不得用於非法用途
 > - 根據 [《生成式人工智慧服務管理暫行辦法》](http://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm) 的要求，請勿對中國地區公眾提供一切未經備案的生成式人工智慧服務
+
+---
+
+## 🏗️ 系統架構
+
+```mermaid
+graph TB
+    subgraph Mobile["📱 使用者A — 行動端"]
+        A1["teniuChat App<br/>iOS / Android"]
+    end
+
+    subgraph Desktop["💻 使用者B — 桌面端"]
+        B1["Teniulink Node<br/>macOS / Windows / Linux"]
+        B2["本地AI服務<br/>Ollama / OpenAI / DeepSeek"]
+        B3["本地網關<br/>localhost:23333"]
+    end
+
+    subgraph Cloud["☁️ 雲端平台 — teniuapi.online"]
+        C1["xnew-api<br/>API Gateway"]
+        C2["設備令牌管理<br/>Octelium SDK"]
+        C3["使用者認證<br/>JWT / OAuth / WebAuthn"]
+        C4[("資料庫<br/>SQLite / MySQL / PG")]
+    end
+
+    subgraph Upstream["🔗 上游AI供應商"]
+        D1["OpenAI"]
+        D2["Claude"]
+        D3["Gemini"]
+        D4["其他 40+ 供應商"]
+    end
+
+    A1 -->|"API 呼叫"| C1
+    B1 -->|"配置本地服務"| B2
+    B2 -->|"代理轉發"| B3
+    B1 -->|"註冊設備令牌"| C2
+    B3 -->|"設備令牌<br/>共享到雲端"| C1
+    C1 -->|"使用者認證"| C3
+    C1 -->|"資料持久化"| C4
+    C1 -->|"路由轉發"| D1
+    C1 -->|"路由轉發"| D2
+    C1 -->|"路由轉發"| D3
+    C1 -->|"路由轉發"| D4
+```
+
+### 相關倉庫
+
+專案由三個程式碼倉庫協同工作：
+
+| 倉庫 | 定位 | 說明 |
+|------|------|------|
+| **[xnew-api](https://github.com/liuyaaixxa/xnew-api)** | ☁️ 雲端網關 | API 網關，部署於 [teniuapi.online](https://teniuapi.online)，統一 AI 模型接入、使用者認證、設備令牌管理、計費 |
+| **[teniu-chat](https://github.com/liuyaaixxa/teniu-chat)** | 📱 行動客戶端 | iOS / Android App，終端使用者透過它接入 Teniu.AI 網路消費大模型服務 |
+| **[teniulink-node-client](https://github.com/liuyaaixxa/teniulink-node-client)** | 💻 桌面節點 | 桌面應用，在本地啟動智慧網關，將本地 AI 服務共享到雲端 |
+
+---
+
+## 👥 使用者場景
+
+### 使用者A — 行動端消費者
+
+1. 透過 **teniuChat App**（iOS / Android）註冊或登入帳戶
+2. 認證方式：GitHub / Discord / 信箱註冊 / Openfort 錢包登入
+3. 在 App 中瀏覽可用 AI 模型（上游供應商 + 使用者 B 共享的本地服務）
+4. 直接呼叫模型，雲端網關統一鑑權、計費、路由
+
+### 使用者B — 桌面端節點提供者
+
+1. 下載並啟動 **Teniulink Node** 桌面應用
+2. 在「模型服務」選單中配置本地 AI 服務（OpenAI、Google、DeepSeek、Ollama 等）
+3. 本地啟動智慧網關 `http://localhost:23333`，代理所有已配置的本地服務
+4. 登入雲端 [teniuapi.online](https://teniuapi.online)，建立**設備令牌**
+5. 在 Teniulink Node 中填入設備令牌，將本地 `23333` 埠服務共享至雲端
+6. 其他使用者（使用者 A）即可透過雲端消費您共享的大模型服務
 
 ---
 

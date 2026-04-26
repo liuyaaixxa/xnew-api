@@ -15,6 +15,8 @@
 
 <p align="center">
   <a href="#-项目简介">项目简介</a> •
+  <a href="#-系统架构">系统架构</a> •
+  <a href="#-用户场景">用户场景</a> •
   <a href="#-核心能力">核心能力</a> •
   <a href="#-快速开始">快速开始</a> •
   <a href="#-teniu-link-客户端">客户端下载</a> •
@@ -33,6 +35,79 @@
 - **低价使用** — 以极低成本使用 GPT-4o、Claude、Gemini 等主流大模型 API，兼容 OpenAI 格式，即开即用
 
 同时，Teniu.AI 也是一个统一的大模型 API 网关，聚合 40+ 上游 AI 供应商（OpenAI、Claude、Gemini、Azure、AWS Bedrock 等），提供统一接口、用户管理、计费、限流和管理后台。
+
+---
+
+## 🏗️ 系统架构
+
+```mermaid
+graph TB
+    subgraph Mobile["📱 用户A — 移动端"]
+        A1["teniuChat App<br/>iOS / Android"]
+    end
+
+    subgraph Desktop["💻 用户B — 桌面端"]
+        B1["Teniulink Node<br/>macOS / Windows / Linux"]
+        B2["本地AI服务<br/>Ollama / OpenAI / DeepSeek"]
+        B3["本地网关<br/>localhost:23333"]
+    end
+
+    subgraph Cloud["☁️ 云端平台 — teniuapi.online"]
+        C1["xnew-api<br/>API Gateway"]
+        C2["设备令牌管理<br/>Octelium SDK"]
+        C3["用户认证<br/>JWT / OAuth / WebAuthn"]
+        C4[("数据库<br/>SQLite / MySQL / PG")]
+    end
+
+    subgraph Upstream["🔗 上游AI供应商"]
+        D1["OpenAI"]
+        D2["Claude"]
+        D3["Gemini"]
+        D4["其他 40+ 供应商"]
+    end
+
+    A1 -->|"API 调用"| C1
+    B1 -->|"配置本地服务"| B2
+    B2 -->|"代理转发"| B3
+    B1 -->|"注册设备令牌"| C2
+    B3 -->|"设备令牌<br/>共享到云端"| C1
+    C1 -->|"用户认证"| C3
+    C1 -->|"数据持久化"| C4
+    C1 -->|"路由转发"| D1
+    C1 -->|"路由转发"| D2
+    C1 -->|"路由转发"| D3
+    C1 -->|"路由转发"| D4
+```
+
+### 相关仓库
+
+项目由三个代码仓库协同工作：
+
+| 仓库 | 定位 | 说明 |
+|------|------|------|
+| **[xnew-api](https://github.com/liuyaaixxa/xnew-api)** | ☁️ 云端网关 | API 网关，部署于 [teniuapi.online](https://teniuapi.online)，统一 AI 模型接入、用户认证、设备令牌管理、计费 |
+| **[teniu-chat](https://github.com/liuyaaixxa/teniu-chat)** | 📱 移动客户端 | iOS / Android App，终端用户通过它接入 Teniu.AI 网络消费大模型服务 |
+| **[teniulink-node-client](https://github.com/liuyaaixxa/teniulink-node-client)** | 💻 桌面节点 | 桌面应用，在本地启动智能网关，将本地 AI 服务共享到云端 |
+
+---
+
+## 👥 用户场景
+
+### 用户A — 移动端消费者
+
+1. 通过 **teniuChat App**（iOS / Android）注册或登录账户
+2. 认证方式：GitHub / Discord / 邮箱注册 / Openfort 钱包登录
+3. 在 App 中浏览可用 AI 模型（上游供应商 + 用户 B 共享的本地服务）
+4. 直接调用模型，云端网关统一鉴权、计费、路由
+
+### 用户B — 桌面端节点提供者
+
+1. 下载并启动 **Teniulink Node** 桌面应用
+2. 在「模型服务」菜单中配置本地 AI 服务（OpenAI、Google、DeepSeek、Ollama 等）
+3. 本地启动智能网关 `http://localhost:23333`，代理所有已配置的本地服务
+4. 登录云端 [teniuapi.online](https://teniuapi.online)，创建**设备令牌**
+5. 在 Teniulink Node 中填入设备令牌，将本地 `23333` 端口服务共享至云端
+6. 其他用户（用户 A）即可通过云端消费您共享的大模型服务
 
 ---
 
