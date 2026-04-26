@@ -179,6 +179,8 @@ func InitOptionMap() {
 	common.OptionMap["AutomaticDisableStatusCodes"] = operation_setting.AutomaticDisableStatusCodesToString()
 	common.OptionMap["AutomaticRetryStatusCodes"] = operation_setting.AutomaticRetryStatusCodesToString()
 	common.OptionMap["ExposeRatioEnabled"] = strconv.FormatBool(ratio_setting.IsExposeRatioEnabled())
+	common.OptionMap["OcteliumAuthToken"] = common.OcteliumAuthToken
+	common.OptionMap["OcteliumDefaultDomain"] = common.OcteliumDefaultDomain
 
 	// 自动添加所有注册的模型配置
 	modelConfigs := config.GlobalConfig.ExportAllConfigs()
@@ -523,6 +525,16 @@ func updateOptionMap(key string, value string) (err error) {
 		err = ratio_setting.UpdateAudioRatioByJSONString(value)
 	case "AudioCompletionRatio":
 		err = ratio_setting.UpdateAudioCompletionRatioByJSONString(value)
+	case "OcteliumAuthToken":
+		common.OcteliumAuthToken = value
+		if common.OcteliumConfigChangeCallback != nil {
+			common.OcteliumConfigChangeCallback()
+		}
+	case "OcteliumDefaultDomain":
+		common.OcteliumDefaultDomain = value
+		if common.OcteliumConfigChangeCallback != nil {
+			common.OcteliumConfigChangeCallback()
+		}
 	case "TeniulinkNodeVersion":
 		common.TeniulinkNodeVersion = value
 	case "TopUpLink":

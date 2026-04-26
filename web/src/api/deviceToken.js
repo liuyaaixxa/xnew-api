@@ -20,6 +20,15 @@ For commercial licensing, please contact support@quantumnous.com
 import { API } from '../helpers';
 
 /**
+ * Get device token config (default domain, enabled status)
+ * @returns {Promise} API response
+ */
+export const getDeviceTokenConfig = async () => {
+  const res = await API.get('/api/device-token/config');
+  return res.data;
+};
+
+/**
  * Get device tokens list
  * @returns {Promise} API response
  */

@@ -76,8 +76,14 @@ var (
 // GetOcteliumService returns the singleton OcteliumService instance
 func GetOcteliumService() *OcteliumService {
 	octeliumServiceOnce.Do(func() {
-		authToken := os.Getenv("OCTELIUM_AUTH_TOKEN")
-		domain := os.Getenv("OCTELIUM_DEFAULT_DOMAIN")
+		authToken := common.OcteliumAuthToken
+		if authToken == "" {
+			authToken = os.Getenv("OCTELIUM_AUTH_TOKEN")
+		}
+		domain := common.OcteliumDefaultDomain
+		if domain == "" {
+			domain = os.Getenv("OCTELIUM_DEFAULT_DOMAIN")
+		}
 		if domain == "" {
 			domain = "teniuapi.cloud"
 		}
@@ -103,13 +109,19 @@ func GetOcteliumService() *OcteliumService {
 		}
 		if !octeliumService.enabled {
 			common.SysLog("Octelium service disabled: OCTELIUM_AUTH_TOKEN not set")
-			return
-		}
-		if err := octeliumService.initGRPC(); err != nil {
-			common.SysError(fmt.Sprintf("Octelium service disabled: gRPC init failed: %v", err))
-			octeliumService.enabled = false
 		} else {
-			common.SysLog(fmt.Sprintf("Octelium service enabled, connected to %s, user policies: %v, insecure TLS: %v", domain, userPolicies, insecureTLS))
+			if err := octeliumService.initGRPC(); err != nil {
+				common.SysError(fmt.Sprintf("Octelium service disabled: gRPC init failed: %v", err))
+				octeliumService.enabled = false
+			} else {
+				common.SysLog(fmt.Sprintf("Octelium service enabled, connected to %s, user policies: %v, insecure TLS: %v", domain, userPolicies, insecureTLS))
+			}
+		}
+		common.OcteliumConfigChangeCallback = func() {
+			octeliumService.UpdateConfig(&OcteliumConfig{
+				AuthToken:     common.OcteliumAuthToken,
+				DefaultDomain: common.OcteliumDefaultDomain,
+			})
 		}
 	})
 	return octeliumService
@@ -468,17 +480,35 @@ func (s *OcteliumService) GetTokenInfo(ctx context.Context, token string) (*Toke
 	}, nil
 }
 
-// UpdateConfig updates the service configuration
+// UpdateConfig updates the service configuration and reinitializes gRPC if needed
 func (s *OcteliumService) UpdateConfig(config *OcteliumConfig) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if config.AuthToken != "" {
+
+	needReconnect := false
+	if config.AuthToken != "" && config.AuthToken != s.authToken {
 		s.authToken = config.AuthToken
+		s.accessToken = ""
+		s.tokenExpiry = time.Time{}
+		needReconnect = true
 	}
-	if config.DefaultDomain != "" {
+	if config.DefaultDomain != "" && config.DefaultDomain != s.domain {
 		s.domain = config.DefaultDomain
+		needReconnect = true
 	}
-	s.enabled = config.Enabled
+	s.enabled = s.authToken != ""
+
+	if needReconnect && s.enabled {
+		if s.grpcConn != nil {
+			s.grpcConn.Close()
+		}
+		if err := s.initGRPC(); err != nil {
+			common.SysError(fmt.Sprintf("Octelium gRPC reconnect failed: %v", err))
+			s.enabled = false
+		} else {
+			common.SysLog(fmt.Sprintf("Octelium service reconfigured, domain: %s", s.domain))
+		}
+	}
 }
 
 // maskToken masks a token for safe display

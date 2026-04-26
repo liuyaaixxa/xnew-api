@@ -283,6 +283,7 @@ func SetApiRouter(router *gin.Engine) {
 		deviceTokenRoute.Use(middleware.UserAuth())
 		{
 			deviceTokenRoute.GET("/", controller.GetAllDeviceTokens)
+			deviceTokenRoute.GET("/config", controller.GetDeviceTokenConfig)
 			deviceTokenRoute.GET("/:id", controller.GetDeviceToken)
 			deviceTokenRoute.POST("/", controller.AddDeviceToken)
 			deviceTokenRoute.DELETE("/:id", controller.DeleteDeviceToken)

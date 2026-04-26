@@ -101,6 +101,8 @@ const SystemSetting = () => {
     LinuxDOClientSecret: '',
     LinuxDOMinimumTrustLevel: '',
     ServerAddress: '',
+    OcteliumAuthToken: '',
+    OcteliumDefaultDomain: '',
     // SSRF防护配置
     'fetch_setting.enable_ssrf_protection': true,
     'fetch_setting.allow_private_ip': '',
@@ -359,6 +361,18 @@ const SystemSetting = () => {
     } else {
       showError(t('邮箱域名白名单格式不正确'));
     }
+  };
+
+  const submitOctelium = async () => {
+    const options = [];
+    if (originInputs['OcteliumAuthToken'] !== inputs.OcteliumAuthToken) {
+      options.push({ key: 'OcteliumAuthToken', value: inputs.OcteliumAuthToken });
+    }
+    if (originInputs['OcteliumDefaultDomain'] !== inputs.OcteliumDefaultDomain) {
+      options.push({ key: 'OcteliumDefaultDomain', value: inputs.OcteliumDefaultDomain });
+    }
+    if (options.length === 0) return showError(t('你似乎并没有修改什么'));
+    await updateOptions(options);
   };
 
   const submitSSRF = async () => {
@@ -1651,6 +1665,41 @@ const SystemSetting = () => {
                   </Row>
                   <Button onClick={submitTurnstile}>
                     {t('保存人机校验设置')}
+                  </Button>
+                </Form.Section>
+              </Card>
+
+              <Card>
+                <Form.Section text={t('Octelium 设备令牌')}>
+                  <Banner
+                    type='info'
+                    description={t(
+                      '配置 Octelium Auth Token 后，用户可在控制台创建设备令牌，用于 TeniuLink Node 接入云端网络',
+                    )}
+                    style={{ marginBottom: 20, marginTop: 16 }}
+                  />
+                  <Row
+                    gutter={{ xs: 8, sm: 16, md: 24, lg: 24, xl: 24, xxl: 24 }}
+                  >
+                    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                      <Form.Input
+                        field='OcteliumAuthToken'
+                        label='Auth Token'
+                        placeholder='AQpABfm0...'
+                        mode='password'
+                      />
+                    </Col>
+                    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                      <Form.Input
+                        field='OcteliumDefaultDomain'
+                        label={t('默认域名')}
+                        placeholder='teniuapi.cloud'
+                        extraText={t('用于生成设备令牌的域名')}
+                      />
+                    </Col>
+                  </Row>
+                  <Button onClick={submitOctelium}>
+                    {t('保存 Octelium 设置')}
                   </Button>
                 </Form.Section>
               </Card>
