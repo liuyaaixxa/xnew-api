@@ -222,13 +222,14 @@ func RequestEpay(c *gin.Context) {
 		amount = dAmount.Div(dQuotaPerUnit).IntPart()
 	}
 	topUp := &model.TopUp{
-		UserId:        id,
-		Amount:        amount,
-		Money:         payMoney,
-		TradeNo:       tradeNo,
-		PaymentMethod: req.PaymentMethod,
-		CreateTime:    time.Now().Unix(),
-		Status:        "pending",
+		UserId:          id,
+		Amount:          amount,
+		Money:           payMoney,
+		TradeNo:         tradeNo,
+		PaymentMethod:   req.PaymentMethod,
+		PaymentProvider: model.PaymentProviderEpay,
+		CreateTime:      time.Now().Unix(),
+		Status:          "pending",
 	}
 	err = topUp.Insert()
 	if err != nil {
@@ -375,7 +376,16 @@ func EpayNotify(c *gin.Context) {
 
 	zl = zl.With(zap.Int("user_id", topUp.UserId), zap.Float64("money", topUp.Money))
 
-	// Guard 3: idempotency + visibility. Any non-pending status gets logged
+	// Guard 3: cross-gateway protection — only EPay-created orders can be completed via EPay.
+	if topUp.PaymentProvider != model.PaymentProviderEpay {
+		zl.Warn("epay callback payment provider mismatch",
+			zap.String("order_provider", topUp.PaymentProvider),
+			zap.String("callback_type", verifyInfo.Type),
+		)
+		return
+	}
+
+	// Guard 4: idempotency + visibility. Any non-pending status gets logged
 	// rather than silently dropped, so replays and post-refund callbacks leave
 	// a paper trail.
 	if topUp.Status != common.TopUpStatusPending {
@@ -385,7 +395,7 @@ func EpayNotify(c *gin.Context) {
 		return
 	}
 
-	// Guard 4: trade_no must encode the same user_id as the order row.
+	// Guard 5: trade_no must encode the same user_id as the order row.
 	if ok, parsed := CheckTradeNoOwnership(verifyInfo.ServiceTradeNo, topUp.UserId); !ok {
 		zl.Error("epay callback trade_no user mismatch",
 			zap.Int("parsed_user_id", parsed),
@@ -393,7 +403,7 @@ func EpayNotify(c *gin.Context) {
 		return
 	}
 
-	// Guard 5: staleness — if the order was created too long ago, treat the
+	// Guard 6: staleness — if the order was created too long ago, treat the
 	// callback as a replay attempt and refuse to credit.
 	if valid, age := CheckOrderAge(topUp.CreateTime, time.Now().Unix(), operation_setting.EpayCallbackMaxOrderAgeSeconds); !valid {
 		zl.Error("epay callback order expired",
@@ -403,7 +413,7 @@ func EpayNotify(c *gin.Context) {
 		return
 	}
 
-	// Guard 6: large orders require human review. Below threshold, auto-credit
+	// Guard 7: large orders require human review. Below threshold, auto-credit
 	// as before.
 	if ShouldPendingReview(topUp.Money, operation_setting.EpayAutoTopUpThreshold) {
 		topUp.Status = common.TopUpStatusPendingReview
@@ -420,6 +430,10 @@ func EpayNotify(c *gin.Context) {
 	}
 
 	// Happy path — credit the user.
+	if topUp.PaymentMethod != verifyInfo.Type {
+		logger.LogInfo(c.Request.Context(), fmt.Sprintf("易支付 实际支付方式与订单不同 trade_no=%s order_payment_method=%s actual_type=%s client_ip=%s", verifyInfo.ServiceTradeNo, topUp.PaymentMethod, verifyInfo.Type, clientIP))
+		topUp.PaymentMethod = verifyInfo.Type
+	}
 	topUp.Status = common.TopUpStatusSuccess
 	topUp.CompleteTime = common.GetTimestamp()
 	if err := topUp.Update(); err != nil {
