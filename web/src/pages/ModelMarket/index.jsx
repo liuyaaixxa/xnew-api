@@ -100,7 +100,7 @@ export default function ModelMarket() {
     });
 
     return () => observerRef.current?.disconnect();
-  }, [filteredModels, currentPage]);
+  }, [filteredModels, currentPage, t]);
 
   // Build endpoint categories from endpointMap
   const categories = useMemo(() => {

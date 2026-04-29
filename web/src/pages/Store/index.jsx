@@ -100,7 +100,7 @@ export default function Store() {
     });
 
     return () => observerRef.current?.disconnect();
-  }, []);
+  }, [t]);
 
   return (
     <div className="store-page">
