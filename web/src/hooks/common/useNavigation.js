@@ -35,18 +35,23 @@ export const useNavigation = (t, docsLink, headerNavModules, { isLoggedIn } = {}
     const allLinks = [
       {
         text: t('首页'),
+        itemKey: 'storeHome',
+        to: '/store',
+      },
+      {
+        text: t('模型市场'),
+        itemKey: 'modelMarket',
+        to: '/model-market',
+      },
+      {
+        text: t('算力池计划'),
         itemKey: 'home',
-        to: '/',
+        to: '/compute-pool',
       },
       {
         text: t('控制台'),
         itemKey: 'console',
         to: '/console',
-      },
-      {
-        text: t('模型广场'),
-        itemKey: 'pricing',
-        to: '/pricing',
       },
       {
         text: t('关于'),
@@ -57,9 +62,15 @@ export const useNavigation = (t, docsLink, headerNavModules, { isLoggedIn } = {}
 
     // 根据配置过滤导航链接
     return allLinks.filter((link) => {
-      if (link.itemKey === 'home') {
+      if (link.itemKey === 'storeHome') {
         // 登录状态隐藏首页，未登录状态显示
         if (isLoggedIn) return false;
+        return modules[link.itemKey] !== false;
+      }
+      if (link.itemKey === 'home') {
+        return modules[link.itemKey] !== false;
+      }
+      if (link.itemKey === 'modelMarket') {
         return modules[link.itemKey] !== false;
       }
       if (link.itemKey === 'pricing') {

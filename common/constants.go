@@ -12,7 +12,7 @@ import (
 
 var StartTime = time.Now().Unix() // unit: second
 var Version = "v0.0.0"            // this hard coding will be replaced automatically when building, no need to manually change
-var SystemName = "Teniu API"
+var SystemName = "Teniu.AI"
 var TeniulinkNodeVersion = "0.1.1"
 var OcteliumAuthToken = ""
 var OcteliumDefaultDomain = "teniuapi.cloud"

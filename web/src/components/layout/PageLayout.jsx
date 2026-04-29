@@ -62,7 +62,7 @@ const PageLayout = () => {
     '/pricing',
   ];
 
-  const legalPages = ['/', '/about', '/privacy', '/tos', '/docs'];
+  const legalPages = ['/', '/about', '/privacy', '/tos', '/docs', '/store', '/model-market'];
   const shouldHideFooter = cardProPages.includes(location.pathname) || legalPages.includes(location.pathname);
 
   const shouldInnerPadding =

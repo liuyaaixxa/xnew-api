@@ -56,6 +56,8 @@ import Setup from './pages/Setup';
 import SetupCheck from './components/layout/SetupCheck';
 
 const Home = lazy(() => import('./pages/Home/index_v2'));
+const Store = lazy(() => import('./pages/Store'));
+const ModelMarket = lazy(() => import('./pages/ModelMarket'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const About = lazy(() => import('./pages/About/LandingAbout'));
 const UserAgreement = lazy(() => import('./pages/UserAgreement'));
@@ -104,7 +106,7 @@ function App() {
           element={
             <HomeRedirect>
               <Suspense fallback={<Loading></Loading>} key={location.pathname}>
-                <Home />
+                <Store />
               </Suspense>
             </HomeRedirect>
           }
@@ -462,6 +464,30 @@ function App() {
                 <Chat2Link />
               </Suspense>
             </PrivateRoute>
+          }
+        />
+        <Route
+          path='/compute-pool'
+          element={
+            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Home />
+            </Suspense>
+          }
+        />
+        <Route
+          path='/store'
+          element={
+            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Store />
+            </Suspense>
+          }
+        />
+        <Route
+          path='/model-market'
+          element={
+            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <ModelMarket />
+            </Suspense>
           }
         />
         <Route path='*' element={<NotFound />} />
