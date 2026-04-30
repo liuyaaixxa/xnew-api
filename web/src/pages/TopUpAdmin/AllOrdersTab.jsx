@@ -27,6 +27,7 @@ const { Text } = Typography;
 
 const STATUS_CONFIG = {
   success: { color: 'green', key: '成功' },
+  completed: { color: 'green', key: '已完成' },
   pending: { color: 'orange', key: '待支付' },
   pending_review: { color: 'orange', key: '审核中' },
   rejected: { color: 'red', key: '已拒绝' },

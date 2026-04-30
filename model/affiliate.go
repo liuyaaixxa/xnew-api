@@ -299,9 +299,31 @@ func RejectSettlement(id int, remark string) error {
 	})
 }
 
-// Log settlement action
+// RecordAffiliateLog logs an affiliate-related action.
 func RecordAffiliateLog(userId int, message string) {
 	if common.LogConsumeEnabled {
 		RecordLog(userId, LogTypeAffiliate, fmt.Sprintf("[推广联盟] %s", message))
 	}
+}
+
+// FixAffiliateCounts backfills aff_count for existing affiliates based on users.inviter_id.
+func FixAffiliateCounts() {
+	counts := make(map[int]int)
+	rows, err := DB.Table("users").Select("inviter_id, count(*) as cnt").
+		Where("inviter_id > 0").Group("inviter_id").Rows()
+	if err != nil {
+		common.SysLog("FixAffiliateCounts query failed: " + err.Error())
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var inviterId, cnt int
+		if err := rows.Scan(&inviterId, &cnt); err == nil {
+			counts[inviterId] = cnt
+		}
+	}
+	for inviterId, cnt := range counts {
+		DB.Model(&User{}).Where("id = ?", inviterId).Update("aff_count", cnt)
+	}
+	common.SysLog(fmt.Sprintf("FixAffiliateCounts: updated %d affiliates", len(counts)))
 }
