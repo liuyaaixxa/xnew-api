@@ -58,6 +58,7 @@ export const DEFAULT_ADMIN_CONFIG = {
     user: true,
     subscription: true,
     treasury: true,
+    'affiliate-admin': true,
     setting: true,
   },
 };

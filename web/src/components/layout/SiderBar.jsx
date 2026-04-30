@@ -55,6 +55,7 @@ const routerMap = {
   'user-channel': '/console/user-channel',
   'user-channel-review': '/console/user-channel-review',
   affiliate: '/console/affiliate',
+  'affiliate-admin': '/console/affiliate-admin',
 };
 
 const SiderBar = ({ onNavigate = () => {} }) => {
@@ -220,6 +221,12 @@ const SiderBar = ({ onNavigate = () => {} }) => {
         text: t('积分管理'),
         itemKey: 'treasury',
         to: '/treasury',
+        className: isAdmin() ? '' : 'tableHiddle',
+      },
+      {
+        text: t('推广管理'),
+        itemKey: 'affiliate-admin',
+        to: '/affiliate-admin',
         className: isAdmin() ? '' : 'tableHiddle',
       },
       {

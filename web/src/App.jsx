@@ -38,6 +38,7 @@ import Token from './pages/Token';
 import Redemption from './pages/Redemption';
 import TopUp from './pages/TopUp';
 import TopUpAdmin from './pages/TopUpAdmin';
+import AdminAffiliate from './pages/AdminAffiliate';
 import Log from './pages/Log';
 import Chat from './pages/Chat';
 import Chat2Link from './pages/Chat2Link';
@@ -200,6 +201,16 @@ function App() {
           element={
             <AdminRoute>
               <TopUpAdmin />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path='/console/affiliate-admin'
+          element={
+            <AdminRoute>
+              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+                <AdminAffiliate />
+              </Suspense>
             </AdminRoute>
           }
         />
