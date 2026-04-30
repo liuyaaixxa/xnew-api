@@ -284,6 +284,8 @@ func migrateDB() error {
 		&UserChannel{},
 		&TreasuryLog{},
 		&SettlementOrder{},
+		&AffiliateRecord{},
+		&AffiliateSettlement{},
 	)
 	if err != nil {
 		return err

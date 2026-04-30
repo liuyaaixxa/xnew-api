@@ -103,6 +103,10 @@ export default defineConfig({
         target: 'http://localhost:3000',
         changeOrigin: true,
       },
+      '/invite': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
     },
   },
 });

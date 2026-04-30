@@ -32,6 +32,7 @@ func SetApiRouter(router *gin.Engine) {
 		apiRouter.GET("/about", controller.GetAbout)
 		//apiRouter.GET("/midjourney", controller.GetMidjourney)
 		apiRouter.GET("/home_page_content", controller.GetHomePageContent)
+	apiRouter.GET("/affiliate/invite", controller.GetInvitePage)
 		apiRouter.GET("/pricing", middleware.TryUserAuth(), controller.GetPricing)
 		apiRouter.GET("/verification", middleware.EmailVerificationRateLimit(), middleware.TurnstileCheck(), controller.SendEmailVerification)
 		apiRouter.GET("/reset_password", middleware.CriticalRateLimit(), middleware.TurnstileCheck(), controller.SendPasswordResetEmail)
@@ -96,6 +97,11 @@ func SetApiRouter(router *gin.Engine) {
 				selfRoute.POST("/creem/pay", middleware.CriticalRateLimit(), controller.RequestCreemPay)
 				selfRoute.POST("/waffo/pay", middleware.CriticalRateLimit(), controller.RequestWaffoPay)
 				selfRoute.POST("/aff_transfer", controller.TransferAffQuota)
+				selfRoute.POST("/affiliate/apply", controller.ApplyAffiliate)
+				selfRoute.GET("/affiliate/status", controller.GetAffiliateStatus)
+				selfRoute.GET("/affiliate/records", controller.GetAffiliateRecords)
+				selfRoute.POST("/affiliate/settlement", middleware.CriticalRateLimit(), controller.ApplyAffiliateSettlement)
+				selfRoute.GET("/affiliate/link", controller.GetAffiliateLink)
 				selfRoute.PUT("/setting", controller.UpdateUserSetting)
 
 				// 2FA routes
@@ -145,6 +151,12 @@ func SetApiRouter(router *gin.Engine) {
 				adminRoute.PUT("/", controller.UpdateUser)
 				adminRoute.DELETE("/:id", controller.DeleteUser)
 				adminRoute.DELETE("/:id/reset_passkey", controller.AdminResetPasskey)
+
+				// Affiliate admin routes
+				adminRoute.GET("/affiliate/list", controller.AdminGetAffiliateList)
+				adminRoute.GET("/affiliate/settlements", controller.AdminGetAffiliateSettlements)
+				adminRoute.POST("/affiliate/settlement/approve", controller.AdminApproveAffiliateSettlement)
+				adminRoute.POST("/affiliate/settlement/reject", controller.AdminRejectAffiliateSettlement)
 
 				// Admin 2FA routes
 				adminRoute.GET("/2fa/stats", controller.Admin2FAStats)

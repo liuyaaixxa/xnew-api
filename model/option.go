@@ -181,6 +181,8 @@ func InitOptionMap() {
 	common.OptionMap["ExposeRatioEnabled"] = strconv.FormatBool(ratio_setting.IsExposeRatioEnabled())
 	common.OptionMap["OcteliumAuthToken"] = common.OcteliumAuthToken
 	common.OptionMap["OcteliumDefaultDomain"] = common.OcteliumDefaultDomain
+	common.OptionMap["AffiliateCommissionRate"] = strconv.Itoa(common.AffiliateCommissionRate)
+	common.OptionMap["AffiliateMinSettlement"] = strconv.FormatFloat(common.AffiliateMinSettlement, 'f', -1, 64)
 
 	// 自动添加所有注册的模型配置
 	modelConfigs := config.GlobalConfig.ExportAllConfigs()
@@ -547,6 +549,10 @@ func updateOptionMap(key string, value string) (err error) {
 		common.ChannelDisableThreshold, _ = strconv.ParseFloat(value, 64)
 	case "QuotaPerUnit":
 		common.QuotaPerUnit, _ = strconv.ParseFloat(value, 64)
+	case "AffiliateCommissionRate":
+		common.AffiliateCommissionRate, _ = strconv.Atoi(value)
+	case "AffiliateMinSettlement":
+		common.AffiliateMinSettlement, _ = strconv.ParseFloat(value, 64)
 	case "SensitiveWords":
 		setting.SensitiveWordsFromString(value)
 	case "AutomaticDisableKeywords":

@@ -58,6 +58,9 @@ import SetupCheck from './components/layout/SetupCheck';
 const Home = lazy(() => import('./pages/Home/index_v2'));
 const Store = lazy(() => import('./pages/Store'));
 const ModelMarket = lazy(() => import('./pages/ModelMarket'));
+const AffiliateLanding = lazy(() => import('./pages/Affiliate/Landing'));
+const AffiliateInvite = lazy(() => import('./pages/Affiliate/Invite'));
+const AffiliateDashboard = lazy(() => import('./pages/Affiliate/Dashboard'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const About = lazy(() => import('./pages/About/LandingAbout'));
 const UserAgreement = lazy(() => import('./pages/UserAgreement'));
@@ -488,6 +491,32 @@ function App() {
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <ModelMarket />
             </Suspense>
+          }
+        />
+        <Route
+          path='/affiliate'
+          element={
+            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <AffiliateLanding />
+            </Suspense>
+          }
+        />
+        <Route
+          path='/invite'
+          element={
+            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <AffiliateInvite />
+            </Suspense>
+          }
+        />
+        <Route
+          path='/console/affiliate'
+          element={
+            <PrivateRoute>
+              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+                <AffiliateDashboard />
+              </Suspense>
+            </PrivateRoute>
           }
         />
         <Route path='*' element={<NotFound />} />

@@ -142,6 +142,24 @@ const HomeV2 = () => {
             </div>
           </header>
 
+          {/* ── Affiliate Banner ── */}
+          <Link to='/affiliate' className='hv2-affiliate-banner'>
+            <div className='hv2-affiliate-banner-inner'>
+              <div className='hv2-affiliate-banner-left'>
+                <span className='hv2-affiliate-banner-icon'>💰</span>
+                <span className='hv2-affiliate-banner-text'>
+                  <strong>{t('推广联盟')}</strong>
+                  <span className='hv2-affiliate-banner-sep'>|</span>
+                  {t('邀请好友使用AI，终身赚取30%佣金')}
+                </span>
+              </div>
+              <div className='hv2-affiliate-banner-cta'>
+                {t('立即加入')}
+                <span className='hv2-affiliate-banner-arrow'>→</span>
+              </div>
+            </div>
+          </Link>
+
           {/* ── Hero ── */}
           <section className='hv2-hero'>
             <NeuralBg nodeCount={isMobile ? 30 : 60} />

@@ -216,6 +216,7 @@ const PageLayout = () => {
               overflowY: isMobile ? 'visible' : 'hidden',
               WebkitOverflowScrolling: 'touch',
               padding: shouldInnerPadding ? (isMobile ? '5px' : '24px') : '0',
+              paddingTop: shouldInnerPadding && !isMobile ? '88px' : undefined,
               position: 'relative',
             }}
           >

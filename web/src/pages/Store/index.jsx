@@ -104,6 +104,24 @@ export default function Store() {
 
   return (
     <div className="store-page">
+      {/* Affiliate Banner */}
+      <a href='/affiliate' className='store-affiliate-banner'>
+        <div className='store-affiliate-banner-inner'>
+          <div className='store-affiliate-banner-left'>
+            <span className='store-affiliate-banner-icon'>💰</span>
+            <span className='store-affiliate-banner-text'>
+              <strong>{t('推广联盟')}</strong>
+              <span className='store-affiliate-banner-sep'>|</span>
+              {t('邀请好友使用AI，终身赚取30%佣金')}
+            </span>
+          </div>
+          <div className='store-affiliate-banner-cta'>
+            {t('立即加入')}
+            <span className='store-affiliate-banner-arrow'>→</span>
+          </div>
+        </div>
+      </a>
+
       {/* Hero */}
       <section className="store-hero">
         <div className="store-hero-content">

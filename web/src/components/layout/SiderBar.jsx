@@ -54,6 +54,7 @@ const routerMap = {
   'topup-admin': '/console/topup-admin',
   'user-channel': '/console/user-channel',
   'user-channel-review': '/console/user-channel-review',
+  affiliate: '/console/affiliate',
 };
 
 const SiderBar = ({ onNavigate = () => {} }) => {
@@ -143,6 +144,11 @@ const SiderBar = ({ onNavigate = () => {} }) => {
         text: t('积分钱包'),
         itemKey: 'wallet',
         to: '/wallet',
+      },
+      {
+        text: t('推广联盟'),
+        itemKey: 'affiliate',
+        to: '/affiliate',
       },
       {
         text: t('个人设置'),

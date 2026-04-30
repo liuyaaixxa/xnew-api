@@ -89,6 +89,138 @@
   box-shadow: var(--lp-glow-green);
 }
 
+/* ─── Affiliate Banner ─── */
+.lp-affiliate-banner {
+  display: block;
+  text-decoration: none;
+  background: linear-gradient(135deg, #D97757 0%, #E0886A 25%, #f0a04b 50%, #E8A838 75%, #D97757 100%);
+  background-size: 200% 100%;
+  animation: affiliateBannerShimmer 4s ease-in-out infinite;
+  position: relative;
+  z-index: 999;
+  margin-top: 72px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.lp-affiliate-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at 30% 50%, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+@keyframes affiliateBannerShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.lp-affiliate-banner-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 14px 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.lp-affiliate-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lp-affiliate-banner-icon {
+  font-size: 22px;
+  animation: affiliateBounce 2s ease-in-out infinite;
+}
+
+@keyframes affiliateBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.lp-affiliate-banner-text {
+  color: #fff;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.lp-affiliate-banner-text strong {
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+
+.lp-affiliate-banner-separator {
+  opacity: 0.4;
+  font-weight: 300;
+}
+
+.lp-affiliate-banner-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 8px 20px;
+  border-radius: 100px;
+  transition: all 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.lp-affiliate-banner:hover .lp-affiliate-banner-right {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateX(4px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.lp-affiliate-banner-cta {
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.lp-affiliate-banner-arrow {
+  color: #fff;
+  font-size: 16px;
+  transition: transform 0.3s;
+}
+
+.lp-affiliate-banner:hover .lp-affiliate-banner-arrow {
+  transform: translateX(3px);
+}
+
+@media (max-width: 768px) {
+  .lp-affiliate-banner-content {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 1rem;
+  }
+
+  .lp-affiliate-banner-text {
+    font-size: 13px;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .lp-affiliate-banner-separator {
+    display: none;
+  }
+}
+
 /* Hero */
 .lp-hero {
   min-height: 100vh;

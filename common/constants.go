@@ -114,6 +114,8 @@ var TelegramBotName = ""
 var QuotaForNewUser = 0
 var QuotaForInviter = 0
 var QuotaForInvitee = 0
+var AffiliateCommissionRate = 30  // percentage (30 = 30%)
+var AffiliateMinSettlement = 100.0 // minimum ¥ for settlement
 var ChannelDisableThreshold = 5.0
 var AutomaticDisableChannelEnabled = false
 var AutomaticEnableChannelEnabled = false

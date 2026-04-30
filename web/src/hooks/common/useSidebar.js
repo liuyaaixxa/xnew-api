@@ -44,6 +44,7 @@ export const DEFAULT_ADMIN_CONFIG = {
     enabled: true,
     topup: true,
     wallet: true,
+    affiliate: true,
     personal: true,
   },
   admin: {
