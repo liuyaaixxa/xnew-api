@@ -459,6 +459,68 @@
   color: var(--text-muted);
 }
 
+/* ─── Rate Scale ─── */
+.cf-rate-scale {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.cf-rate-block {
+  text-align: center;
+  padding: 16px 20px;
+  border-radius: 14px;
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  min-width: 90px;
+  transition: transform .2s;
+}
+
+.cf-rate-block:hover { transform: translateY(-2px); }
+
+.cf-rate-block.bronze { border-color: #CD7F32; background: linear-gradient(180deg, #FDF5EF, #F5EDE0); }
+.cf-rate-block.silver { border-color: #A8A8A8; background: linear-gradient(180deg, #FAFAFA, #F0F0F0); }
+.cf-rate-block.gold   { border-color: #E8A838; background: linear-gradient(180deg, #FFFDF5, #FFF8E8); }
+.cf-rate-block.diamond { border-color: #B8D4F0; background: linear-gradient(180deg, #F8FAFF, #EEF4FF); }
+
+.cf-rate-icon { font-size: 24px; margin-bottom: 6px; }
+.cf-rate-val  { font-size: 24px; font-weight: 800; color: var(--text); }
+.cf-rate-lbl  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+.cf-rate-arrow {
+  font-size: 20px;
+  color: var(--border-light);
+  font-weight: 600;
+}
+
+/* ─── Result Grid ─── */
+.cf-result-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.cf-result-item {
+  background: #F8F5F0;
+  border-radius: 12px;
+  padding: 16px 12px;
+  text-align: center;
+  border: 2px solid transparent;
+}
+
+.cf-result-item.highlight {
+  border-color: #B8D4F0;
+  background: linear-gradient(180deg, #F8FAFF, #EEF4FF);
+}
+
+.cf-result-tier { font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; }
+.cf-result-val  { font-size: 22px; font-weight: 800; color: var(--accent3); }
+.cf-result-pct  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
 /* ─── Benefit Cards ─── */
 .benefit-grid {
   display: grid;

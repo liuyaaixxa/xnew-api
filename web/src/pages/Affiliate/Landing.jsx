@@ -23,10 +23,10 @@ import { useTranslation } from 'react-i18next';
 import './Landing.css';
 
 const TIERS = [
-  { name: '铜牌', icon: '🥉', rate: '30%', referrals: '1 – 9 人', withdraw: '标准提现 (1-3工作日)', perks: '实时数据面板', cls: 'bronze' },
-  { name: '银牌', icon: '🥈', rate: '35%', referrals: '10 – 49 人', withdraw: '快速提现 (24小时内)', perks: '优先客服 · 推广素材包', cls: 'silver' },
-  { name: '金牌', icon: '🥇', rate: '40%', referrals: '50 – 199 人', withdraw: '即时提现', perks: 'VIP客服 · 联合品牌 · 季度奖励', cls: 'gold' },
-  { name: '钻石合伙人', icon: '💎', rate: '50%', referrals: '200+ 人', withdraw: '即时提现', perks: '专属客户经理 · 年度分红 · 二级推广权', cls: 'diamond' },
+  { name: '铜牌', icon: '🥉', rate: '10%', referrals: '1 – 50 人', withdraw: '标准提现 (1-3工作日)', perks: '实时数据面板', cls: 'bronze' },
+  { name: '银牌', icon: '🥈', rate: '15%', referrals: '51 – 150 人', withdraw: '快速提现 (24小时内)', perks: '优先客服 · 推广素材包', cls: 'silver' },
+  { name: '金牌', icon: '🥇', rate: '20%', referrals: '151 – 200 人', withdraw: '即时提现', perks: 'VIP客服 · 联合品牌 · 季度奖励', cls: 'gold' },
+  { name: '钻石合伙人', icon: '💎', rate: '30%', referrals: '200+ 人', withdraw: '即时提现', perks: '专属客户经理 · 年度分红 · 二级推广权', cls: 'diamond' },
 ];
 
 const TESTIMONIALS = [
@@ -99,10 +99,10 @@ export default function AffiliateLanding() {
               </div>
               <h1 className="hero-title">
                 {t('分享AI算力')}<br />
-                <em>{t('赚取')}</em><span className="gold">{t('终身30%')}</span><em>{t('收益')}</em>
+                <em>{t('赚取')}</em><span className="gold">{t('最高终身30%')}</span><em>{t('收益')}</em>
               </h1>
               <p className="hero-sub">
-                {t('邀请一位好友使用Teniu.AI，好友每次购买Token你都能获得30%佣金。建圈子，管收益，轻松拥有被动收入。')}
+                {t('邀请一位好友使用Teniu.AI，好友每次购买Token你都能获得佣金回报。建圈子，管收益，轻松拥有被动收入。')}
               </p>
               <div className="hero-stats-row">
                 <div className="hero-stat-item">
@@ -115,7 +115,7 @@ export default function AffiliateLanding() {
                 <div className="hero-stat-item">
                   <span className="hero-stat-icon">💰</span>
                   <div>
-                    <div className="hero-stat-val">¥2.4M+</div>
+                    <div className="hero-stat-val">$2.4M+</div>
                     <div className="hero-stat-lbl">{t('累计分佣')}</div>
                   </div>
                 </div>
@@ -141,19 +141,19 @@ export default function AffiliateLanding() {
               <div className="tv-level-lbl" style={{ marginTop: 16 }}>📊 {t('收益汇总')}</div>
               <div className="tv-earn-grid">
                 <div className="tv-earn-cell">
-                  <div className="tv-earn-val">¥450</div>
-                  <div className="tv-earn-lbl">B1 {t('消费')}¥1,500</div>
+                  <div className="tv-earn-val">$450</div>
+                  <div className="tv-earn-lbl">B1 {t('消费')}$1,500</div>
                 </div>
                 <div className="tv-earn-cell">
-                  <div className="tv-earn-val">¥180</div>
-                  <div className="tv-earn-lbl">B2 {t('消费')}¥600</div>
+                  <div className="tv-earn-val">$180</div>
+                  <div className="tv-earn-lbl">B2 {t('消费')}$600</div>
                 </div>
                 <div className="tv-earn-cell">
-                  <div className="tv-earn-val">¥90</div>
-                  <div className="tv-earn-lbl">B3 {t('消费')}¥300</div>
+                  <div className="tv-earn-val">$90</div>
+                  <div className="tv-earn-lbl">B3 {t('消费')}$300</div>
                 </div>
               </div>
-              <div className="tv-total">{t('本月总收益')}: ¥720</div>
+              <div className="tv-total">{t('本月总收益')}: $720</div>
             </div>
           </div>
         </div>
@@ -191,9 +191,26 @@ export default function AffiliateLanding() {
       <section className="aff-landing-section section-warm">
         <div className="container">
           <div className="section-label fade-in">{t('佣金演示')}</div>
-          <h2 className="section-title fade-in">{t('30%佣金，到底怎么算？')}</h2>
-          <p className="section-sub fade-in">{t('举个例子，你就明白了。')}</p>
+          <h2 className="section-title fade-in">{t('你的佣金比例，越推越高')}</h2>
+          <p className="section-sub fade-in">{t('从10%起步，根据邀请人数逐步升级。')}</p>
           <div className="commission-flow fade-in">
+            <div className="cf-rate-scale">
+              {[
+                { rate: '10%', referrals: t('1-50人'), cls: 'bronze', icon: '🥉' },
+                { rate: '15%', referrals: t('51-150人'), cls: 'silver', icon: '🥈' },
+                { rate: '20%', referrals: t('151-200人'), cls: 'gold', icon: '🥇' },
+                { rate: '30%', referrals: t('200+人'), cls: 'diamond', icon: '💎' },
+              ].map((item, i) => (
+                <React.Fragment key={item.cls}>
+                  {i > 0 && <div className="cf-rate-arrow">→</div>}
+                  <div className={`cf-rate-block ${item.cls}`}>
+                    <div className="cf-rate-icon">{item.icon}</div>
+                    <div className="cf-rate-val">{item.rate}</div>
+                    <div className="cf-rate-lbl">{item.referrals}</div>
+                  </div>
+                </React.Fragment>
+              ))}
+            </div>
             <div className="cf-row">
               <div className="cf-user a">👤 {t('用户A (推广者)')}</div>
               <div className="cf-arrow-wrap">
@@ -203,15 +220,33 @@ export default function AffiliateLanding() {
               <div className="cf-user b">👤 {t('用户B (被邀请者)')}</div>
             </div>
             <div className="cf-middle">
-              <div>{t('用户B 购买了')} <strong>¥1,000</strong> {t('的AI Token')}</div>
-              <div className="cf-middle-sub">{t('系统自动计算 30% 佣金')}</div>
+              <div>{t('用户B 购买了')} <strong>$1,000</strong> {t('的AI Token')}</div>
+              <div className="cf-middle-sub">{t('根据当前等级比例自动计算佣金')}</div>
             </div>
-            <div className="cf-result">
-              <span className="cf-result-label">{t('用户A 获得佣金')}</span>
-              <span className="cf-result-val">¥300</span>
+            <div className="cf-result-grid">
+              <div className="cf-result-item">
+                <div className="cf-result-tier">🥉 {t('铜牌')}</div>
+                <div className="cf-result-val">$100</div>
+                <div className="cf-result-pct">10%</div>
+              </div>
+              <div className="cf-result-item">
+                <div className="cf-result-tier">🥈 {t('银牌')}</div>
+                <div className="cf-result-val">$150</div>
+                <div className="cf-result-pct">15%</div>
+              </div>
+              <div className="cf-result-item">
+                <div className="cf-result-tier">🥇 {t('金牌')}</div>
+                <div className="cf-result-val">$200</div>
+                <div className="cf-result-pct">20%</div>
+              </div>
+              <div className="cf-result-item highlight">
+                <div className="cf-result-tier">💎 {t('钻石')}</div>
+                <div className="cf-result-val">$300</div>
+                <div className="cf-result-pct">30%</div>
+              </div>
             </div>
             <div className="cf-footnote">
-              💡 {t('用户B下个月再消费¥1,000 → 用户A 再得¥300 → 终身循环')}
+              💡 {t('用户B下个月再消费$1,000 → 用户A 再获得对应佣金 → 终身循环')}
             </div>
           </div>
         </div>
@@ -242,7 +277,7 @@ export default function AffiliateLanding() {
             <div className="benefit-card">
               <div className="benefit-icon">💳</div>
               <h3 className="benefit-title">{t('灵活提现 · 低门槛')}</h3>
-              <p className="benefit-desc">{t('收益满¥100即可提现，支持支付宝、微信、银行卡和USDT。资金安全有保障，到账快。')}</p>
+              <p className="benefit-desc">{t('收益满$100即可提现，支持支付宝、微信、银行卡和USDT。资金安全有保障，到账快。')}</p>
             </div>
             <div className="benefit-card">
               <div className="benefit-icon">🎨</div>
@@ -252,7 +287,7 @@ export default function AffiliateLanding() {
             <div className="benefit-card">
               <div className="benefit-icon">🏆</div>
               <h3 className="benefit-title">{t('阶梯奖励 · 越推越赚')}</h3>
-              <p className="benefit-desc">{t('邀请越多活跃用户，佣金比例越高。从30%起步，最高可达50%。还有季度奖励、年度分红等你来拿。')}</p>
+              <p className="benefit-desc">{t('邀请越多活跃用户，佣金比例越高。从10%起步，最高可达30%。还有季度奖励、年度分红等你来拿。')}</p>
             </div>
           </div>
         </div>
@@ -321,11 +356,11 @@ export default function AffiliateLanding() {
           <div className="cta-bottom fade-in">
             <div className="section-label cta-label">{t('免费加入')}</div>
             <h2 className="section-title cta-title">{t('开始建立你的AI收益管道')}</h2>
-            <p className="section-sub cta-sub">{t('已有 3,200+ 推广者通过 Teniu.AI 获得被动收入。零成本加入，终身30%佣金。')}</p>
+            <p className="section-sub cta-sub">{t('已有 3,200+ 推广者通过 Teniu.AI 获得被动收入。零成本加入，最高终身30%佣金。')}</p>
             <div className="btn-group" style={{ justifyContent: 'center', marginTop: 36 }}>
               <a href="/console/affiliate" className="btn-primary btn-cta" onClick={handleJoinClick}>🚀 {t('免费加入推广联盟')}</a>
             </div>
-            <p className="cta-footnote">{t('无需任何费用 · 3分钟完成设置 · 终身30%佣金')}</p>
+            <p className="cta-footnote">{t('无需任何费用 · 3分钟完成设置 · 最高终身30%佣金')}</p>
           </div>
         </div>
       </section>
