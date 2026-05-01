@@ -327,3 +327,25 @@ func FixAffiliateCounts() {
 	}
 	common.SysLog(fmt.Sprintf("FixAffiliateCounts: updated %d affiliates", len(counts)))
 }
+
+// InvitedUserInfo is a lightweight view of a user invited by an affiliate.
+type InvitedUserInfo struct {
+	UserId       int    `json:"user_id"`
+	UserName     string `json:"user_name"`
+	RegisterTime int64  `json:"register_time"`
+}
+
+// GetInvitedUsers returns users who were invited by the given affiliate userId.
+func GetInvitedUsers(affiliateUserId int, startIdx int, num int) (users []*InvitedUserInfo, total int64) {
+	DB.Table("users").
+		Where("inviter_id = ?", affiliateUserId).
+		Count(&total)
+
+	DB.Table("users").
+		Select("id as user_id, display_name as user_name, created_at as register_time").
+		Where("inviter_id = ?", affiliateUserId).
+		Order("id desc").
+		Offset(startIdx).Limit(num).
+		Find(&users)
+	return
+}

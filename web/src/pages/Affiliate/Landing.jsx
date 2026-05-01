@@ -17,7 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import './Landing.css';
 
@@ -54,6 +55,20 @@ const TESTIMONIALS = [
 
 export default function AffiliateLanding() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const handleJoinClick = useCallback(
+    (e) => {
+      e.preventDefault();
+      const isLoggedIn = !!localStorage.getItem('user');
+      if (isLoggedIn) {
+        navigate('/console/affiliate');
+      } else {
+        navigate('/login?next=' + encodeURIComponent('/console/affiliate'));
+      }
+    },
+    [navigate],
+  );
 
   useEffect(() => {
     const elements = document.querySelectorAll('.fade-in');
@@ -106,7 +121,7 @@ export default function AffiliateLanding() {
                 </div>
               </div>
               <div className="btn-group">
-                <a href="/console/affiliate" className="btn-primary">{t('立即加入推广联盟')} →</a>
+                <a href="/console/affiliate" className="btn-primary" onClick={handleJoinClick}>{t('立即加入推广联盟')} →</a>
                 <a href="#flow" className="btn-outline">{t('了解运作方式')}</a>
               </div>
             </div>
@@ -308,7 +323,7 @@ export default function AffiliateLanding() {
             <h2 className="section-title cta-title">{t('开始建立你的AI收益管道')}</h2>
             <p className="section-sub cta-sub">{t('已有 3,200+ 推广者通过 Teniu.AI 获得被动收入。零成本加入，终身30%佣金。')}</p>
             <div className="btn-group" style={{ justifyContent: 'center', marginTop: 36 }}>
-              <a href="/console/affiliate" className="btn-primary btn-cta">🚀 {t('免费加入推广联盟')}</a>
+              <a href="/console/affiliate" className="btn-primary btn-cta" onClick={handleJoinClick}>🚀 {t('免费加入推广联盟')}</a>
             </div>
             <p className="cta-footnote">{t('无需任何费用 · 3分钟完成设置 · 终身30%佣金')}</p>
           </div>

@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/QuantumNous/new-api/common"
@@ -456,4 +458,18 @@ func AdminRejectAffiliateSettlement(c *gin.Context) {
 	}
 
 	common.ApiSuccess(c, gin.H{"message": "结算已拒绝"})
+}
+
+// AdminGetAffiliateInvitedUsers returns users invited by a specific affiliate.
+func AdminGetAffiliateInvitedUsers(c *gin.Context) {
+	userId, err := strconv.Atoi(c.Query("user_id"))
+	if err != nil || userId <= 0 {
+		common.ApiError(c, errors.New("无效的用户ID"))
+		return
+	}
+	pageInfo := common.GetPageQuery(c)
+	users, total := model.GetInvitedUsers(userId, pageInfo.GetStartIdx(), pageInfo.GetPageSize())
+	pageInfo.SetTotal(int(total))
+	pageInfo.SetItems(users)
+	common.ApiSuccess(c, pageInfo)
 }

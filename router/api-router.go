@@ -157,6 +157,7 @@ func SetApiRouter(router *gin.Engine) {
 				adminRoute.GET("/affiliate/settlements", controller.AdminGetAffiliateSettlements)
 				adminRoute.POST("/affiliate/settlement/approve", controller.AdminApproveAffiliateSettlement)
 				adminRoute.POST("/affiliate/settlement/reject", controller.AdminRejectAffiliateSettlement)
+				adminRoute.GET("/affiliate/invited-users", controller.AdminGetAffiliateInvitedUsers)
 
 				// Admin 2FA routes
 				adminRoute.GET("/2fa/stats", controller.Admin2FAStats)

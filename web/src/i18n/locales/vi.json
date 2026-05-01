@@ -4748,5 +4748,8 @@
   "立即注册": "Đăng ký ngay",
   "已有账号？登录": "Đã có tài khoản? Đăng nhập",
   "缺少邀请码": "Thiếu mã mời",
-  "邀请码无效": "Mã mời không hợp lệ"
+  "邀请码无效": "Mã mời không hợp lệ",
+  "注册时间": "",
+  "邀请用户列表": "Người dùng được mời",
+  "暂无邀请用户": "Không có người dùng được mời"
 }

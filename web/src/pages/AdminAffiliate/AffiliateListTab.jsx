@@ -19,8 +19,8 @@ For commercial licensing, please contact support@quantumnous.com
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, Typography, Empty } from '@douyinfe/semi-ui';
-import { API } from '../../helpers';
+import { Table, Typography, Empty, SideSheet, Button } from '@douyinfe/semi-ui';
+import { API, timestamp2string } from '../../helpers';
 
 const { Text } = Typography;
 
@@ -31,6 +31,15 @@ export default function AffiliateListTab() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+
+  // Drawer state
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [drawerAffiliate, setDrawerAffiliate] = useState(null);
+  const [invitedUsers, setInvitedUsers] = useState([]);
+  const [invitedTotal, setInvitedTotal] = useState(0);
+  const [invitedLoading, setInvitedLoading] = useState(false);
+  const [invitedPage, setInvitedPage] = useState(1);
+  const [invitedPageSize, setInvitedPageSize] = useState(10);
 
   const load = useCallback(async (currentPage = page, currentPageSize = pageSize) => {
     setLoading(true);
@@ -54,6 +63,52 @@ export default function AffiliateListTab() {
   useEffect(() => {
     load(1, pageSize);
   }, []);
+
+  const loadInvitedUsers = useCallback(async (affiliateUserId, currentPage, currentPageSize) => {
+    setInvitedLoading(true);
+    try {
+      const res = await API.get(
+        `/api/user/affiliate/invited-users?user_id=${affiliateUserId}&p=${currentPage}&page_size=${currentPageSize}`
+      );
+      const { success, data } = res.data;
+      if (success) {
+        setInvitedUsers(data.items || []);
+        setInvitedTotal(data.total || 0);
+      }
+    } catch (e) {
+      // handled by interceptor
+    } finally {
+      setInvitedLoading(false);
+    }
+  }, []);
+
+  const openInvitedDrawer = (record) => {
+    setDrawerAffiliate(record);
+    setInvitedPage(1);
+    setInvitedPageSize(10);
+    setDrawerVisible(true);
+    loadInvitedUsers(record.user_id, 1, 10);
+  };
+
+  const invitedColumns = [
+    {
+      title: t('用户ID'),
+      dataIndex: 'user_id',
+      width: 80,
+    },
+    {
+      title: t('用户名'),
+      dataIndex: 'user_name',
+      width: 150,
+      render: (text) => text || '-',
+    },
+    {
+      title: t('注册时间'),
+      dataIndex: 'register_time',
+      width: 180,
+      render: (ts) => timestamp2string(ts),
+    },
+  ];
 
   const columns = [
     {
@@ -79,7 +134,22 @@ export default function AffiliateListTab() {
       title: t('邀请人数'),
       dataIndex: 'aff_count',
       width: 100,
-      render: (text) => text || 0,
+      render: (text, record) => {
+        const count = text || 0;
+        if (count > 0) {
+          return (
+            <Button
+              theme='borderless'
+              type='primary'
+              size='small'
+              onClick={() => openInvitedDrawer(record)}
+            >
+              {count}
+            </Button>
+          );
+        }
+        return <Text type='tertiary'>0</Text>;
+      },
     },
     {
       title: t('累计收益'),
@@ -94,21 +164,59 @@ export default function AffiliateListTab() {
   ];
 
   return (
-    <Table
-      columns={columns}
-      dataSource={records}
-      rowKey="user_id"
-      loading={loading}
-      pagination={{
-        currentPage: page,
-        pageSize,
-        total,
-        showSizeChanger: true,
-        pageSizeOpts: [10, 20, 50, 100],
-        onPageChange: (p) => { setPage(p); load(p, pageSize); },
-        onPageSizeChange: (s) => { setPageSize(s); setPage(1); load(1, s); },
-      }}
-      empty={<Empty description={t('暂无推广者')} />}
-    />
+    <>
+      <Table
+        columns={columns}
+        dataSource={records}
+        rowKey="user_id"
+        loading={loading}
+        pagination={{
+          currentPage: page,
+          pageSize,
+          total,
+          showSizeChanger: true,
+          pageSizeOpts: [10, 20, 50, 100],
+          onPageChange: (p) => { setPage(p); load(p, pageSize); },
+          onPageSizeChange: (s) => { setPageSize(s); setPage(1); load(1, s); },
+        }}
+        empty={<Empty description={t('暂无推广者')} />}
+      />
+
+      <SideSheet
+        title={
+          drawerAffiliate
+            ? t('邀请用户列表') + ' — ' + (drawerAffiliate.user_name || 'ID:' + drawerAffiliate.user_id)
+            : t('邀请用户列表')
+        }
+        visible={drawerVisible}
+        onCancel={() => setDrawerVisible(false)}
+        width={560}
+      >
+        <Table
+          columns={invitedColumns}
+          dataSource={invitedUsers}
+          rowKey="user_id"
+          loading={invitedLoading}
+          pagination={{
+            currentPage: invitedPage,
+            pageSize: invitedPageSize,
+            total: invitedTotal,
+            showSizeChanger: true,
+            pageSizeOpts: [10, 20, 50],
+            onPageChange: (p) => {
+              setInvitedPage(p);
+              loadInvitedUsers(drawerAffiliate?.user_id, p, invitedPageSize);
+            },
+            onPageSizeChange: (s) => {
+              setInvitedPageSize(s);
+              setInvitedPage(1);
+              loadInvitedUsers(drawerAffiliate?.user_id, 1, s);
+            },
+          }}
+          empty={<Empty description={t('暂无邀请用户')} />}
+          size='small'
+        />
+      </SideSheet>
+    </>
   );
 }
