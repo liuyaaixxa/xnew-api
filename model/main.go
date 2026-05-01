@@ -286,6 +286,8 @@ func migrateDB() error {
 		&SettlementOrder{},
 		&AffiliateRecord{},
 		&AffiliateSettlement{},
+		&ModelTag{},
+		&ModelTagRelation{},
 	)
 	if err != nil {
 		return err

@@ -409,19 +409,23 @@ export default function ModelMarket() {
               <div className="mm-model-grid">
                 {paginatedModels.map((model) => {
                   const badges = getEndpointBadges(model);
+                  const isFeatured = model.badge === 'featured';
                   const isCompared = compareList.includes(model.model_name);
                   return (
                     <div
-                      className={`mm-model-card mm-fade-in${isCompared ? ' compared' : ''}`}
+                      className={`mm-model-card mm-fade-in${isFeatured ? ' featured' : ''}${isCompared ? ' compared' : ''}`}
                       key={model.model_name}
                       onClick={() => toggleCompare(model.model_name)}
                     >
+                      {model.badge && ['new', 'hot'].includes(model.badge) && (
+                        <span className={`mm-tag-${model.badge}`}>{model.badge.toUpperCase()}</span>
+                      )}
                       <div className="mm-card-header">
                         <div className="mm-provider-icon">
                           {getLobeHubIcon(model.icon || model.vendor_icon, 28)}
                         </div>
                         <div className="mm-card-header-info">
-                          <h3 className="mm-model-name">{model.model_name}</h3>
+                          <h3 className="mm-model-name">{model.display_name || model.model_name}</h3>
                           <span className="mm-model-provider">{model.vendor_name || t('未知')}</span>
                         </div>
                       </div>
@@ -430,14 +434,24 @@ export default function ModelMarket() {
                           {model.description || t('先进的AI模型，具有卓越的性能。')}
                         </p>
                         <div className="mm-specs-row">
-                          {badges.slice(0, 3).map((b) => (
-                            <span className="mm-spec-tag" key={b.key}>{b.label}</span>
-                          ))}
+                          {badges.slice(0, 4).map((b) => {
+                            const isGold = /context|open.?source|128k|1M/i.test(b.key);
+                            return (
+                              <span className={`mm-spec-tag${isGold ? ' gold' : ''}`} key={b.key}>
+                                {b.label}
+                              </span>
+                            );
+                          })}
                         </div>
                         <div className="mm-cap-row">
-                          {badges.map((b) => (
-                            <span className="mm-cap-badge active" key={b.key}>{b.label}</span>
-                          ))}
+                          {CAPABILITIES.map((cap) => {
+                            const active = activeCaps.length === 0 || activeCaps.includes(cap);
+                            return (
+                              <span className={`mm-cap-badge${active ? ' active' : ''}`} key={cap}>
+                                {cap}
+                              </span>
+                            );
+                          })}
                         </div>
                       </div>
                       <div className="mm-card-footer">

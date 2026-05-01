@@ -433,6 +433,18 @@ func SetApiRouter(router *gin.Engine) {
 			modelsRoute.POST("/", controller.CreateModelMeta)
 			modelsRoute.PUT("/", controller.UpdateModelMeta)
 			modelsRoute.DELETE("/:id", controller.DeleteModelMeta)
+			modelsRoute.GET("/:id/tags", controller.GetModelTagsHandler)
+			modelsRoute.PUT("/:id/tags", controller.SetModelTagsHandler)
+		}
+
+		// Model Tags (admin only)
+		tagsRoute := apiRouter.Group("/model-tags")
+		tagsRoute.Use(middleware.AdminAuth())
+		{
+			tagsRoute.GET("/", controller.ListModelTags)
+			tagsRoute.POST("/", controller.CreateModelTag)
+			tagsRoute.PUT("/:id", controller.UpdateModelTag)
+			tagsRoute.DELETE("/:id", controller.DeleteModelTag)
 		}
 
 		// Deployments (model deployment management)

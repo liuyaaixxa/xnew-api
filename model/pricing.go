@@ -16,10 +16,13 @@ import (
 
 type Pricing struct {
 	ModelName              string                  `json:"model_name"`
+	DisplayName            string                  `json:"display_name,omitempty"`
 	Description            string                  `json:"description,omitempty"`
 	Icon                   string                  `json:"icon,omitempty"`
 	Tags                   string                  `json:"tags,omitempty"`
+	Badge                  string                  `json:"badge,omitempty"`
 	VendorID               int                     `json:"vendor_id,omitempty"`
+	SortOrder              int                     `json:"sort_order"`
 	QuotaType              int                     `json:"quota_type"`
 	ModelRatio             float64                 `json:"model_ratio"`
 	ModelPrice             float64                 `json:"model_price"`
@@ -290,6 +293,9 @@ func updatePricing() {
 			pricing.Description = meta.Description
 			pricing.Icon = meta.Icon
 			pricing.Tags = meta.Tags
+			pricing.Badge = meta.Badge
+			pricing.DisplayName = meta.DisplayName
+			pricing.SortOrder = meta.SortOrder
 			pricing.VendorID = meta.VendorID
 		}
 		modelPrice, findPrice := ratio_setting.GetModelPrice(model, false)

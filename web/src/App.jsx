@@ -39,6 +39,7 @@ import Redemption from './pages/Redemption';
 import TopUp from './pages/TopUp';
 import TopUpAdmin from './pages/TopUpAdmin';
 import AdminAffiliate from './pages/AdminAffiliate';
+import AdminModelMarket from './pages/AdminModelMarket';
 import Log from './pages/Log';
 import Chat from './pages/Chat';
 import Chat2Link from './pages/Chat2Link';
@@ -210,6 +211,16 @@ function App() {
             <AdminRoute>
               <Suspense fallback={<Loading></Loading>} key={location.pathname}>
                 <AdminAffiliate />
+              </Suspense>
+            </AdminRoute>
+          }
+        />
+        <Route
+          path='/console/model-market-admin'
+          element={
+            <AdminRoute>
+              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+                <AdminModelMarket />
               </Suspense>
             </AdminRoute>
           }

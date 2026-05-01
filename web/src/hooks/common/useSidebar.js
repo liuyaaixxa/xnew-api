@@ -59,6 +59,7 @@ export const DEFAULT_ADMIN_CONFIG = {
     subscription: true,
     treasury: true,
     'affiliate-admin': true,
+    'model-market-admin': true,
     setting: true,
   },
 };
