@@ -2,15 +2,8 @@ import { useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getSystemName } from '../../helpers';
+import StoreCarousel from './StoreCarousel';
 import './store.css';
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.5">
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
 
 function ShieldIcon() {
   return (
@@ -31,33 +24,6 @@ export default function Store() {
     { value: '99.9%', label: t('运行SLA') },
     { value: '2K+', label: t('开发者') },
     { value: '50M+', label: t('日请求量') },
-  ];
-
-  const plans = [
-    {
-      name: t('入门版'), desc: t('适合原型开发和小型项目'),
-      price: t('免费'), unit: t('/月'),
-      features: [t('1万Tokens/月'), t('5个模型'), t('社区支持')],
-      icon: '⚡', featured: false, cta: t('立即开始'), to: '/register',
-    },
-    {
-      name: t('专业版'), desc: t('适合成长型团队和生产应用'),
-      price: '$19', unit: t('/月'),
-      features: [t('500万Tokens/月'), t('全部40+模型'), t('优先支持'), t('API密钥管理')],
-      icon: '📦', featured: true, cta: t('免费试用'), to: '/register',
-    },
-    {
-      name: t('团队版'), desc: t('与整个团队协作'),
-      price: '$99', unit: t('/月'),
-      features: [t('5000万Tokens/月'), t('10个团队席位'), t('用量分析'), t('SSO & RBAC')],
-      icon: '👥', featured: false, cta: t('立即开始'), to: '/register',
-    },
-    {
-      name: t('企业版'), desc: t('大规模定制解决方案'),
-      price: t('定制'), unit: t('定价'),
-      features: [t('无限Tokens'), t('专属支持'), t('SLA保障'), t('本地部署')],
-      icon: '🏢', featured: false, cta: t('联系销售'), to: '/register',
-    },
   ];
 
   const features = [
@@ -177,12 +143,7 @@ export default function Store() {
           </div>
         </div>
         <div className="store-hero-visual">
-          <div className="store-hero-visual-illustration">
-            <div className="store-illust-circle c1" />
-            <div className="store-illust-circle c2" />
-            <div className="store-illust-circle c3" />
-            <div className="store-illust-diamond" />
-          </div>
+          <StoreCarousel />
         </div>
       </section>
 
@@ -195,43 +156,6 @@ export default function Store() {
           </div>
         ))}
       </div>
-
-      {/* Plans & Pricing */}
-      <section className="store-section store-section-light">
-        <div className="store-section-header">
-          <div className="store-section-label">{t('方案与定价')}</div>
-          <h2 className="store-section-title">{t('选择你的AI算力方案')}</h2>
-          <p className="store-section-sub">{t('从初创到企业 — 用透明、按量付费的定价扩展你的AI能力。')}</p>
-        </div>
-        <div className="store-product-grid">
-          {plans.map((plan) => (
-            <div className={`store-product-card store-fade-in${plan.featured ? ' featured' : ''}`} key={plan.name}>
-              <div className="store-card-image">
-                <span className="store-card-image-icon">{plan.icon}</span>
-              </div>
-              <div className="store-card-body">
-                <h3 className="store-card-name">{plan.name}</h3>
-                <p className="store-card-desc">{plan.desc}</p>
-                <div className="store-card-price">
-                  <span className="store-card-price-amount">{plan.price}</span>
-                  <span className="store-card-price-unit">{plan.unit}</span>
-                </div>
-                <div className="store-card-features">
-                  {plan.features.map((f) => (
-                    <div className="store-card-feat" key={f}><CheckIcon /> {f}</div>
-                  ))}
-                </div>
-                <button
-                  className={`store-card-cta${plan.featured ? ' primary' : ''}`}
-                  onClick={() => navigate(plan.to)}
-                >
-                  {plan.cta}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* Features */}
       <section className="store-section store-section-warm">

@@ -452,6 +452,14 @@ func GetAffiliateLink(c *gin.Context) {
 	})
 }
 
+// ─── Public promotion endpoint ───
+
+// GetPublicPromotions returns enabled promotions (no auth required).
+func GetPublicPromotions(c *gin.Context) {
+	promotions := model.GetEnabledPromotions()
+	common.ApiSuccess(c, promotions)
+}
+
 // ─── Admin promotion management ───
 
 // AdminGetPromotions returns all affiliate promotions (admin).

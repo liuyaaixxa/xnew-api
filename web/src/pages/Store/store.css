@@ -225,21 +225,64 @@ body[theme-mode="dark"] .store-page {
 
 .store-hero-visual {
   flex: 1; max-width: 520px; height: 420px;
-  background: var(--store-bg-hero-visual);
   border-radius: 20px; display: flex; align-items: center; justify-content: center;
   position: relative; overflow: hidden;
+  background: transparent;
 }
-.store-hero-visual-illustration { position: relative; width: 200px; height: 200px; }
-.store-illust-circle {
-  position: absolute; border-radius: 50%; border: 3px solid var(--store-accent);
+/* ========== Hero Carousel ========== */
+.store-carousel-wrapper {
+  width: 100%; height: 100%; border-radius: 20px; overflow: hidden;
 }
-.store-illust-circle.c1 { width: 160px; height: 160px; top: 20px; left: 20px; opacity: .3; }
-.store-illust-circle.c2 { width: 110px; height: 110px; top: 45px; left: 45px; opacity: .5; }
-.store-illust-circle.c3 { width: 60px; height: 60px; top: 70px; left: 70px; background: var(--store-accent); opacity: .12; }
-.store-illust-diamond {
-  position: absolute; width: 36px; height: 36px; background: var(--store-accent);
-  transform: rotate(45deg); top: 82px; left: 82px; border-radius: 4px;
-  opacity: .8;
+.store-carousel {
+  width: 100%; height: 100%;
+}
+.store-carousel .swiper-pagination {
+  bottom: 16px !important;
+}
+.store-carousel .swiper-pagination-bullet {
+  width: 8px; height: 8px; background: rgba(255,255,255,.5); opacity: 1; transition: all .3s;
+}
+.store-carousel .swiper-pagination-bullet-active {
+  background: #fff; width: 24px; border-radius: 4px;
+}
+.store-carousel-slide {
+  width: 100%; height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  padding: 48px 36px; cursor: pointer; position: relative; overflow: hidden;
+  background: linear-gradient(145deg, var(--slide-color, #0d0d1a) 0%, color-mix(in srgb, var(--slide-color, #0d0d1a) 80%, #D97757) 100%);
+}
+.store-carousel-badge {
+  display: inline-block; padding: 5px 14px; border-radius: 100px;
+  background: rgba(255,255,255,.12); color: rgba(255,255,255,.85);
+  font-size: 12px; font-weight: 600; letter-spacing: .5px;
+  margin-bottom: 18px; backdrop-filter: blur(8px);
+}
+.store-carousel-title {
+  font-size: 32px; font-weight: 800; color: #fff; margin: 0 0 12px;
+  letter-spacing: -.5px; line-height: 1.2; position: relative; z-index: 1;
+}
+.store-carousel-desc {
+  font-size: 15px; color: rgba(255,255,255,.7); margin: 0 0 24px;
+  line-height: 1.5; max-width: 320px; position: relative; z-index: 1;
+}
+.store-carousel-cta {
+  padding: 12px 32px; border: none; border-radius: 8px;
+  background: #D97757; color: #fff; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: all .25s; position: relative; z-index: 1;
+}
+.store-carousel-cta:hover {
+  background: #c5684a; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(217,119,87,.4);
+}
+.store-carousel-shape {
+  position: absolute; border-radius: 50%; pointer-events: none;
+}
+.store-carousel-shape.s1 {
+  width: 180px; height: 180px; top: -60px; right: -60px;
+  background: rgba(255,255,255,.04);
+}
+.store-carousel-shape.s2 {
+  width: 120px; height: 120px; bottom: -30px; left: -30px;
+  background: rgba(255,255,255,.03);
 }
 
 /* ========== Trust Bar ========== */
