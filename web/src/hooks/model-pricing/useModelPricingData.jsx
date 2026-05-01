@@ -51,6 +51,7 @@ export const useModelPricingData = () => {
   const [usableGroup, setUsableGroup] = useState({});
   const [endpointMap, setEndpointMap] = useState({});
   const [autoGroups, setAutoGroups] = useState([]);
+  const [tagsList, setTagsList] = useState([]);
 
   const [statusState] = useContext(StatusContext);
   const [userState] = useContext(UserContext);
@@ -128,10 +129,17 @@ export const useModelPricingData = () => {
       }
     }
 
-    // 标签筛选
+    // 标签筛选 — check both legacy tags string and new tag_list
     if (filterTag !== 'all') {
       const tagLower = filterTag.toLowerCase();
       result = result.filter((model) => {
+        // Check new structured tag_list first
+        if (model.tag_list && Array.isArray(model.tag_list)) {
+          return model.tag_list.some(
+            (t) => t.toLowerCase() === tagLower
+          );
+        }
+        // Fallback to legacy comma-separated tags
         if (!model.tags) return false;
         const tagsArr = model.tags
           .toLowerCase()
@@ -253,6 +261,7 @@ export const useModelPricingData = () => {
       setVendorsMap(vendorMap);
       setEndpointMap(supported_endpoint || {});
       setAutoGroups(auto_groups || []);
+      setTagsList(res.data.tags || []);
       setModelsFormat(data, group_ratio, vendorMap);
     } else {
       showError(message);
@@ -374,6 +383,7 @@ export const useModelPricingData = () => {
     usableGroup,
     endpointMap,
     autoGroups,
+    tagsList,
 
     // 计算属性
     priceRate,

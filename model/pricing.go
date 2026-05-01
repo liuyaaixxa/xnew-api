@@ -20,6 +20,7 @@ type Pricing struct {
 	Description            string                  `json:"description,omitempty"`
 	Icon                   string                  `json:"icon,omitempty"`
 	Tags                   string                  `json:"tags,omitempty"`
+	TagList                []string                `json:"tag_list,omitempty"`
 	Badge                  string                  `json:"badge,omitempty"`
 	VendorID               int                     `json:"vendor_id,omitempty"`
 	SortOrder              int                     `json:"sort_order"`
@@ -49,6 +50,7 @@ var (
 	pricingMap           []Pricing
 	vendorsList          []PricingVendor
 	supportedEndpointMap map[string]common.EndpointInfo
+	pricingTagsList      []ModelTagWithCount
 	lastGetPricingTime   time.Time
 	updatePricingLock    sync.Mutex
 
@@ -167,6 +169,31 @@ func updatePricing() {
 
 	// 初始化默认供应商映射
 	initDefaultVendorMapping(metaMap, vendorMap, enableAbilities)
+
+	// 预加载模型标签关系与标签
+	var allTagRels []ModelTagRelation
+	DB.Find(&allTagRels)
+	modelTagIdMap := make(map[int][]int) // model_id -> []tag_id
+	for _, rel := range allTagRels {
+		modelTagIdMap[rel.ModelId] = append(modelTagIdMap[rel.ModelId], rel.TagId)
+	}
+	var allTags []ModelTag
+	DB.Find(&allTags)
+	tagNameMap := make(map[int]string)
+	for _, t := range allTags {
+		tagNameMap[t.Id] = t.Name
+	}
+	tagCountMap := make(map[int]int64)
+	for _, rel := range allTagRels {
+		tagCountMap[rel.TagId]++
+	}
+	pricingTagsList = make([]ModelTagWithCount, 0, len(allTags))
+	for _, t := range allTags {
+		pricingTagsList = append(pricingTagsList, ModelTagWithCount{
+			ModelTag:   t,
+			ModelCount: tagCountMap[t.Id],
+		})
+	}
 
 	// 构建对前端友好的供应商列表
 	vendorsList = make([]PricingVendor, 0, len(vendorMap))
@@ -297,6 +324,15 @@ func updatePricing() {
 			pricing.DisplayName = meta.DisplayName
 			pricing.SortOrder = meta.SortOrder
 			pricing.VendorID = meta.VendorID
+			if tagIds, ok := modelTagIdMap[meta.Id]; ok {
+				tagNames := make([]string, 0, len(tagIds))
+				for _, tid := range tagIds {
+					if name, ok := tagNameMap[tid]; ok {
+						tagNames = append(tagNames, name)
+					}
+				}
+				pricing.TagList = tagNames
+			}
 		}
 		modelPrice, findPrice := ratio_setting.GetModelPrice(model, false)
 		if findPrice {
@@ -349,4 +385,9 @@ func updatePricing() {
 // GetSupportedEndpointMap 返回全局端点到路径的映射
 func GetSupportedEndpointMap() map[string]common.EndpointInfo {
 	return supportedEndpointMap
+}
+
+// GetPricingTags 返回模型标签列表及每个标签的模型数量
+func GetPricingTags() []ModelTagWithCount {
+	return pricingTagsList
 }

@@ -52,6 +52,33 @@ export default function ModelMarket() {
 
   const CAPABILITIES = [t('流式'), t('函数调用'), t('JSON模式'), t('视觉输入')];
 
+  // Infer model capabilities from available data (tags, model name, endpoints)
+  const getModelCapabilities = (model) => {
+    const caps = new Set();
+    const name = (model.model_name || '').toLowerCase();
+    const tags = model.tag_list || [];
+
+    // 流式: all models support streaming via OpenAI-compatible endpoints
+    caps.add(t('流式'));
+
+    // 函数调用 & JSON模式: Chat/LLM models
+    const isChatModel = tags.includes('Chat/LLM') ||
+      /gpt|claude|gemini|qwen|llama|chat|command|mistral/i.test(name);
+    if (isChatModel) {
+      caps.add(t('函数调用'));
+      caps.add(t('JSON模式'));
+    }
+
+    // 视觉输入: multimodal models
+    const hasVision = tags.includes('Image') || tags.includes('Video') ||
+      /gpt-4o|gpt-4-turbo|gemini.*(?:flash|pro)|claude.*sonnet|vision|vl|dall-e|multimodal/i.test(name);
+    if (hasVision) {
+      caps.add(t('视觉输入'));
+    }
+
+    return caps;
+  };
+
   const SORT_OPTIONS = [
     { value: 'popular', label: t('排序: 热门') },
     { value: 'price-asc', label: t('排序: 价格低→高') },
@@ -68,10 +95,11 @@ export default function ModelMarket() {
     vendorsMap,
     endpointMap,
     displayPrice,
-    filterEndpointType,
-    setFilterEndpointType,
+    filterTag,
+    setFilterTag,
     filterVendor,
     setFilterVendor,
+    tagsList,
     userState,
   } = useModelPricingData();
 
@@ -102,21 +130,21 @@ export default function ModelMarket() {
     return () => observerRef.current?.disconnect();
   }, [filteredModels, currentPage, t]);
 
-  // Build endpoint categories from endpointMap
+  // Build categories from model tags
   const categories = useMemo(() => {
     const cats = [{ key: 'all', label: t('全部模型'), count: models.length }];
-    if (endpointMap) {
-      Object.entries(endpointMap).forEach(([key, val]) => {
+    if (tagsList && tagsList.length > 0) {
+      tagsList.forEach((tag) => {
         const count = models.filter(
-          (m) => m.supported_endpoint_types && m.supported_endpoint_types.includes(key)
+          (m) => m.tag_list && Array.isArray(m.tag_list) && m.tag_list.includes(tag.name)
         ).length;
         if (count > 0) {
-          cats.push({ key, label: val?.display_name || key, count });
+          cats.push({ key: tag.name, label: tag.name, count });
         }
       });
     }
     return cats;
-  }, [models, endpointMap, t]);
+  }, [models, tagsList, t]);
 
   // Build provider filters from vendorsMap
   const providers = useMemo(() => {
@@ -150,6 +178,14 @@ export default function ModelMarket() {
       result = result.filter((m) => (m.model_ratio || 0) > 10);
     }
 
+    // Capability filter
+    if (activeCaps.length > 0) {
+      result = result.filter((m) => {
+        const caps = getModelCapabilities(m);
+        return activeCaps.every((c) => caps.has(c));
+      });
+    }
+
     // Sort
     if (sortBy === 'price-asc') {
       result.sort((a, b) => (a.model_ratio || 0) - (b.model_ratio || 0));
@@ -158,7 +194,7 @@ export default function ModelMarket() {
     }
 
     return result;
-  }, [filteredModels, priceFilter, sortBy]);
+  }, [filteredModels, priceFilter, sortBy, activeCaps, t]);
 
   const totalPages = Math.max(1, Math.ceil(displayModels.length / MODELS_PER_PAGE));
   const paginatedModels = displayModels.slice(
@@ -169,7 +205,7 @@ export default function ModelMarket() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchValue, filterEndpointType, filterVendor, priceFilter]);
+  }, [searchValue, filterTag, filterVendor, priceFilter]);
 
   // Compare logic
   const toggleCompare = (modelName) => {
@@ -193,7 +229,7 @@ export default function ModelMarket() {
   };
 
   const handleResetFilters = () => {
-    setFilterEndpointType('all');
+    setFilterTag('all');
     setFilterVendor('all');
     setPriceFilter('all');
     setActiveCaps([]);
@@ -299,11 +335,11 @@ export default function ModelMarket() {
             {categories.map((cat) => (
               <div
                 key={cat.key}
-                className={`mm-filter-item${filterEndpointType === cat.key ? ' active' : ''}`}
-                onClick={() => setFilterEndpointType(cat.key)}
+                className={`mm-filter-item${filterTag === cat.key ? ' active' : ''}`}
+                onClick={() => setFilterTag(cat.key)}
               >
                 <span className="mm-filter-check">
-                  <span className={`mm-checkbox${filterEndpointType === cat.key ? ' checked' : ''}`} />
+                  <span className={`mm-checkbox${filterTag === cat.key ? ' checked' : ''}`} />
                   {cat.label}
                 </span>
                 <span className="mm-filter-count">{cat.count}</span>
@@ -444,7 +480,7 @@ export default function ModelMarket() {
                           })}
                         </div>
                         <div className="mm-cap-row">
-                          {CAPABILITIES.map((cap) => {
+                          {CAPABILITIES.filter((cap) => getModelCapabilities(model).has(cap)).map((cap) => {
                             const active = activeCaps.length === 0 || activeCaps.includes(cap);
                             return (
                               <span className={`mm-cap-badge${active ? ' active' : ''}`} key={cap}>

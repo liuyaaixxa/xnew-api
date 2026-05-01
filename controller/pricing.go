@@ -110,11 +110,21 @@ func GetPricing(c *gin.Context) {
 		pricing = filtered
 	}
 
-	// Tag filter
+	// Tag filter — check both legacy Tags string and new TagList
 	if tagFilter != "" {
+		tagLower := strings.ToLower(tagFilter)
 		filtered := make([]model.Pricing, 0)
 		for _, p := range pricing {
-			if strings.Contains(strings.ToLower(p.Tags), strings.ToLower(tagFilter)) {
+			matched := strings.Contains(strings.ToLower(p.Tags), tagLower)
+			if !matched {
+				for _, tn := range p.TagList {
+					if strings.ToLower(tn) == tagLower {
+						matched = true
+						break
+					}
+				}
+			}
+			if matched {
 				filtered = append(filtered, p)
 			}
 		}
@@ -190,6 +200,7 @@ func GetPricing(c *gin.Context) {
 		"usable_group":       usableGroup,
 		"supported_endpoint": model.GetSupportedEndpointMap(),
 		"auto_groups":        service.GetUserAutoGroup(group),
+		"tags":               model.GetPricingTags(),
 		"pricing_version":    "a42d372ccf0b5dd13ecf71203521f9d2",
 		"total":              total,
 		"page":               page,
