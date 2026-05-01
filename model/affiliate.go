@@ -45,6 +45,75 @@ const (
 	AffiliateSettlementStatusRejected = "rejected"
 )
 
+// AffiliatePromotion is an admin-managed promotion activity shown on the affiliate dashboard.
+type AffiliatePromotion struct {
+	Id          int    `json:"id" gorm:"primaryKey"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	TemplateKey string `json:"template_key"` // template filename, e.g. "invite-v1", "token618"
+	RoutePath   string `json:"route_path"`   // URL path, e.g. "/invite/v1", "/affiliate-618"
+	Color       string `json:"color"`        // preview color hex, e.g. "#0d0d1a"
+	SortOrder   int    `json:"sort_order"`
+	Enabled     bool   `json:"enabled" gorm:"default:true"`
+	CreatedTime int64  `json:"created_time"`
+	UpdatedTime int64  `json:"updated_time"`
+}
+
+// GetEnabledPromotions returns all enabled promotions ordered by sort_order.
+func GetEnabledPromotions() []AffiliatePromotion {
+	var list []AffiliatePromotion
+	DB.Where("enabled = ?", true).Order("sort_order asc").Find(&list)
+	return list
+}
+
+// GetAllPromotions returns all promotions ordered by sort_order.
+func GetAllPromotions() []AffiliatePromotion {
+	var list []AffiliatePromotion
+	DB.Order("sort_order asc").Find(&list)
+	return list
+}
+
+// GetPromotionById returns a single promotion by id.
+func GetPromotionById(id int) *AffiliatePromotion {
+	var p AffiliatePromotion
+	if err := DB.First(&p, id).Error; err != nil {
+		return nil
+	}
+	return &p
+}
+
+// UpdatePromotion updates the mutable fields of a promotion.
+func UpdatePromotion(id int, name, desc, color string, sortOrder int, enabled bool) error {
+	return DB.Model(&AffiliatePromotion{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"name":         name,
+		"description":  desc,
+		"color":        color,
+		"sort_order":   sortOrder,
+		"enabled":      enabled,
+		"updated_time": common.GetTimestamp(),
+	}).Error
+}
+
+// SeedAffiliatePromotions inserts default promotions if the table is empty.
+func SeedAffiliatePromotions() {
+	var count int64
+	DB.Model(&AffiliatePromotion{}).Count(&count)
+	if count > 0 {
+		return
+	}
+	now := common.GetTimestamp()
+	promotions := []AffiliatePromotion{
+		{Name: "创业黑金", Description: "深色科技风，强调副业创业", TemplateKey: "invite-v1", RoutePath: "/invite/v1", Color: "#0d0d1a", SortOrder: 1, Enabled: true, CreatedTime: now, UpdatedTime: now},
+		{Name: "创意工作室", Description: "温暖柔和风，强调创作搭档", TemplateKey: "invite-v2", RoutePath: "/invite/v2", Color: "#fef9f6", SortOrder: 2, Enabled: true, CreatedTime: now, UpdatedTime: now},
+		{Name: "数据驱动", Description: "清爽商务风，数据说服力", TemplateKey: "invite-v3", RoutePath: "/invite/v3", Color: "#fafaf9", SortOrder: 3, Enabled: true, CreatedTime: now, UpdatedTime: now},
+		{Name: "618新人注册活动", Description: "618限时福利，1000万Token赠送", TemplateKey: "token618", RoutePath: "/affiliate-618", Color: "#0a0a0f", SortOrder: 4, Enabled: true, CreatedTime: now, UpdatedTime: now},
+	}
+	for _, p := range promotions {
+		DB.Create(&p)
+	}
+	common.SysLog(fmt.Sprintf("Seeded %d affiliate promotions", len(promotions)))
+}
+
 var (
 	ErrAffiliateAlreadyApplied   = errors.New("已申请推广联盟")
 	ErrAffiliateNoEarnings       = errors.New("没有可结算的收益")

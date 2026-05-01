@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Card,
@@ -45,15 +45,10 @@ export default function AffiliateDashboard() {
   const [affCode, setAffCode] = useState('');
   const [applying, setApplying] = useState(false);
   const [qrModal, setQrModal] = useState(null);
-  const [selectedVersion, setSelectedVersion] = useState('v1');
+  const [selectedVersion, setSelectedVersion] = useState('');
+  const [versions, setVersions] = useState([]);
 
   const pageSize = 10;
-
-  const versions = useMemo(() => [
-    { key: 'v1', label: t('创业黑金'), desc: t('深色科技风，强调副业创业'), color: '#0d0d1a' },
-    { key: 'v2', label: t('创意工作室'), desc: t('温暖柔和风，强调创作搭档'), color: '#fef9f6' },
-    { key: 'v3', label: t('数据驱动'), desc: t('清爽商务风，数据说服力'), color: '#fafaf9' },
-  ], [t]);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -71,13 +66,22 @@ export default function AffiliateDashboard() {
       const res = await API.get('/api/user/affiliate/link');
       if (res.data.success) {
         const d = res.data.data;
-        setLinks({ v1: d.v1, v2: d.v2, v3: d.v3 });
         setAffCode(d.aff_code);
+        const linkMap = {};
+        const versionList = (d.promotions || []).map((p) => {
+          linkMap[p.key] = p.url;
+          return { key: p.key, label: p.name, desc: p.description, color: p.color };
+        });
+        setLinks(linkMap);
+        setVersions(versionList);
+        if (versionList.length > 0 && !selectedVersion) {
+          setSelectedVersion(versionList[0].key);
+        }
       }
     } catch (err) {
       // Link not available yet
     }
-  }, []);
+  }, [selectedVersion]);
 
   const fetchRecords = useCallback(async () => {
     try {

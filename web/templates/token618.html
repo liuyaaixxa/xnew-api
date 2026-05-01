@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Teniu.AI — 您的好友给您发了1000万Token！</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --bg-card: #13131c;
+    --bg-elevated: #1a1a28;
+    --text: #f0f0f5;
+    --text-dim: #8888a0;
+    --accent: #7c3aed;
+    --accent2: #06b6d4;
+    --accent3: #f59e0b;
+    --accent4: #10b981;
+    --gradient1: linear-gradient(135deg, #7c3aed, #a855f7, #6366f1);
+    --gradient2: linear-gradient(135deg, #06b6d4, #22d3ee, #10b981);
+    --gradient3: linear-gradient(135deg, #f59e0b, #fbbf24, #f97316);
+    --gradient4: linear-gradient(135deg, #ef4444, #f87171, #dc2626);
+    --border: #1e1e30;
+    --card-shadow: 0 8px 32px rgba(0,0,0,.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', 'Noto Sans SC', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 0%, rgba(124,58,237,.06) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 30% at 80% 30%, rgba(6,182,212,.05) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 30% at 50% 70%, rgba(245,158,11,.04) 0%, transparent 50%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* Hero */
+  .hero { min-height: 100vh; display: flex; align-items: center; position: relative; padding: 80px 0; }
+  .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px;
+    border-radius: 6px; background: rgba(124,58,237,.15);
+    border: 1px solid rgba(124,58,237,.3); color: #a78bfa;
+    font-size: 13px; font-weight: 600; letter-spacing: .5px; margin-bottom: 24px;
+  }
+  .hero-eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: #a78bfa; }
+
+  .hero-title { font-size: 60px; font-weight: 900; line-height: 1.06; letter-spacing: -2px; margin-bottom: 24px; }
+  .hero-title .g { background: var(--gradient1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero-title .g2 { background: var(--gradient3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+  .hero-sub { font-size: 17px; color: var(--text-dim); line-height: 1.65; max-width: 460px; margin-bottom: 36px; }
+
+  .hero-metric-row { display: flex; gap: 32px; margin-bottom: 40px; flex-wrap: wrap; }
+  .hero-metric { position: relative; }
+  .hero-metric-val { font-size: 30px; font-weight: 900; background: var(--gradient1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -1px; }
+  .hero-metric:nth-child(2) .hero-metric-val { background: var(--gradient2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero-metric-lbl { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px; padding: 16px 38px;
+    border: none; border-radius: 12px; background: var(--gradient1); color: #fff;
+    font-size: 16px; font-weight: 700; cursor: pointer; transition: all .3s;
+    text-decoration: none; box-shadow: 0 0 40px rgba(124,58,237,.3);
+    position: relative; overflow: hidden;
+    -webkit-tap-highlight-color: transparent; user-select: none;
+  }
+  .btn-primary::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,.1) 50%, transparent 60%);
+    animation: btnShine 3s infinite;
+  }
+  @keyframes btnShine { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+  .btn-primary:active { transform: scale(.97); }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 0 60px rgba(124,58,237,.5); }
+
+  /* Countdown Bar */
+  .countdown-bar {
+    display: flex; align-items: center; justify-content: flex-start; gap: 16px; flex-wrap: wrap;
+    padding: 14px 24px; border-radius: 12px; margin-bottom: 36px;
+    background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2);
+  }
+  .countdown-label { font-size: 13px; color: #f87171; font-weight: 600; }
+  .countdown-digits { display: flex; gap: 8px; align-items: center; }
+  .countdown-digit {
+    background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.25);
+    border-radius: 8px; padding: 6px 10px; min-width: 44px; text-align: center;
+  }
+  .countdown-digit .num { font-size: 22px; font-weight: 900; color: #f87171; line-height: 1.2; font-variant-numeric: tabular-nums; }
+  .countdown-digit .unit { font-size: 10px; color: #fca5a5; }
+  .countdown-sep { font-size: 20px; font-weight: 700; color: #f87171; }
+  .countdown-hurry { font-size: 12px; color: #fca5a5; margin-top: 6px; }
+
+  .btn-outline {
+    display: inline-flex; align-items: center; gap: 8px; padding: 16px 38px;
+    border: 1.5px solid var(--border); border-radius: 12px; background: transparent;
+    color: var(--text); font-size: 16px; font-weight: 600; cursor: pointer;
+    transition: all .25s; text-decoration: none;
+    -webkit-tap-highlight-color: transparent; user-select: none;
+  }
+  .btn-outline:active { transform: scale(.97); }
+  .btn-outline:hover { border-color: #7c3aed; color: #a78bfa; }
+  .btn-group { display: flex; gap: 14px; flex-wrap: wrap; }
+
+  /* Hero Dashboard Card */
+  .hero-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+    padding: 36px; box-shadow: var(--card-shadow);
+  }
+  .hc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+  .hc-title { font-weight: 700; font-size: 16px; }
+  .hc-badge { font-size: 12px; padding: 4px 12px; border-radius: 20px; background: rgba(16,185,129,.15); color: #34d399; font-weight: 600; }
+  .hc-badge.deadline { background: rgba(239,68,68,.15); color: #f87171; }
+
+  .hc-token-display {
+    text-align: center; padding: 28px; border-radius: 16px;
+    background: linear-gradient(135deg, rgba(124,58,237,.1), rgba(6,182,212,.1));
+    border: 1px solid rgba(124,58,237,.2); margin-bottom: 20px;
+  }
+  .hc-token-big { font-size: 52px; font-weight: 900; background: var(--gradient1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -2px; }
+  .hc-token-lbl { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+
+  .hc-split { display: flex; gap: 12px; }
+  .hc-split-item {
+    flex: 1; padding: 16px; border-radius: 12px; text-align: center;
+    background: var(--bg-elevated); border: 1px solid var(--border);
+  }
+  .hc-split-val { font-size: 22px; font-weight: 800; letter-spacing: -1px; }
+  .hc-split-val.purple { background: var(--gradient1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hc-split-val.cyan { color: #22d3ee; }
+  .hc-split-lbl { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+  /* Section */
+  .section { padding: 80px 0; }
+  .section-dim { background: var(--bg-card); }
+  .section-label {
+    font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+    margin-bottom: 16px; text-align: center; color: #a78bfa;
+  }
+  .section-title { font-size: 44px; font-weight: 900; text-align: center; letter-spacing: -1px; margin-bottom: 18px; }
+  .section-sub { text-align: center; color: var(--text-dim); font-size: 16px; max-width: 560px; margin: 0 auto 48px; line-height: 1.6; }
+
+  /* Steps Timeline */
+  .timeline { display: flex; justify-content: center; gap: 0; position: relative; }
+  .timeline::before {
+    content: ''; position: absolute; top: 48px; left: 17%; right: 17%; height: 2px;
+    background: linear-gradient(90deg, #7c3aed, #06b6d4, #10b981);
+  }
+  .tl-step { flex: 1; max-width: 280px; text-align: center; position: relative; z-index: 1; }
+  .tl-num {
+    width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 26px; font-weight: 900; margin: 16px auto 28px; position: relative;
+  }
+  .tl-num.step1 { background: var(--gradient1); color: #fff; }
+  .tl-num.step2 { background: linear-gradient(135deg, #06b6d4, #22d3ee); color: #000; }
+  .tl-num.step3 { background: linear-gradient(135deg, #10b981, #34d399); color: #000; }
+  .tl-title { font-size: 19px; font-weight: 700; margin-bottom: 10px; }
+  .tl-desc { font-size: 14px; color: var(--text-dim); line-height: 1.7; }
+
+  /* Reward Cards */
+  .reward-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 900px; margin: 0 auto; }
+  .reward-card {
+    background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 20px;
+    padding: 48px 36px; text-align: center; position: relative; overflow: hidden;
+    transition: all .3s;
+  }
+  .reward-card:active { transform: scale(.98); }
+  .reward-card.r-signup { border-color: rgba(124,58,237,.3); }
+  .reward-card.r-invite { border-color: rgba(6,182,212,.3); }
+  .reward-tag {
+    position: absolute; top: 14px; right: 14px; font-size: 11px; font-weight: 700;
+    padding: 4px 12px; border-radius: 4px;
+  }
+  .r-signup .reward-tag { background: rgba(124,58,237,.2); color: #a78bfa; }
+  .r-invite .reward-tag { background: rgba(6,182,212,.2); color: #22d3ee; }
+  .reward-icon { font-size: 52px; margin-bottom: 16px; }
+  .reward-amount { font-size: 48px; font-weight: 900; letter-spacing: -2px; margin-bottom: 8px; }
+  .r-signup .reward-amount { background: var(--gradient1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .r-invite .reward-amount { background: var(--gradient2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .reward-unit { font-size: 18px; font-weight: 600; color: var(--text-dim); }
+  .reward-desc { font-size: 15px; color: var(--text-dim); line-height: 1.6; margin-top: 12px; }
+
+  /* Comparison */
+  .compare-wrapper {
+    background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 24px;
+    padding: 48px; max-width: 860px; margin: 0 auto; box-shadow: var(--card-shadow);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
+  }
+  .compare-scenarios { display: flex; flex-direction: column; gap: 16px; }
+  .compare-scenario {
+    padding: 18px 20px; border-radius: 14px; background: var(--bg-card);
+    border: 1px solid var(--border); display: flex; justify-content: space-between;
+    align-items: center; transition: all .2s;
+  }
+  .compare-scenario .label { font-weight: 600; font-size: 15px; }
+  .compare-scenario .tokens {
+    font-size: 20px; font-weight: 800; background: var(--gradient1);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .compare-output {
+    text-align: center; padding: 36px; border-radius: 20px;
+    background: linear-gradient(135deg, rgba(124,58,237,.1), rgba(6,182,212,.1));
+    border: 1px solid rgba(124,58,237,.2);
+  }
+  .compare-output-big { font-size: 48px; font-weight: 900; }
+  .compare-total {
+    text-align: center; margin-top: 12px; padding: 14px;
+    background: linear-gradient(135deg, rgba(16,185,129,.15), rgba(6,182,212,.1));
+    border: 1px solid rgba(16,185,129,.3); border-radius: 14px;
+  }
+
+  /* Token Value Cards */
+  .value-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .value-card {
+    background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 18px;
+    padding: 28px 20px; text-align: center; transition: all .3s; position: relative;
+  }
+  .value-card:active { transform: scale(.98); }
+  .value-card-icon { font-size: 42px; margin-bottom: 14px; }
+  .value-card-tokens { font-size: 28px; font-weight: 900; letter-spacing: -1px; background: var(--gradient1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 6px; }
+  .value-card-desc { font-size: 13px; color: var(--text-dim); }
+
+  /* FAQ Grid */
+  .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 860px; margin: 0 auto; }
+  .faq-card {
+    background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px;
+    padding: 28px; transition: all .2s; cursor: pointer;
+    -webkit-tap-highlight-color: transparent; user-select: none;
+  }
+  .faq-card:active { background: rgba(124,58,237,.05); }
+  .faq-q { font-weight: 700; font-size: 15px; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px; }
+  .faq-q .icon { color: #a78bfa; flex-shrink: 0; margin-top: 1px; }
+  .faq-a { font-size: 13px; color: var(--text-dim); line-height: 1.7; }
+
+  /* CTA */
+  .cta-mega {
+    margin: 0 24px 80px; padding: 80px 48px; text-align: center; border-radius: 28px;
+    background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(124,58,237,.15) 0%, transparent 60%),
+                linear-gradient(135deg, #0f0f1a, #131320, #0a0a15);
+    position: relative; overflow: hidden;
+  }
+  .cta-mega::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%237c3aed' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='1.5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  .cta-mega .section-title { color: #fff; position: relative; }
+  .cta-mega .section-sub { color: var(--text-dim); position: relative; }
+
+  /* QR Code */
+  .qr-section {
+    margin: 0 24px 40px; text-align: center; position: relative; z-index: 1;
+  }
+  .qr-title {
+    font-size: 14px; color: var(--text-dim); margin-bottom: 16px;
+  }
+  .qr-wrap {
+    background: #fff; border-radius: 16px;
+    display: inline-block; padding: 16px;
+  }
+  .qr-hint {
+    font-size: 12px; color: var(--text-dim); margin-top: 12px;
+  }
+
+  .footer { border-top: 1px solid var(--border); padding: 40px 0; text-align: center; font-size: 13px; color: var(--text-dim); }
+
+  /* ═══ Responsive ═══ */
+  @media (max-width: 1024px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 48px; }
+    .hero-title { font-size: 42px; }
+    .hero-card { padding: 28px; }
+    .hc-token-big { font-size: 40px; }
+    .section-title { font-size: 34px; }
+    .compare-wrapper { grid-template-columns: 1fr; gap: 32px; padding: 36px; }
+    .faq-grid { grid-template-columns: 1fr; }
+    .value-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+    .container { padding: 0 20px; }
+    .hero { min-height: auto; padding: 48px 0 32px; }
+    .hero-grid { gap: 32px; }
+    .hero-title { font-size: 34px; letter-spacing: -1px; }
+    .hero-sub { font-size: 15px; }
+    .hero-metric-row { gap: 20px; }
+    .hero-metric-val { font-size: 24px; }
+    .hero-card { padding: 24px; }
+    .hc-token-big { font-size: 34px; }
+    .hc-split-val { font-size: 18px; }
+    .hc-token-display { padding: 20px; }
+    .section { padding: 56px 0; }
+    .section-title { font-size: 28px; letter-spacing: -.5px; }
+    .section-sub { font-size: 14px; margin-bottom: 36px; }
+    .timeline { flex-direction: column; align-items: center; gap: 24px; }
+    .timeline::before { display: none; }
+    .tl-step { max-width: 100%; }
+    .reward-grid { grid-template-columns: 1fr; gap: 20px; }
+    .reward-card { padding: 36px 24px; }
+    .reward-amount { font-size: 36px; }
+    .compare-wrapper { padding: 28px; }
+    .compare-output-big { font-size: 36px; }
+    .value-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .value-card { padding: 24px 16px; }
+    .value-card-tokens { font-size: 22px; }
+    .value-card-icon { font-size: 32px; }
+    .faq-grid { grid-template-columns: 1fr; gap: 12px; }
+    .faq-card { padding: 22px; }
+    .faq-q { font-size: 14px; }
+    .btn-primary, .btn-outline { padding: 14px 28px; font-size: 16px; width: 100%; justify-content: center; }
+    .btn-group { flex-direction: column; }
+    .cta-mega { margin: 0 16px 60px; padding: 56px 24px; border-radius: 20px; }
+    .countdown-bar { padding: 10px 16px; gap: 10px; }
+    .countdown-label { font-size: 12px; }
+    .countdown-digit { min-width: 36px; padding: 4px 6px; }
+    .countdown-digit .num { font-size: 18px; }
+    .countdown-digit .unit { font-size: 9px; }
+    .countdown-sep { font-size: 16px; }
+  }
+
+  @media (max-width: 480px) {
+    .container { padding: 0 16px; }
+    .hero-title { font-size: 28px; }
+    .hero-sub { font-size: 14px; }
+    .hero-eyebrow { font-size: 11px; padding: 5px 12px; }
+    .hero-metric-val { font-size: 20px; }
+    .hero-metric-lbl { font-size: 11px; }
+    .hc-token-big { font-size: 28px; }
+    .hc-split { flex-direction: column; }
+    .section-title { font-size: 24px; }
+    .section-label { font-size: 11px; }
+    .reward-card { padding: 28px 18px; border-radius: 16px; }
+    .reward-amount { font-size: 30px; }
+    .reward-icon { font-size: 40px; }
+    .reward-tag { font-size: 10px; padding: 3px 10px; top: 10px; right: 10px; }
+    .compare-wrapper { padding: 22px; border-radius: 18px; }
+    .compare-output-big { font-size: 30px; }
+    .value-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .value-card { padding: 20px 12px; border-radius: 14px; }
+    .value-card-tokens { font-size: 18px; }
+    .value-card-icon { font-size: 28px; }
+    .cta-mega { margin: 0 12px 48px; padding: 44px 20px; border-radius: 16px; }
+    .countdown-bar { padding: 8px 12px; gap: 6px; border-radius: 10px; }
+    .countdown-label { font-size: 11px; }
+    .countdown-digit { min-width: 30px; padding: 3px 5px; border-radius: 6px; }
+    .countdown-digit .num { font-size: 16px; }
+    .countdown-sep { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<main>
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <header>
+        <div class="hero-eyebrow"><span class="hero-eyebrow-dot"></span> 618大促 · 限时活动 · 6月30日截止</div>
+        <h1 class="hero-title">您的好友给您发了<br><span class="g">1000万</span>Token</h1>
+        <p class="hero-sub">加入 Teniu.AI，立即获得 500万免费Token。输入邀请码再领 500万。618限时福利，<strong style="color:#f87171">6月30日截止</strong>，错过不再有！</p>
+        <!-- Countdown -->
+        <div class="countdown-bar">
+          <span class="countdown-label">⏳ 距离活动结束还剩</span>
+          <div class="countdown-digits">
+            <div class="countdown-digit"><div class="num" id="cd-days">00</div><div class="unit">天</div></div>
+            <span class="countdown-sep">:</span>
+            <div class="countdown-digit"><div class="num" id="cd-hours">00</div><div class="unit">时</div></div>
+            <span class="countdown-sep">:</span>
+            <div class="countdown-digit"><div class="num" id="cd-mins">00</div><div class="unit">分</div></div>
+            <span class="countdown-sep">:</span>
+            <div class="countdown-digit"><div class="num" id="cd-secs">00</div><div class="unit">秒</div></div>
+          </div>
+        </div>
+        <p class="countdown-hurry" id="countdownHurry" style="display:none"></p>
+        <div class="hero-metric-row">
+          <div class="hero-metric"><div class="hero-metric-val">10,000,000</div><div class="hero-metric-lbl">免费Token</div></div>
+          <div class="hero-metric"><div class="hero-metric-val">40+</div><div class="hero-metric-lbl">顶级AI模型</div></div>
+          <div class="hero-metric"><div class="hero-metric-val">30s</div><div class="hero-metric-lbl">完成注册</div></div>
+        </div>
+        <nav class="btn-group">
+          <a href="{{.RegisterURL}}" class="btn-primary">⚡ 立即注册领取Token</a>
+          <a href="#how" class="btn-outline">了解更多</a>
+        </nav>
+      </header>
+
+      <aside class="hero-card" aria-hidden="true">
+        <div class="hc-header">
+          <span class="hc-title">🎁 我的Token礼包</span>
+          <span class="hc-badge deadline">● 6月30日截止</span>
+        </div>
+        <div class="hc-token-display">
+          <div class="hc-token-big">10,000,000</div>
+          <div class="hc-token-lbl">免费 Token 等你领取</div>
+        </div>
+        <div class="hc-split">
+          <div class="hc-split-item">
+            <div class="hc-split-val purple">5,000,000</div>
+            <div class="hc-split-lbl">新人见面礼 · 注册即得</div>
+          </div>
+          <div class="hc-split-item">
+            <div class="hc-split-val cyan">5,000,000</div>
+            <div class="hc-split-lbl">邀请码奖励 · 输入即得</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:16px;padding:10px;background:rgba(16,185,129,.1);border-radius:8px;font-size:12px;color:#34d399">
+          💡 两步叠加，总共1000万Token到手
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section class="section section-dim" id="how">
+  <div class="container">
+    <div class="section-label">领取流程</div>
+    <h2 class="section-title">三步开启AI之旅</h2>
+    <p class="section-sub">设计极简，一分钟完成。然后尽情体验顶级AI模型。</p>
+    <div class="timeline">
+      <article class="tl-step">
+        <div class="tl-num step1">1</div>
+        <h3 class="tl-title">点击好友链接注册</h3>
+        <p class="tl-desc">使用邮箱或手机号注册Tenu.AI账户。30秒完成，无需实名认证，无需绑定支付方式。</p>
+      </article>
+      <article class="tl-step">
+        <div class="tl-num step2">2</div>
+        <h3 class="tl-title">500万Token自动到账</h3>
+        <p class="tl-desc">注册成功后，新人见面礼500万Token即刻发放。在控制台实时查看余额，马上开始使用。</p>
+      </article>
+      <article class="tl-step">
+        <div class="tl-num step3">3</div>
+        <h3 class="tl-title">输入邀请码再领500万</h3>
+        <p class="tl-desc">在控制台或注册页面输入好友邀请码，额外500万Token立即叠加。总共1000万免费Token！</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ REWARD SPLIT ═══ -->
+<section class="section">
+  <div class="container">
+    <div class="section-label">奖励明细</div>
+    <h2 class="section-title">1000万Token怎么拿？</h2>
+    <p class="section-sub">简单两步，总共1000万免费Token到手。零门槛，注册即送。</p>
+    <div class="reward-grid">
+      <article class="reward-card r-signup">
+        <div class="reward-tag">立即到账</div>
+        <div class="reward-icon">🎁</div>
+        <div class="reward-amount">5,000,000</div>
+        <div class="reward-unit">Token</div>
+        <p class="reward-desc">新人专属见面礼<br>注册成功即刻发放到你的账户</p>
+      </article>
+      <article class="reward-card r-invite">
+        <div class="reward-tag">分享即得</div>
+        <div class="reward-icon">👥</div>
+        <div class="reward-amount">5,000,000</div>
+        <div class="reward-unit">Token</div>
+        <p class="reward-desc">输入好友邀请码<br>额外赠礼自动叠加，无需等待</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TOKEN VALUE ═══ -->
+<section class="section section-dim">
+  <div class="container">
+    <div class="section-label">1000万Token能做什么</div>
+    <h2 class="section-title">畅享顶级AI模型</h2>
+    <p class="section-sub">看看这1000万Token能带给你多少AI体验。</p>
+    <div class="compare-wrapper">
+      <div class="compare-scenarios">
+        <article class="compare-scenario">
+          <span class="label">💬 GPT-5.4 完整对话</span>
+          <span class="tokens">~5,000次</span>
+        </article>
+        <article class="compare-scenario">
+          <span class="label">🎨 高质量AI图像生成</span>
+          <span class="tokens">~500张</span>
+        </article>
+        <article class="compare-scenario">
+          <span class="label">💻 代码生成与审查</span>
+          <span class="tokens">~2,000次</span>
+        </article>
+        <article class="compare-scenario">
+          <span class="label">📊 文档分析与总结</span>
+          <span class="tokens">~3,000次</span>
+        </article>
+      </div>
+      <div class="compare-output">
+        <div style="font-size:14px;color:var(--text-dim);margin-bottom:8px">总价值相当于</div>
+        <div class="compare-output-big" style="background:var(--gradient1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">10,000,000</div>
+        <div style="font-size:14px;color:var(--text-dim);margin-top:8px">免费Token</div>
+        <div class="compare-total">
+          <span style="color:#34d399;font-weight:700">🎉 零成本体验世界顶级AI</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PLATFORM BENEFITS ═══ -->
+<section class="section">
+  <div class="container">
+    <div class="section-label">平台优势</div>
+    <h2 class="section-title">不止是免费Token</h2>
+    <p class="section-sub">一个账号，统一接入全球40+顶级AI模型。</p>
+    <div class="value-grid">
+      <article class="value-card">
+        <div class="value-card-icon">🌐</div>
+        <div class="value-card-tokens">40+</div>
+        <div class="value-card-desc">顶级AI模型一站式接入</div>
+      </article>
+      <article class="value-card">
+        <div class="value-card-icon">⚡</div>
+        <div class="value-card-tokens">99.9%</div>
+        <div class="value-card-desc">服务可用性保障</div>
+      </article>
+      <article class="value-card">
+        <div class="value-card-icon">🔒</div>
+        <div class="value-card-tokens">TLS 1.3</div>
+        <div class="value-card-desc">端到端数据加密</div>
+      </article>
+      <article class="value-card">
+        <div class="value-card-icon">🎯</div>
+        <div class="value-card-tokens">邀请</div>
+        <div class="value-card-desc">推广联盟 · 赚取返利</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ═══ -->
+<section class="section section-dim">
+  <div class="container">
+    <div class="section-label">常见问题</div>
+    <h2 class="section-title">快速解答你的疑问</h2>
+    <div class="faq-grid">
+      <article class="faq-card">
+        <div class="faq-q"><span class="icon">Q</span> 赠送的Token有使用期限吗？</div>
+        <div class="faq-a">新人见面礼500万Token有效期为注册后30天。邀请码奖励500万Token有效期为领取后60天。抓紧时间体验吧！</div>
+      </article>
+      <article class="faq-card">
+        <div class="faq-q"><span class="icon">Q</span> 领取奖励需要绑定支付方式吗？</div>
+        <div class="faq-a">完全不需要！注册即可领取，无需绑定信用卡或任何支付方式。纯免费体验，零门槛。</div>
+      </article>
+      <article class="faq-card">
+        <div class="faq-q"><span class="icon">Q</span> 邀请码在哪里获取？</div>
+        <div class="faq-a">你的好友会在Tenu.AI控制台的"推广联盟"页面找到专属邀请码。也可以分享邀请链接，系统会自动识别。</div>
+      </article>
+      <article class="faq-card">
+        <div class="faq-q"><span class="icon">Q</span> 如果注册时没有输入邀请码，之后还能补吗？</div>
+        <div class="faq-a">可以！注册后7天内在控制台→个人设置→输入邀请码，依然可以领取500万Token奖励。过期后将无法补领。</div>
+      </article>
+      <article class="faq-card">
+        <div class="faq-q"><span class="icon">Q</span> 我可以邀请我自己的其他账号吗？</div>
+        <div class="faq-a">不可以。我们有完善的反作弊系统，自买自推、虚假注册等行为会被检测并冻结奖励。请诚信参与活动。</div>
+      </article>
+      <article class="faq-card">
+        <div class="faq-q"><span class="icon">Q</span> 用完之后如何继续使用？</div>
+        <div class="faq-a">免费Token用完后，你可以通过充值继续使用。也可以加入推广联盟，邀请好友注册消费获得佣金返利。</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section>
+  <div class="container">
+    <div class="cta-mega">
+      <div class="section-label" style="color:#f87171">618限时福利 · 6月30日截止</div>
+      <h2 class="section-title">1000万Token等你来领</h2>
+      <p class="section-sub">好友已为你准备好见面礼。注册即得500万，输入邀请码再得500万。<strong style="color:#f87171">618专属福利，6月30日截止</strong>，错过不再有！零成本畅享40+顶级AI模型。</p>
+      <nav class="btn-group" style="justify-content:center;margin-top:36px">
+        <a href="{{.RegisterURL}}" class="btn-primary" style="font-size:18px;padding:18px 48px">⚡ 立即领取免费Token</a>
+      </nav>
+      <p style="margin-top:24px;color:var(--text-dim);font-size:14px;position:relative">无需绑定支付方式 · 30秒完成注册 · 即刻到账</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ═══ QR CODE ═══ -->
+<div class="qr-section">
+  <div class="qr-title">📱 扫一扫，分享给好友</div>
+  <div class="qr-wrap"><div id="qrcode"></div></div>
+  <div class="qr-hint">长按保存图片，分享给好友一起领取</div>
+</div>
+
+<footer class="footer">&copy; 2026 Teniu.AI · 推广联盟计划 · 诚信参与，共建生态</footer>
+
+<script src="/invite/assets/qrcode.js"></script>
+<script>
+renderQRCode(document.getElementById('qrcode'), {{.InviteLinkJSON}}, 180);
+</script>
+<script>
+(function() {
+  var DEADLINE = new Date('2026-06-30T23:59:59+08:00');
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function update() {
+    var now = new Date();
+    var diff = DEADLINE - now;
+
+    if (diff <= 0) {
+      document.getElementById('cd-days').textContent = '00';
+      document.getElementById('cd-hours').textContent = '00';
+      document.getElementById('cd-mins').textContent = '00';
+      document.getElementById('cd-secs').textContent = '00';
+      var hurry = document.getElementById('countdownHurry');
+      hurry.style.display = 'block';
+      hurry.textContent = '活动已结束，感谢参与！';
+      return;
+    }
+
+    var days = Math.floor(diff / 86400000);
+    var hours = Math.floor((diff % 86400000) / 3600000);
+    var mins = Math.floor((diff % 3600000) / 60000);
+    var secs = Math.floor((diff % 60000) / 1000);
+
+    document.getElementById('cd-days').textContent = pad(days);
+    document.getElementById('cd-hours').textContent = pad(hours);
+    document.getElementById('cd-mins').textContent = pad(mins);
+    document.getElementById('cd-secs').textContent = pad(secs);
+
+    if (days <= 3) {
+      var hurry = document.getElementById('countdownHurry');
+      hurry.style.display = 'block';
+      hurry.textContent = '🔥 活动即将截止，抓紧时间领取！';
+      hurry.style.color = '#f87171';
+    }
+  }
+
+  update();
+  setInterval(update, 1000);
+})();
+</script>
+
+</body>
+</html>

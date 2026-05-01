@@ -19,13 +19,14 @@ For commercial licensing, please contact support@quantumnous.com
 
 import React, { useState } from 'react';
 import { Tabs, TabPane } from '@douyinfe/semi-ui';
-import { Users, FileText, Settings } from 'lucide-react';
+import { Users, FileText, Settings, Megaphone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { isRoot } from '../../helpers';
 
 import AffiliateListTab from './AffiliateListTab';
 import SettlementTab from './SettlementTab';
 import SettingsTab from './SettingsTab';
+import PromotionTab from './PromotionTab';
 
 export default function AdminAffiliate() {
   const { t } = useTranslation();
@@ -51,6 +52,16 @@ export default function AdminAffiliate() {
         </span>
       ),
       content: <SettlementTab />,
+    },
+    {
+      itemKey: 'promotions',
+      tab: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Megaphone size={16} />
+          {t('活动管理')}
+        </span>
+      ),
+      content: <PromotionTab />,
     },
   ];
 

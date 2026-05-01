@@ -291,6 +291,8 @@ func InitResources() error {
 
 	// Backfill affiliate counts for existing users
 	model.FixAffiliateCounts()
+	// Seed default promotion activities if table is empty
+	model.SeedAffiliatePromotions()
 
 	// 清理旧的磁盘缓存文件
 	common.CleanupOldCacheFiles()

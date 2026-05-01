@@ -61,4 +61,7 @@ func SetAffiliateInviteRouter(router *gin.Engine, assetFS embed.FS) {
 
 	// Default invite redirects to v1
 	router.GET("/invite", controller.GetDefaultInvitePage)
+
+	// 618 promotion activity page
+	router.GET("/affiliate-618", controller.GetToken618Page)
 }

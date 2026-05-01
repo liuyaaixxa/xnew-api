@@ -363,7 +363,47 @@ func GetDefaultInvitePage(c *gin.Context) {
 	c.Redirect(http.StatusFound, fmt.Sprintf("/invite/v1?aff=%s", affCode))
 }
 
-// GetAffiliateLink returns the user's affiliate links for all 3 invite page versions.
+// GetToken618Page renders the 618 promotion activity page.
+func GetToken618Page(c *gin.Context) {
+	affCode := c.Query("aff")
+
+	scheme := "https"
+	if c.Request.TLS == nil && c.GetHeader("X-Forwarded-Proto") != "https" {
+		scheme = "http"
+	}
+	baseURL := fmt.Sprintf("%s://%s", scheme, c.Request.Host)
+	if system_setting.ServerAddress != "" && c.Request.Host == "" {
+		baseURL = system_setting.ServerAddress
+	}
+
+	pageURL := fmt.Sprintf("%s/affiliate-618", baseURL)
+	registerURL := fmt.Sprintf("%s/register", baseURL)
+	if affCode != "" {
+		registerURL = fmt.Sprintf("%s/register?aff=%s", baseURL, affCode)
+		pageURL = fmt.Sprintf("%s/affiliate-618?aff=%s", baseURL, affCode)
+		// Set aff cookie for registration tracking
+		c.SetCookie("aff_code", affCode, 30*24*60*60, "/", "", false, true)
+	}
+
+	data := InvitePageData{
+		RegisterURL:    registerURL,
+		InviteLinkJSON: template.JS(fmt.Sprintf("`%s`", pageURL)),
+	}
+
+	tmpl := InviteTemplates.Lookup("token618.html")
+	if tmpl == nil {
+		c.String(http.StatusOK, "<h1>模板未加载</h1>")
+		return
+	}
+
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	c.Header("Cache-Control", "no-cache")
+	if err := tmpl.Execute(c.Writer, data); err != nil {
+		common.SysLog(fmt.Sprintf("token618 template error: %v", err))
+	}
+}
+
+// GetAffiliateLink returns the user's affiliate links for all enabled promotions.
 func GetAffiliateLink(c *gin.Context) {
 	id := c.GetInt("id")
 	u, err := model.GetUserById(id, false)
@@ -381,12 +421,68 @@ func GetAffiliateLink(c *gin.Context) {
 		baseURL = system_setting.ServerAddress
 	}
 
+	promotions := model.GetEnabledPromotions()
+	type PromotionInfo struct {
+		Key         string `json:"key"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		Color       string `json:"color"`
+		URL         string `json:"url"`
+	}
+	list := make([]PromotionInfo, 0, len(promotions))
+	for _, p := range promotions {
+		list = append(list, PromotionInfo{
+			Key:         p.TemplateKey,
+			Name:        p.Name,
+			Description: p.Description,
+			Color:       p.Color,
+			URL:         fmt.Sprintf("%s%s?aff=%s", baseURL, p.RoutePath, u.AffCode),
+		})
+	}
+	// Default URL from the first enabled promotion
+	defaultURL := ""
+	if len(list) > 0 {
+		defaultURL = list[0].URL
+	}
+
 	common.ApiSuccess(c, gin.H{
-		"aff_code": u.AffCode,
-		"v1":       fmt.Sprintf("%s/invite/v1?aff=%s", baseURL, u.AffCode),
-		"v2":       fmt.Sprintf("%s/invite/v2?aff=%s", baseURL, u.AffCode),
-		"v3":       fmt.Sprintf("%s/invite/v3?aff=%s", baseURL, u.AffCode),
+		"aff_code":    u.AffCode,
+		"default_url": defaultURL,
+		"promotions":  list,
 	})
+}
+
+// ─── Admin promotion management ───
+
+// AdminGetPromotions returns all affiliate promotions (admin).
+func AdminGetPromotions(c *gin.Context) {
+	promotions := model.GetAllPromotions()
+	common.ApiSuccess(c, promotions)
+}
+
+// AdminUpdatePromotion updates a promotion's display fields and enabled status.
+func AdminUpdatePromotion(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		common.ApiError(c, fmt.Errorf("invalid id"))
+		return
+	}
+	var req struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		Color       string `json:"color"`
+		SortOrder   int    `json:"sort_order"`
+		Enabled     bool   `json:"enabled"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		common.ApiError(c, err)
+		return
+	}
+	if err := model.UpdatePromotion(id, req.Name, req.Description, req.Color, req.SortOrder, req.Enabled); err != nil {
+		common.ApiError(c, err)
+		return
+	}
+	common.ApiSuccess(c, nil)
 }
 
 // ─── Admin endpoints ───
