@@ -303,6 +303,24 @@ func updatePricing() {
 		}
 	}
 
+	// 自动为 channel 中的模型创建 model_meta 记录（管理员后续编辑即可）
+	for model := range modelGroupsMap {
+		vendorID := 0
+		if meta, ok := metaMap[model]; ok {
+			vendorID = meta.VendorID
+		}
+		newMeta, err := EnsureModelMeta(model, vendorID)
+		if err == nil {
+			metaMap[model] = newMeta
+		}
+	}
+	// 重新加载标签关系（新创建的 meta 不会有标签，但保持兼容）
+	DB.Find(&allTagRels)
+	modelTagIdMap = make(map[int][]int)
+	for _, rel := range allTagRels {
+		modelTagIdMap[rel.ModelId] = append(modelTagIdMap[rel.ModelId], rel.TagId)
+	}
+
 	pricingMap = make([]Pricing, 0)
 	for model, groups := range modelGroupsMap {
 		pricing := Pricing{

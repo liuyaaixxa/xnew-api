@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/QuantumNous/new-api/common"
@@ -160,4 +161,31 @@ func SearchModels(keyword string, vendor string, offset int, limit int) ([]*Mode
 		return nil, 0, err
 	}
 	return models, total, nil
+}
+
+// EnsureModelMeta 确保 channel 中的每个模型都有对应的 model_meta 记录
+// 如果不存在则自动创建，管理员后续编辑即可
+func EnsureModelMeta(modelName string, vendorID int) (*Model, error) {
+	var existing Model
+	err := DB.Where("model_name = ?", modelName).First(&existing).Error
+	if err == nil {
+		return &existing, nil
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	now := common.GetTimestamp()
+	m := &Model{
+		ModelName:    modelName,
+		VendorID:     vendorID,
+		Status:       1,
+		SyncOfficial: 1,
+		NameRule:     NameRuleExact,
+		CreatedTime:  now,
+		UpdatedTime:  now,
+	}
+	if err := DB.Create(m).Error; err != nil {
+		return nil, err
+	}
+	return m, nil
 }
