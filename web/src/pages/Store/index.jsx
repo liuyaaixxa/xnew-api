@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getSystemName } from '../../helpers';
 import './store.css';
@@ -76,10 +76,38 @@ export default function Store() {
   ];
 
   const footerCols = [
-    { title: t('产品'), links: [t('模型'), t('定价'), t('文档'), t('更新日志')] },
-    { title: t('公司'), links: [t('关于'), t('博客'), t('招聘'), t('联系我们')] },
-    { title: t('资源'), links: [t('API参考'), t('SDK与工具'), t('服务状态'), t('社区')] },
-    { title: t('法律'), links: [t('隐私'), t('条款'), t('GDPR'), t('安全')] },
+    {
+      title: t('产品'),
+      links: [
+        { label: t('模型市场'), to: '/model-market' },
+        { label: t('API定价'), to: '/pricing' },
+        { label: t('用户文档'), to: '/docs' },
+        { label: t('下载客户端'), href: 'https://github.com/liuyaaixxa/teniulink-node-client/releases' },
+      ],
+    },
+    {
+      title: t('公司'),
+      links: [
+        { label: t('关于我们'), to: '/about' },
+        { label: t('推广联盟'), to: '/affiliate' },
+        { label: t('联系我们'), href: 'mailto:support@teniucloud.com' },
+      ],
+    },
+    {
+      title: t('资源'),
+      links: [
+        { label: 'GitHub', href: 'https://github.com/liuyaaixxa/xnew-api' },
+        { label: 'Discord', href: 'https://discord.gg/teniuai' },
+        { label: 'X (Twitter)', href: 'https://x.com/TeniuAI' },
+      ],
+    },
+    {
+      title: t('法律'),
+      links: [
+        { label: t('隐私政策'), to: '/privacy' },
+        { label: t('服务条款'), to: '/tos' },
+      ],
+    },
   ];
 
   useEffect(() => {
@@ -277,7 +305,13 @@ export default function Store() {
             <div key={col.title}>
               <div className="store-footer-col-title">{col.title}</div>
               <div className="store-footer-col">
-                {col.links.map((link) => <a href="#" key={link} onClick={(e) => e.preventDefault()}>{link}</a>)}
+                {col.links.map((link) =>
+                  link.to ? (
+                    <Link to={link.to} key={link.label}>{link.label}</Link>
+                  ) : (
+                    <a href={link.href} key={link.label} target="_blank" rel="noreferrer">{link.label}</a>
+                  )
+                )}
               </div>
             </div>
           ))}

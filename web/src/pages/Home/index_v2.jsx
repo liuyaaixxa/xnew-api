@@ -455,13 +455,19 @@ const HomeV2 = () => {
               </div>
               <div className='hv2-footer-col'>
                 <h4>{t('产品')}</h4>
-                <Link to='/pricing'>{t('模型广场')}</Link>
-                <Link to='/docs'>{t('文档')}</Link>
+                <Link to='/model-market'>{t('模型市场')}</Link>
+                <Link to='/pricing'>{t('API定价')}</Link>
+                <Link to='/docs'>{t('用户文档')}</Link>
                 <a href='https://github.com/liuyaaixxa/teniulink-node-client/releases' target='_blank' rel='noreferrer'>{t('下载客户端')}</a>
               </div>
               <div className='hv2-footer-col'>
                 <h4>{t('公司')}</h4>
                 <Link to='/about'>{t('关于我们')}</Link>
+                <Link to='/affiliate'>{t('推广联盟')}</Link>
+                <a href='mailto:support@teniucloud.com'>{t('联系我们')}</a>
+              </div>
+              <div className='hv2-footer-col'>
+                <h4>{t('法律')}</h4>
                 <Link to='/privacy'>{t('隐私政策')}</Link>
                 <Link to='/tos'>{t('服务条款')}</Link>
               </div>
