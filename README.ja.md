@@ -44,6 +44,8 @@
 
 <p align="center">
   <a href="#-クイックスタート">クイックスタート</a> •
+  <a href="#-システムアーキテクチャ">システムアーキテクチャ</a> •
+  <a href="#-ユーザーシナリオ">ユーザーシナリオ</a> •
   <a href="#-主な機能">主な機能</a> •
   <a href="#-デプロイ">デプロイ</a> •
   <a href="#-ドキュメント">ドキュメント</a> •
@@ -58,6 +60,79 @@
 > - 本プロジェクトは個人学習用のみであり、安定性の保証や技術サポートは提供しません。
 > - ユーザーは、OpenAIの[利用規約](https://openai.com/policies/terms-of-use)および**法律法規**を遵守する必要があり、違法な目的で使用してはいけません。
 > - [《生成式人工智能服务管理暂行办法》](http://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm)の要求に従い、中国地域の公衆に未登録の生成式AI サービスを提供しないでください。
+
+---
+
+## 🏗️ システムアーキテクチャ
+
+```mermaid
+graph TB
+    subgraph Mobile["📱 ユーザーA — モバイル"]
+        A1["teniuChat App<br/>iOS / Android"]
+    end
+
+    subgraph Desktop["💻 ユーザーB — デスクトップ"]
+        B1["Teniulink Node<br/>macOS / Windows / Linux"]
+        B2["ローカルAIサービス<br/>Ollama / OpenAI / DeepSeek"]
+        B3["ローカルゲートウェイ<br/>localhost:23333"]
+    end
+
+    subgraph Cloud["☁️ クラウドプラットフォーム — teniuapi.online"]
+        C1["xnew-api<br/>API Gateway"]
+        C2["デバイストークン管理<br/>Octelium SDK"]
+        C3["ユーザー認証<br/>JWT / OAuth / WebAuthn"]
+        C4[("データベース<br/>SQLite / MySQL / PG")]
+    end
+
+    subgraph Upstream["🔗 上流AIプロバイダー"]
+        D1["OpenAI"]
+        D2["Claude"]
+        D3["Gemini"]
+        D4["その他 40+ プロバイダー"]
+    end
+
+    A1 -->|"API 呼び出し"| C1
+    B1 -->|"ローカルサービス設定"| B2
+    B2 -->|"プロキシ転送"| B3
+    B1 -->|"デバイストークン登録"| C2
+    B3 -->|"デバイストークン<br/>クラウドに共有"| C1
+    C1 -->|"ユーザー認証"| C3
+    C1 -->|"データ永続化"| C4
+    C1 -->|"ルーティング転送"| D1
+    C1 -->|"ルーティング転送"| D2
+    C1 -->|"ルーティング転送"| D3
+    C1 -->|"ルーティング転送"| D4
+```
+
+### 関連リポジトリ
+
+プロジェクトは3つのコードリポジトリが連携して動作します：
+
+| リポジトリ | 位置付け | 説明 |
+|------|------|------|
+| **[xnew-api](https://github.com/liuyaaixxa/xnew-api)** | ☁️ クラウドゲートウェイ | API ゲートウェイ。[teniuapi.online](https://teniuapi.online) にデプロイ。AI モデルアクセス、ユーザー認証、デバイストークン管理、課金を統合 |
+| **[teniu-chat](https://github.com/liuyaaixxa/teniu-chat)** | 📱 モバイルクライアント | iOS / Android アプリ。エンドユーザーが Teniu.AI ネットワークに接続し、大規模モデルサービスを利用 |
+| **[teniulink-node-client](https://github.com/liuyaaixxa/teniulink-node-client)** | 💻 デスクトップノード | デスクトップアプリ。ローカルでスマートゲートウェイを起動し、ローカル AI サービスをクラウドに共有 |
+
+---
+
+## 👥 ユーザーシナリオ
+
+### ユーザーA — モバイル消費者
+
+1. **teniuChat App**（iOS / Android）でアカウントを登録またはログイン
+2. 認証方式：GitHub / Discord / メール登録 / Openfort ウォレットログイン
+3. アプリで利用可能な AI モデルを閲覧（上流プロバイダー + ユーザーB が共有するローカルサービス）
+4. モデルを直接呼び出し、クラウドゲートウェイが認証・課金・ルーティングを一元管理
+
+### ユーザーB — デスクトップノードプロバイダー
+
+1. **Teniulink Node** デスクトップアプリをダウンロードして起動
+2. 「モデルサービス」メニューでローカル AI サービスを設定（OpenAI、Google、DeepSeek、Ollama など）
+3. ローカルでスマートゲートウェイ `http://localhost:23333` を起動し、設定済みのローカルサービスをすべてプロキシ
+4. クラウド [teniuapi.online](https://teniuapi.online) にログインし、**デバイストークン**を作成
+5. Teniulink Node にデバイストークンを入力し、ローカルの `23333` ポートサービスをクラウドに共有
+6. 他のユーザー（ユーザーA）がクラウドを通じてあなたの共有した大規模モデルサービスを利用可能に
 
 ---
 

@@ -44,6 +44,7 @@ export const DEFAULT_ADMIN_CONFIG = {
     enabled: true,
     topup: true,
     wallet: true,
+    affiliate: true,
     personal: true,
   },
   admin: {
@@ -57,6 +58,8 @@ export const DEFAULT_ADMIN_CONFIG = {
     user: true,
     subscription: true,
     treasury: true,
+    'affiliate-admin': true,
+    'model-market-admin': true,
     setting: true,
   },
 };

@@ -15,7 +15,7 @@ import {
   Tag,
   Toast,
   Typography,
-  Input,
+  TextArea,
   Empty,
   Space,
   Banner,
@@ -25,7 +25,6 @@ import { useTranslation } from 'react-i18next';
 import { API, timestamp2string } from '../../helpers';
 
 const { Text } = Typography;
-const { TextArea } = Input;
 
 // Status-to-badge mapping kept intentionally small. We only expect
 // pending_review rows here, but falling back to the raw value keeps

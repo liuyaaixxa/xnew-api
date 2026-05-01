@@ -13,16 +13,38 @@ import (
 )
 
 type TopUp struct {
-	Id               int     `json:"id"`
-	UserId           int     `json:"user_id" gorm:"index"`
-	Amount           int64   `json:"amount"`
-	Money            float64 `json:"money"`
-	TradeNo          string  `json:"trade_no" gorm:"unique;type:varchar(255);index"`
-	PaymentMethod    string  `json:"payment_method" gorm:"type:varchar(50)"`
-	CreateTime       int64   `json:"create_time"`
-	CompleteTime     int64   `json:"complete_time"`
-	Status           string  `json:"status"`
+	Id              int     `json:"id"`
+	UserId          int     `json:"user_id" gorm:"index"`
+	Amount          int64   `json:"amount"`
+	Money           float64 `json:"money"`
+	TradeNo         string  `json:"trade_no" gorm:"unique;type:varchar(255);index"`
+	PaymentMethod   string  `json:"payment_method" gorm:"type:varchar(50)"`
+	PaymentProvider string  `json:"payment_provider" gorm:"type:varchar(50);default:''"`
+	CreateTime      int64   `json:"create_time"`
+	CompleteTime    int64   `json:"complete_time"`
+	Status          string  `json:"status"`
 }
+
+const (
+	PaymentMethodStripe       = "stripe"
+	PaymentMethodCreem        = "creem"
+	PaymentMethodWaffo        = "waffo"
+	PaymentMethodWaffoPancake = "waffo_pancake"
+)
+
+const (
+	PaymentProviderEpay         = "epay"
+	PaymentProviderStripe       = "stripe"
+	PaymentProviderCreem        = "creem"
+	PaymentProviderWaffo        = "waffo"
+	PaymentProviderWaffoPancake = "waffo_pancake"
+)
+
+var (
+	ErrPaymentMethodMismatch = errors.New("payment method mismatch")
+	ErrTopUpNotFound         = errors.New("topup not found")
+	ErrTopUpStatusInvalid    = errors.New("topup status invalid")
+)
 
 func (topUp *TopUp) Insert() error {
 	var err error
@@ -44,6 +66,31 @@ func GetTopUpById(id int) *TopUp {
 		return nil
 	}
 	return topUp
+}
+
+func UpdatePendingTopUpStatus(tradeNo string, expectedPaymentProvider string, targetStatus string) error {
+	if tradeNo == "" {
+		return errors.New("未提供支付单号")
+	}
+	refCol := "`trade_no`"
+	if common.UsingPostgreSQL {
+		refCol = `"trade_no"`
+	}
+	return DB.Transaction(func(tx *gorm.DB) error {
+		topUp := &TopUp{}
+		if err := tx.Set("gorm:query_option", "FOR UPDATE").Where(refCol+" = ?", tradeNo).First(topUp).Error; err != nil {
+			return ErrTopUpNotFound
+		}
+		if expectedPaymentProvider != "" && topUp.PaymentProvider != expectedPaymentProvider {
+			return ErrPaymentMethodMismatch
+		}
+		if topUp.Status != common.TopUpStatusPending {
+			return ErrTopUpStatusInvalid
+		}
+		topUp.Status = targetStatus
+		topUp.CompleteTime = common.GetTimestamp()
+		return tx.Save(topUp).Error
+	})
 }
 
 func GetTopUpByTradeNo(tradeNo string) *TopUp {
@@ -79,6 +126,10 @@ func Recharge(referenceId string, customerId string) (err error) {
 			return errors.New("充值订单状态错误")
 		}
 
+		if topUp.PaymentProvider != PaymentProviderStripe {
+			return ErrPaymentMethodMismatch
+		}
+
 		topUp.CompleteTime = common.GetTimestamp()
 		topUp.Status = common.TopUpStatusSuccess
 		err = tx.Save(topUp).Error
@@ -101,6 +152,7 @@ func Recharge(referenceId string, customerId string) (err error) {
 	}
 
 	RecordLog(topUp.UserId, LogTypeTopup, fmt.Sprintf("使用在线充值成功，充值金额: %v，支付金额：%d", logger.FormatQuota(int(quota)), topUp.Amount))
+	createAffiliateCommission(topUp.UserId, topUp.Id, topUp.Money)
 
 	return nil
 }
@@ -308,6 +360,7 @@ func ApprovePendingReviewTopUp(tradeNo string) error {
 	}
 
 	var userId int
+	var topUpId int
 	var quotaToAdd int
 	var payMoney float64
 
@@ -337,6 +390,7 @@ func ApprovePendingReviewTopUp(tradeNo string) error {
 			return err
 		}
 		userId = topUp.UserId
+		topUpId = topUp.Id
 		payMoney = topUp.Money
 		return nil
 	})
@@ -346,6 +400,7 @@ func ApprovePendingReviewTopUp(tradeNo string) error {
 
 	RecordLog(userId, LogTypeTopup, fmt.Sprintf("管理员审核通过：充值金额 %v，支付金额 $%.2f",
 		logger.FormatQuota(quotaToAdd), payMoney))
+	createAffiliateCommission(userId, topUpId, payMoney)
 	return nil
 }
 
@@ -407,6 +462,7 @@ func ManualCompleteTopUp(tradeNo string) error {
 	}
 
 	var userId int
+	var topUpId int
 	var quotaToAdd int
 	var payMoney float64
 
@@ -429,7 +485,7 @@ func ManualCompleteTopUp(tradeNo string) error {
 		// 计算应充值额度：
 		// - Stripe 订单：Money 代表经分组倍率换算后的美元数量，直接 * QuotaPerUnit
 		// - 其他订单（如易支付）：Amount 为美元数量，* QuotaPerUnit
-		if topUp.PaymentMethod == "stripe" {
+		if topUp.PaymentProvider == PaymentProviderStripe {
 			dQuotaPerUnit := decimal.NewFromFloat(common.QuotaPerUnit)
 			quotaToAdd = int(decimal.NewFromFloat(topUp.Money).Mul(dQuotaPerUnit).IntPart())
 		} else {
@@ -454,6 +510,7 @@ func ManualCompleteTopUp(tradeNo string) error {
 		}
 
 		userId = topUp.UserId
+		topUpId = topUp.Id
 		payMoney = topUp.Money
 		return nil
 	})
@@ -464,6 +521,7 @@ func ManualCompleteTopUp(tradeNo string) error {
 
 	// 事务外记录日志，避免阻塞
 	RecordLog(userId, LogTypeTopup, fmt.Sprintf("管理员补单成功，充值金额: %v，支付金额：%f", logger.FormatQuota(quotaToAdd), payMoney))
+	createAffiliateCommission(userId, topUpId, payMoney)
 	return nil
 }
 func RechargeCreem(referenceId string, customerEmail string, customerName string) (err error) {
@@ -487,6 +545,10 @@ func RechargeCreem(referenceId string, customerEmail string, customerName string
 
 		if topUp.Status != common.TopUpStatusPending {
 			return errors.New("充值订单状态错误")
+		}
+
+		if topUp.PaymentProvider != PaymentProviderCreem {
+			return ErrPaymentMethodMismatch
 		}
 
 		topUp.CompleteTime = common.GetTimestamp()
@@ -533,6 +595,7 @@ func RechargeCreem(referenceId string, customerEmail string, customerName string
 	}
 
 	RecordLog(topUp.UserId, LogTypeTopup, fmt.Sprintf("使用Creem充值成功，充值额度: %v，支付金额：%.2f", quota, topUp.Money))
+	createAffiliateCommission(topUp.UserId, topUp.Id, topUp.Money)
 
 	return nil
 }
@@ -564,6 +627,10 @@ func RechargeWaffo(tradeNo string) (err error) {
 			return errors.New("充值订单状态错误")
 		}
 
+		if topUp.PaymentProvider != PaymentProviderWaffo {
+			return ErrPaymentMethodMismatch
+		}
+
 		dAmount := decimal.NewFromInt(topUp.Amount)
 		dQuotaPerUnit := decimal.NewFromFloat(common.QuotaPerUnit)
 		quotaToAdd = int(dAmount.Mul(dQuotaPerUnit).IntPart())
@@ -590,8 +657,19 @@ func RechargeWaffo(tradeNo string) (err error) {
 	}
 
 	if quotaToAdd > 0 {
+		createAffiliateCommission(topUp.UserId, topUp.Id, topUp.Money)
 		RecordLog(topUp.UserId, LogTypeTopup, fmt.Sprintf("Waffo充值成功，充值额度: %v，支付金额: %.2f", logger.FormatQuota(quotaToAdd), topUp.Money))
 	}
 
 	return nil
+}
+
+func createAffiliateCommission(userId int, topUpId int, money float64) {
+	u, _ := GetUserById(userId, false)
+	if u == nil || u.InviterId == 0 {
+		return
+	}
+	if err := CreateAffiliateRecord(u.InviterId, userId, topUpId, money); err != nil {
+		common.SysError("create affiliate commission failed: " + err.Error())
+	}
 }

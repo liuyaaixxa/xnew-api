@@ -26,6 +26,18 @@ type DeviceTokenBatchRequest struct {
 	Ids []uint `json:"ids" binding:"required"`
 }
 
+// GetDeviceTokenConfig returns the device token configuration for the current user
+func GetDeviceTokenConfig(c *gin.Context) {
+	octeliumSvc := service.GetOcteliumService()
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data": gin.H{
+			"enabled":        octeliumSvc.IsEnabled(),
+			"default_domain": octeliumSvc.GetDefaultDomain(),
+		},
+	})
+}
+
 // GetAllDeviceTokens gets all device tokens for the current user
 func GetAllDeviceTokens(c *gin.Context) {
 	userId := c.GetInt("id")

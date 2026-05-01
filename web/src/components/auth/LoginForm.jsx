@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { UserContext } from '../../context/User';
 import { StatusContext } from '../../context/Status';
 import {
@@ -70,6 +70,7 @@ import AuthSlogan from './AuthSlogan';
 
 const LoginForm = () => {
   let navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
   const githubButtonTextKeyByState = {
     idle: '使用 GitHub 继续',
@@ -259,7 +260,7 @@ const LoginForm = () => {
               centered: true,
             });
           }
-          const nextUrl = searchParams.get('next');
+          const nextUrl = searchParams.get('next') || location.state?.from?.pathname;
           navigate(nextUrl || '/console');
         } else {
           showError(message);
@@ -461,7 +462,7 @@ const LoginForm = () => {
         setUserData(finish.data);
         updateAPI();
         showSuccess('登录成功！');
-        const nextUrl = searchParams.get('next');
+        const nextUrl = searchParams.get('next') || location.state?.from?.pathname;
         navigate(nextUrl || '/console');
       } else {
         showError(finish.message || 'Passkey 登录失败，请重试');
@@ -497,7 +498,7 @@ const LoginForm = () => {
     setUserData(data);
     updateAPI();
     showSuccess('登录成功！');
-    const nextUrl = searchParams.get('next');
+    const nextUrl = searchParams.get('next') || location.state?.from?.pathname;
     navigate(nextUrl || '/console');
   };
 
@@ -708,7 +709,7 @@ const LoginForm = () => {
                   <Text>
                     {t('没有账户？')}{' '}
                     <Link
-                      to='/register'
+                      to={'/register' + (searchParams.get('next') ? '?next=' + encodeURIComponent(searchParams.get('next')) : '')}
                       className='text-blue-600 hover:text-blue-800 font-medium'
                     >
                       {t('注册')}
@@ -861,7 +862,7 @@ const LoginForm = () => {
                   <Text>
                     {t('没有账户？')}{' '}
                     <Link
-                      to='/register'
+                      to={'/register' + (searchParams.get('next') ? '?next=' + encodeURIComponent(searchParams.get('next')) : '')}
                       className='text-blue-600 hover:text-blue-800 font-medium'
                     >
                       {t('注册')}

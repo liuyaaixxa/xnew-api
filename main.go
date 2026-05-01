@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"embed"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -39,6 +40,12 @@ var buildFS embed.FS
 
 //go:embed web/dist/index.html
 var indexPage []byte
+
+//go:embed web/templates/*.html
+var inviteTemplateFS embed.FS
+
+//go:embed web/templates/assets/*.js
+var inviteAssetFS embed.FS
 
 func main() {
 	startTime := time.Now()
@@ -182,8 +189,17 @@ func main() {
 	InjectUmamiAnalytics()
 	InjectGoogleAnalytics()
 
+	// Parse invite page templates
+	inviteTmpl, err := template.ParseFS(inviteTemplateFS, "web/templates/*.html")
+	if err != nil {
+		common.SysLog(fmt.Sprintf("failed to parse invite templates: %v", err))
+	} else {
+		controller.SetInviteTemplates(inviteTmpl)
+		common.SysLog(fmt.Sprintf("invite templates loaded: %d templates", len(inviteTmpl.Templates())))
+	}
+
 	// 设置路由
-	router.SetRouter(server, buildFS, indexPage)
+	router.SetRouter(server, buildFS, indexPage, inviteAssetFS)
 	var port = os.Getenv("PORT")
 	if port == "" {
 		port = strconv.Itoa(*common.Port)
@@ -272,6 +288,9 @@ func InitResources() error {
 
 	// Initialize options, should after model.InitDB()
 	model.InitOptionMap()
+
+	// Backfill affiliate counts for existing users
+	model.FixAffiliateCounts()
 
 	// 清理旧的磁盘缓存文件
 	common.CleanupOldCacheFiles()

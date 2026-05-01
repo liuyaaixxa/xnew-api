@@ -39,6 +39,9 @@ data/
 # Test screenshots
 test-*.png
 
+# Test assets (local only)
+test/
+
 # Docs directory (local development only)
 docs/
 openspec/

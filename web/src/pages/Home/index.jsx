@@ -109,6 +109,24 @@ const Home = () => {
             </div>
           </header>
 
+          {/* Affiliate Banner */}
+          <Link to='/affiliate' className='lp-affiliate-banner'>
+            <div className='lp-affiliate-banner-content'>
+              <div className='lp-affiliate-banner-left'>
+                <span className='lp-affiliate-banner-icon'>💰</span>
+                <span className='lp-affiliate-banner-text'>
+                  <strong>{t('推广联盟')}</strong>
+                  <span className='lp-affiliate-banner-separator'>|</span>
+                  {t('邀请好友使用AI，终身赚取30%佣金')}
+                </span>
+              </div>
+              <div className='lp-affiliate-banner-right'>
+                <span className='lp-affiliate-banner-cta'>{t('立即加入')}</span>
+                <span className='lp-affiliate-banner-arrow'>→</span>
+              </div>
+            </div>
+          </Link>
+
           {/* Hero */}
           <section className='lp-hero'>
             <div className='lp-hero-bg' />

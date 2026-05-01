@@ -54,6 +54,9 @@ const routerMap = {
   'topup-admin': '/console/topup-admin',
   'user-channel': '/console/user-channel',
   'user-channel-review': '/console/user-channel-review',
+  affiliate: '/console/affiliate',
+  'affiliate-admin': '/console/affiliate-admin',
+  'model-market-admin': '/console/model-market-admin',
 };
 
 const SiderBar = ({ onNavigate = () => {} }) => {
@@ -145,6 +148,11 @@ const SiderBar = ({ onNavigate = () => {} }) => {
         to: '/wallet',
       },
       {
+        text: t('推广联盟'),
+        itemKey: 'affiliate',
+        to: '/affiliate',
+      },
+      {
         text: t('个人设置'),
         itemKey: 'personal',
         to: '/personal',
@@ -214,6 +222,18 @@ const SiderBar = ({ onNavigate = () => {} }) => {
         text: t('积分管理'),
         itemKey: 'treasury',
         to: '/treasury',
+        className: isAdmin() ? '' : 'tableHiddle',
+      },
+      {
+        text: t('推广管理'),
+        itemKey: 'affiliate-admin',
+        to: '/affiliate-admin',
+        className: isAdmin() ? '' : 'tableHiddle',
+      },
+      {
+        text: t('模型市场管理'),
+        itemKey: 'model-market-admin',
+        to: '/model-market-admin',
         className: isAdmin() ? '' : 'tableHiddle',
       },
       {

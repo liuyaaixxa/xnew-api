@@ -62,7 +62,7 @@ const PageLayout = () => {
     '/pricing',
   ];
 
-  const legalPages = ['/', '/about', '/privacy', '/tos', '/docs'];
+  const legalPages = ['/', '/about', '/privacy', '/tos', '/docs', '/store', '/model-market'];
   const shouldHideFooter = cardProPages.includes(location.pathname) || legalPages.includes(location.pathname);
 
   const shouldInnerPadding =
@@ -216,6 +216,7 @@ const PageLayout = () => {
               overflowY: isMobile ? 'visible' : 'hidden',
               WebkitOverflowScrolling: 'touch',
               padding: shouldInnerPadding ? (isMobile ? '5px' : '24px') : '0',
+              paddingTop: shouldInnerPadding && !isMobile ? '88px' : undefined,
               position: 'relative',
             }}
           >

@@ -32,6 +32,7 @@ func SetApiRouter(router *gin.Engine) {
 		apiRouter.GET("/about", controller.GetAbout)
 		//apiRouter.GET("/midjourney", controller.GetMidjourney)
 		apiRouter.GET("/home_page_content", controller.GetHomePageContent)
+	apiRouter.GET("/affiliate/invite", controller.GetInvitePage)
 		apiRouter.GET("/pricing", middleware.TryUserAuth(), controller.GetPricing)
 		apiRouter.GET("/verification", middleware.EmailVerificationRateLimit(), middleware.TurnstileCheck(), controller.SendEmailVerification)
 		apiRouter.GET("/reset_password", middleware.CriticalRateLimit(), middleware.TurnstileCheck(), controller.SendPasswordResetEmail)
@@ -102,14 +103,17 @@ func SetApiRouter(router *gin.Engine) {
 				selfRoute.POST("/waffo/pay", middleware.CriticalRateLimit(), controller.RequestWaffoPay)
 				selfRoute.POST("/paypal/pay", middleware.CriticalRateLimit(), controller.RequestPayPalPay)
 				selfRoute.POST("/aff_transfer", controller.TransferAffQuota)
-
 				// Withdrawal routes
 				selfRoute.GET("/withdrawal/stats", controller.GetWithdrawalStats)
 				selfRoute.GET("/withdrawal/records", controller.GetWithdrawalRecords)
 				selfRoute.GET("/withdrawal/details", controller.GetWithdrawalDetails)
 				selfRoute.POST("/withdrawal", controller.CreateWithdrawalRequest)
 				selfRoute.POST("/withdrawal/:id/confirm", controller.ConfirmWithdrawal)
-
+				selfRoute.POST("/affiliate/apply", controller.ApplyAffiliate)
+				selfRoute.GET("/affiliate/status", controller.GetAffiliateStatus)
+				selfRoute.GET("/affiliate/records", controller.GetAffiliateRecords)
+				selfRoute.POST("/affiliate/settlement", middleware.CriticalRateLimit(), controller.ApplyAffiliateSettlement)
+				selfRoute.GET("/affiliate/link", controller.GetAffiliateLink)
 				selfRoute.PUT("/setting", controller.UpdateUserSetting)
 
 				// 2FA routes
@@ -159,6 +163,13 @@ func SetApiRouter(router *gin.Engine) {
 				adminRoute.PUT("/", controller.UpdateUser)
 				adminRoute.DELETE("/:id", controller.DeleteUser)
 				adminRoute.DELETE("/:id/reset_passkey", controller.AdminResetPasskey)
+
+				// Affiliate admin routes
+				adminRoute.GET("/affiliate/list", controller.AdminGetAffiliateList)
+				adminRoute.GET("/affiliate/settlements", controller.AdminGetAffiliateSettlements)
+				adminRoute.POST("/affiliate/settlement/approve", controller.AdminApproveAffiliateSettlement)
+				adminRoute.POST("/affiliate/settlement/reject", controller.AdminRejectAffiliateSettlement)
+				adminRoute.GET("/affiliate/invited-users", controller.AdminGetAffiliateInvitedUsers)
 
 				// Admin 2FA routes
 				adminRoute.GET("/2fa/stats", controller.Admin2FAStats)
@@ -300,6 +311,7 @@ func SetApiRouter(router *gin.Engine) {
 		deviceTokenRoute.Use(middleware.UserAuth())
 		{
 			deviceTokenRoute.GET("/", controller.GetAllDeviceTokens)
+			deviceTokenRoute.GET("/config", controller.GetDeviceTokenConfig)
 			deviceTokenRoute.GET("/:id", controller.GetDeviceToken)
 			deviceTokenRoute.POST("/", controller.AddDeviceToken)
 			deviceTokenRoute.DELETE("/:id", controller.DeleteDeviceToken)
@@ -436,6 +448,18 @@ func SetApiRouter(router *gin.Engine) {
 			modelsRoute.POST("/", controller.CreateModelMeta)
 			modelsRoute.PUT("/", controller.UpdateModelMeta)
 			modelsRoute.DELETE("/:id", controller.DeleteModelMeta)
+			modelsRoute.GET("/:id/tags", controller.GetModelTagsHandler)
+			modelsRoute.PUT("/:id/tags", controller.SetModelTagsHandler)
+		}
+
+		// Model Tags (admin only)
+		tagsRoute := apiRouter.Group("/model-tags")
+		tagsRoute.Use(middleware.AdminAuth())
+		{
+			tagsRoute.GET("/", controller.ListModelTags)
+			tagsRoute.POST("/", controller.CreateModelTag)
+			tagsRoute.PUT("/:id", controller.UpdateModelTag)
+			tagsRoute.DELETE("/:id", controller.DeleteModelTag)
 		}
 
 		// Deployments (model deployment management)

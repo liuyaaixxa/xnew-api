@@ -163,7 +163,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: LOKI_URL,LOKI_USER,LOKI_PASSWORD
+          envs: LOKI_URL,LOKI_USER,LOKI_PASSWORD,OCTELIUM_AUTH_TOKEN,OCTELIUM_DEFAULT_DOMAIN,OCTELIUM_USER_POLICIES,MAX_USER_DEVICE_TOKENS
           script: |
             echo "==> Pulling latest image..."
             sudo docker pull liuyaaixx/xnew-api:latest
@@ -181,6 +181,10 @@ jobs:
               -e REDIS_CONN_STRING="redis://127.0.0.1:6379" \
               -e UMAMI_WEBSITE_ID="cf26f3e9-d52e-43d0-a35b-8c3d9c0056d2" \
               -e UMAMI_SCRIPT_URL="https://cloud.umami.is/script.js" \
+              -e OCTELIUM_AUTH_TOKEN="${OCTELIUM_AUTH_TOKEN}" \
+              -e OCTELIUM_DEFAULT_DOMAIN="${OCTELIUM_DEFAULT_DOMAIN}" \
+              -e OCTELIUM_USER_POLICIES="${OCTELIUM_USER_POLICIES}" \
+              -e MAX_USER_DEVICE_TOKENS="${MAX_USER_DEVICE_TOKENS}" \
               liuyaaixx/xnew-api:latest
 
             echo "==> Waiting for container to start..."
@@ -222,3 +226,7 @@ jobs:
           LOKI_URL: ${{ secrets.LOKI_URL }}
           LOKI_USER: ${{ secrets.LOKI_USER }}
           LOKI_PASSWORD: ${{ secrets.LOKI_PASSWORD }}
+          OCTELIUM_AUTH_TOKEN: ${{ secrets.OCTELIUM_AUTH_TOKEN }}
+          OCTELIUM_DEFAULT_DOMAIN: ${{ secrets.OCTELIUM_DEFAULT_DOMAIN }}
+          OCTELIUM_USER_POLICIES: ${{ secrets.OCTELIUM_USER_POLICIES }}
+          MAX_USER_DEVICE_TOKENS: ${{ secrets.MAX_USER_DEVICE_TOKENS }}

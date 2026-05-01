@@ -12,8 +12,11 @@ import (
 
 var StartTime = time.Now().Unix() // unit: second
 var Version = "v0.0.0"            // this hard coding will be replaced automatically when building, no need to manually change
-var SystemName = "Teniu API"
+var SystemName = "Teniu.AI"
 var TeniulinkNodeVersion = "0.1.1"
+var OcteliumAuthToken = ""
+var OcteliumDefaultDomain = "teniuapi.cloud"
+var OcteliumConfigChangeCallback func()
 var Footer = ""
 var Logo = ""
 var TopUpLink = ""
@@ -111,6 +114,8 @@ var TelegramBotName = ""
 var QuotaForNewUser = 0
 var QuotaForInviter = 0
 var QuotaForInvitee = 0
+var AffiliateCommissionRate = 30  // percentage (30 = 30%)
+var AffiliateMinSettlement = 100.0 // minimum ¥ for settlement
 var ChannelDisableThreshold = 5.0
 var AutomaticDisableChannelEnabled = false
 var AutomaticEnableChannelEnabled = false

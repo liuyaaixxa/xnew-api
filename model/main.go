@@ -287,6 +287,10 @@ func migrateDB() error {
 		&WithdrawalDetail{},
 		&WithdrawalRecord{},
 		&WithdrawalPaymentRecord{},
+		&AffiliateRecord{},
+		&AffiliateSettlement{},
+		&ModelTag{},
+		&ModelTagRelation{},
 	)
 	if err != nil {
 		return err

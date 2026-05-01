@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Modal,
   Form,
@@ -33,20 +33,37 @@ import {
   IconKey,
 } from '@douyinfe/semi-icons';
 import PropTypes from 'prop-types';
-import { createDeviceToken } from '../../api/deviceToken';
+import { createDeviceToken, getDeviceTokenConfig } from '../../api/deviceToken';
 import { showError, showSuccess, copy } from '../../helpers';
 
 const { Text, Title } = Typography;
 
 const AddTokenModal = ({ visible, onClose, onSuccess, newToken, t = (key) => key }) => {
   const [loading, setLoading] = useState(false);
+  const [defaultDomain, setDefaultDomain] = useState('teniuapi.cloud');
   const formApiRef = useRef(null);
+
+  useEffect(() => {
+    if (visible && !newToken) {
+      getDeviceTokenConfig().then((res) => {
+        if (res.success && res.data?.default_domain) {
+          setDefaultDomain(res.data.default_domain);
+        }
+      }).catch(() => {});
+    }
+  }, [visible, newToken]);
+
+  useEffect(() => {
+    if (formApiRef.current && defaultDomain) {
+      formApiRef.current.setValue('domain', defaultDomain);
+    }
+  }, [defaultDomain]);
 
   const isNewTokenMode = !!newToken;
 
   const getInitValues = () => ({
     name: '',
-    domain: 'teniuapi.cloud',
+    domain: defaultDomain,
     port: 11434,
   });
 
@@ -55,7 +72,7 @@ const AddTokenModal = ({ visible, onClose, onSuccess, newToken, t = (key) => key
     try {
       const { success, message, data } = await createDeviceToken({
         name: values.name || 'default',
-        domain: values.domain || 'teniuapi.cloud',
+        domain: defaultDomain,
         port: values.port || 11434,
       });
 
@@ -193,9 +210,8 @@ const AddTokenModal = ({ visible, onClose, onSuccess, newToken, t = (key) => key
               field="domain"
               label={t('域名')}
               placeholder={t('请输入 octelium 域名')}
-              extraText={t('设备连接的 octelium 域名，默认为 teniuapi.cloud')}
-              rules={[{ required: false }]}
-              showClear
+              extraText={t('由管理员在系统配置中设置')}
+              disabled
             />
 
             <Form.InputNumber

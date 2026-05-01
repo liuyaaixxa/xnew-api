@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{.I18n.v3_page_title}}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #fafaf9;
+    color: #1c1917;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .top-bar {
+    text-align: center; padding: 48px 24px 0;
+  }
+  .invite-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #fff;
+    border: 1px solid #e7e5e4;
+    border-radius: 100px;
+    padding: 8px 20px;
+    font-size: 14px; font-weight: 500;
+    color: #44403c;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  .inviter-highlight {
+    color: #D97757; font-weight: 700;
+  }
+  .arrow { color: #D97757; }
+
+  /* ── Hero ── */
+  .hero {
+    text-align: center;
+    max-width: 640px; margin: 0 auto;
+    padding: 36px 24px 20px;
+  }
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 900; line-height: 1.15;
+    letter-spacing: -.025em;
+    margin-bottom: 16px;
+  }
+  .hero h1 .grad {
+    background: linear-gradient(135deg, #D97757 0%, #f59e0b 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    font-size: 16px; color: #78716c; line-height: 1.6;
+    max-width: 440px; margin: 0 auto;
+  }
+
+  /* ── Stats row ── */
+  .stats {
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+    max-width: 520px; margin: 0 auto 20px; padding: 0 24px;
+  }
+  .stat {
+    text-align: center; min-width: 100px;
+    animation: popIn .5s ease both;
+  }
+  .stat-val {
+    font-size: 36px; font-weight: 900; color: #D97757;
+    letter-spacing: -.02em; line-height: 1;
+  }
+  .stat-label { font-size: 13px; color: #a8a29e; margin-top: 4px; }
+  @keyframes popIn {
+    from { opacity:0; transform:scale(.85); }
+    to { opacity:1; transform:scale(1); }
+  }
+  .s1 { animation-delay: .1s; } .s2 { animation-delay: .2s; } .s3 { animation-delay: .3s; } .s4 { animation-delay: .4s; }
+
+  /* ── Main card ── */
+  .main-card {
+    max-width: 560px; margin: 0 auto; padding: 0 24px 60px;
+  }
+  .content {
+    background: #fff;
+    border: 1px solid #e7e5e4;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow:
+      0 1px 3px rgba(0,0,0,.03),
+      0 8px 32px rgba(0,0,0,.05);
+  }
+
+  /* ── Benefits section ── */
+  .benefits-section {
+    padding: 32px 36px;
+    border-bottom: 1px solid #f0efed;
+    text-align: center;
+  }
+  .section-badge {
+    display: inline-block;
+    background: rgba(217,119,87,.08);
+    color: #D97757;
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+    border-radius: 6px; padding: 4px 10px; margin-bottom: 16px;
+  }
+  .benefit-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; margin-top: 20px;
+  }
+  @media (max-width: 440px) {
+    .benefit-grid { grid-template-columns: 1fr; }
+    .benefits-section { padding: 24px 20px; }
+  }
+  .benefit-item {
+    display: flex; align-items: center; gap: 10px;
+    text-align: left;
+    background: #fafaf9; border-radius: 12px;
+    padding: 14px 16px;
+    transition: background .2s;
+  }
+  .benefit-item:hover { background: #f5f4f2; }
+  .benefit-icon { font-size: 24px; flex-shrink: 0; }
+  .benefit-title { font-size: 13px; font-weight: 700; }
+  .benefit-desc { font-size: 11px; color: #78716c; margin-top: 2px; }
+
+  /* ── Testimonials ── */
+  .testimonials {
+    padding: 32px 36px;
+    border-bottom: 1px solid #f0efed;
+  }
+  .testimonials h3 {
+    font-size: 15px; font-weight: 700; margin-bottom: 16px; text-align: center;
+  }
+  .testimonial {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: #fafaf9; border-radius: 14px;
+    padding: 16px; margin-bottom: 10px;
+  }
+  .test-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #D97757, #f59e0b);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; flex-shrink: 0;
+  }
+  .test-body { font-size: 13px; color: #44403c; line-height: 1.5; }
+  .test-meta { color: #a8a29e; font-size: 11px; }
+
+  /* ── CTA ── */
+  .cta-section {
+    padding: 32px 36px; text-align: center;
+  }
+  .cta-primary {
+    display: block; width: 100%;
+    background: linear-gradient(135deg, #D97757, #c0603f);
+    color: #fff; font-size: 16px; font-weight: 700;
+    border: none; border-radius: 14px;
+    padding: 15px 32px; cursor: pointer;
+    text-decoration: none;
+    transition: transform .2s, box-shadow .2s;
+    box-shadow: 0 4px 16px rgba(217,119,87,.2);
+    margin-bottom: 12px;
+  }
+  .cta-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(217,119,87,.3);
+  }
+  .cta-secondary {
+    font-size: 13px; color: #a8a29e; text-decoration: none; font-weight: 500;
+  }
+  .cta-secondary:hover { color: #D97757; }
+
+  /* ── QR section ── */
+  .qr-section {
+    margin-top: 20px; padding-top: 18px;
+    border-top: 1px solid #f0efed;
+  }
+  .qr-title {
+    font-size: 13px; color: #a8a29e;
+    margin-bottom: 14px;
+  }
+  .qr-wrap {
+    background: #fafaf9; border-radius: 14px;
+    display: inline-block; padding: 14px;
+    border: 1px solid #f0efed;
+  }
+  .share-hint {
+    font-size: 12px; color: #d6d3d1;
+    margin-top: 10px;
+  }
+
+  .footer-note {
+    text-align: center; font-size: 12px; color: #d6d3d1;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="invite-chip">
+      👋 <span class="inviter-highlight">{{.InviterName}}</span>
+      <span class="arrow">→</span> {{.I18n.invites_you}}
+    </div>
+  </div>
+
+  <div class="hero">
+    <h1>
+      <span class="grad">{{.I18n.v3_headline}}</span>
+    </h1>
+    <p>{{.I18n.v3_subtitle}}</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat s1">
+      <div class="stat-val">{{.I18n.v3_trust_item1_val}}</div>
+      <div class="stat-label">{{.I18n.v3_trust_item1_lbl}}</div>
+    </div>
+    <div class="stat s2">
+      <div class="stat-val">{{.I18n.v3_trust_item2_val}}</div>
+      <div class="stat-label">{{.I18n.v3_trust_item2_lbl}}</div>
+    </div>
+    <div class="stat s3">
+      <div class="stat-val">{{.I18n.v3_trust_item3_val}}</div>
+      <div class="stat-label">{{.I18n.v3_trust_item3_lbl}}</div>
+    </div>
+    <div class="stat s4">
+      <div class="stat-val">{{.I18n.v3_trust_item4_val}}</div>
+      <div class="stat-label">{{.I18n.v3_trust_item4_lbl}}</div>
+    </div>
+  </div>
+
+  <div class="main-card">
+    <div class="content">
+
+      <!-- Benefits -->
+      <div class="benefits-section">
+        <div class="section-badge">{{.I18n.v3_badge}}</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:4px;">{{.I18n.v3_benefit1_title}}</div>
+        <div style="font-size:13px;color:#78716c;">{{.I18n.v3_benefit1_sub}}</div>
+        <div class="benefit-grid">
+          <div class="benefit-item">
+            <span class="benefit-icon">🔗</span>
+            <div>
+              <div class="benefit-title">{{.I18n.v3_benefit1_title}}</div>
+              <div class="benefit-desc">{{.I18n.v3_benefit1_sub}}</div>
+            </div>
+          </div>
+          <div class="benefit-item">
+            <span class="benefit-icon">💳</span>
+            <div>
+              <div class="benefit-title">{{.I18n.v3_benefit2_title}}</div>
+              <div class="benefit-desc">{{.I18n.v3_benefit2_sub}}</div>
+            </div>
+          </div>
+          <div class="benefit-item">
+            <span class="benefit-icon">🛡️</span>
+            <div>
+              <div class="benefit-title">{{.I18n.v3_benefit3_title}}</div>
+              <div class="benefit-desc">{{.I18n.v3_benefit3_sub}}</div>
+            </div>
+          </div>
+          <div class="benefit-item">
+            <span class="benefit-icon">⚡</span>
+            <div>
+              <div class="benefit-title">{{.I18n.v3_benefit2_title}}</div>
+              <div class="benefit-desc">{{.I18n.v3_benefit2_sub}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Testimonials -->
+      <div class="testimonials">
+        <h3>{{.I18n.v3_badge}}</h3>
+        <div class="testimonial">
+          <div class="test-avatar">"</div>
+          <div class="test-body">
+            <div style="font-size:14px;margin:4px 0;">{{.I18nHTML.v3_testimonial1}}</div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div class="test-avatar">"</div>
+          <div class="test-body">
+            <div style="font-size:14px;margin:4px 0;">{{.I18nHTML.v3_testimonial2}}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-section">
+        <a class="cta-primary" href="{{.RegisterURL}}">
+          {{.I18n.v3_cta_button}}
+        </a>
+        <a class="cta-secondary" href="/login">{{.I18n.v3_login_link}}</a>
+
+        <!-- QR Code -->
+        <div class="qr-section">
+          <div class="qr-title">{{.I18n.v3_qr_title}}</div>
+          <div class="qr-wrap"><div id="qrcode"></div></div>
+          <div class="share-hint">{{.I18n.v3_share_hint}}</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-note">
+    {{.I18n.v3_subtitle}}
+  </div>
+
+<script src="/invite/assets/qrcode.js"></script>
+<script>
+renderQRCode(document.getElementById('qrcode'), {{.InviteLinkJSON}}, 180);
+</script>
+</body>
+</html>

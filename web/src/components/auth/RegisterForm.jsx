@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   API,
   getLogo,
@@ -68,6 +68,8 @@ import AuthSlogan from './AuthSlogan';
 
 const RegisterForm = () => {
   let navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const nextUrl = searchParams.get('next');
   const { t } = useTranslation();
   const githubButtonTextKeyByState = {
     idle: '使用 GitHub 继续',
@@ -203,7 +205,7 @@ const RegisterForm = () => {
         localStorage.setItem('user', JSON.stringify(data));
         setUserData(data);
         updateAPI();
-        navigate('/');
+        navigate(nextUrl || '/');
         showSuccess('登录成功！');
         setShowWeChatLoginModal(false);
       } else {
@@ -246,7 +248,8 @@ const RegisterForm = () => {
         );
         const { success, message } = res.data;
         if (success) {
-          navigate('/login');
+          const loginTarget = nextUrl ? '/login?next=' + encodeURIComponent(nextUrl) : '/login';
+          navigate(loginTarget);
           showSuccess('注册成功！');
         } else {
           showError(message);
@@ -387,7 +390,7 @@ const RegisterForm = () => {
         showSuccess('登录成功！');
         setUserData(data);
         updateAPI();
-        navigate('/');
+        navigate(nextUrl || '/');
       } else {
         showError(message);
       }

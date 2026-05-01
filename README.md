@@ -2,7 +2,15 @@
 
 # Teniu.AI
 
-**去中心化 LLM Token / GPU 共享网络 · Decentralized LLM Token & GPU Sharing Network**
+**Decentralized LLM Token & GPU Sharing Network**
+
+<p align="center">
+  <strong>English</strong> |
+  <a href="./README.zh_CN.md">简体中文</a> |
+  <a href="./README.zh_TW.md">繁體中文</a> |
+  <a href="./README.ja.md">日本語</a> |
+  <a href="./README.fr.md">Français</a>
+</p>
 
 <p align="center">
   <a href="https://github.com/liuyaaixxa/xnew-api">
@@ -14,78 +22,153 @@
 </p>
 
 <p align="center">
-  <a href="#-项目简介">项目简介</a> •
-  <a href="#-核心能力">核心能力</a> •
-  <a href="#-快速开始">快速开始</a> •
-  <a href="#-teniu-link-客户端">客户端下载</a> •
-  <a href="#-技术架构">技术架构</a>
+  <a href="#-introduction">Introduction</a> •
+  <a href="#-architecture">Architecture</a> •
+  <a href="#-user-scenarios">User Scenarios</a> •
+  <a href="#-core-capabilities">Core Capabilities</a> •
+  <a href="#-quick-start">Quick Start</a> •
+  <a href="#-teniu-link-client">Client Download</a> •
+  <a href="#-tech-stack">Tech Stack</a>
 </p>
 
 </div>
 
 ---
 
-## 📝 项目简介
+## 📝 Introduction
 
-**Teniu.AI** 是一个去中心化的 LLM Token / GPU 共享网络平台，具备双重核心场景：
+**Teniu.AI** is a decentralized LLM Token / GPU sharing network with two core scenarios:
 
-- **共享赚钱** — 将您闲置的 GPU 算力或 LLM Token 接入 Teniu.AI 网络，按贡献获取收益
-- **低价使用** — 以极低成本使用 GPT-4o、Claude、Gemini 等主流大模型 API，兼容 OpenAI 格式，即开即用
+- **Earn by Sharing** — Connect your idle GPU compute or LLM API tokens to the Teniu.AI network and earn rewards
+- **Low-Cost Access** — Use GPT-4o, Claude, Gemini, and other leading AI models at a fraction of the cost, with full OpenAI API compatibility
 
-同时，Teniu.AI 也是一个统一的大模型 API 网关，聚合 40+ 上游 AI 供应商（OpenAI、Claude、Gemini、Azure、AWS Bedrock 等），提供统一接口、用户管理、计费、限流和管理后台。
+Teniu.AI is also a unified AI API gateway aggregating 40+ upstream providers (OpenAI, Claude, Gemini, Azure, AWS Bedrock, etc.), offering a single interface with user management, billing, rate limiting, and an admin dashboard.
 
 ---
 
-## ✨ 核心能力
+## 🏗️ Architecture
 
-### 🔗 去中心化共享网络
+```mermaid
+graph TB
+    subgraph Mobile["📱 User A — Mobile"]
+        A1["teniuChat App<br/>iOS / Android"]
+    end
 
-| 能力 | 说明 |
+    subgraph Desktop["💻 User B — Desktop"]
+        B1["Teniulink Node<br/>macOS / Windows / Linux"]
+        B2["Local AI Services<br/>Ollama / OpenAI / DeepSeek"]
+        B3["Local Gateway<br/>localhost:23333"]
+    end
+
+    subgraph Cloud["☁️ Cloud Platform — teniuapi.online"]
+        C1["xnew-api<br/>API Gateway"]
+        C2["Device Token Mgmt<br/>Octelium SDK"]
+        C3["Auth<br/>JWT / OAuth / WebAuthn"]
+        C4[("Database<br/>SQLite / MySQL / PG")]
+    end
+
+    subgraph Upstream["🔗 Upstream AI Providers"]
+        D1["OpenAI"]
+        D2["Claude"]
+        D3["Gemini"]
+        D4["40+ Other Providers"]
+    end
+
+    A1 -->|"API Call"| C1
+    B1 -->|"Config Local Services"| B2
+    B2 -->|"Proxy Forward"| B3
+    B1 -->|"Register Device Token"| C2
+    B3 -->|"Device Token<br/>Share to Cloud"| C1
+    C1 -->|"Authenticate"| C3
+    C1 -->|"Persist Data"| C4
+    C1 -->|"Route"| D1
+    C1 -->|"Route"| D2
+    C1 -->|"Route"| D3
+    C1 -->|"Route"| D4
+```
+
+### Related Repositories
+
+The project is composed of three repositories working together:
+
+| Repository | Role | Description |
+|------|------|------|
+| **[xnew-api](https://github.com/liuyaaixxa/xnew-api)** | ☁️ Cloud Gateway | API gateway deployed at [teniuapi.online](https://teniuapi.online) — unified AI model access, user auth, device token management, billing |
+| **[teniu-chat](https://github.com/liuyaaixxa/teniu-chat)** | 📱 Mobile Client | iOS / Android app for end users to access the Teniu.AI network and consume AI services |
+| **[teniulink-node-client](https://github.com/liuyaaixxa/teniulink-node-client)** | 💻 Desktop Node | Desktop app that starts a local smart gateway and shares local AI services to the cloud |
+
+---
+
+## 👥 User Scenarios
+
+### User A — Mobile Consumer
+
+1. Register or log in via **teniuChat App** (iOS / Android)
+2. Auth methods: GitHub / Discord / Email / Openfort Wallet
+3. Browse available AI models (upstream providers + services shared by User B)
+4. Call models directly — the cloud gateway handles auth, billing, and routing transparently
+
+### User B — Desktop Node Provider
+
+1. Download and launch **Teniulink Node** desktop app
+2. Configure local AI services in the "Model Services" menu (OpenAI, Google, DeepSeek, Ollama, etc.)
+3. Start the local smart gateway at `http://localhost:23333` — it proxies all configured services
+4. Log in to [teniuapi.online](https://teniuapi.online) and create a **Device Token**
+5. Enter the device token in Teniulink Node to share your local `23333` port service to the cloud
+6. Other users (User A) can now consume your shared AI services through the cloud
+
+---
+
+## ✨ Core Capabilities
+
+### 🔗 Decentralized Sharing Network
+
+| Capability | Description |
 |------|------|
-| **LLM Token 共享** | 共享您的闲置 LLM API Token，为其他用户提供低价模型调用 |
-| **GPU 算力共享** | 将闲置 GPU 接入网络，托管 Ollama 本地模型赚取收益 |
-| **实时结算** | 智能合约自动结算，实时查看收益，支持多种提现方式 |
-| **全球网络** | 节点遍布全球，确保低延迟和高可用性 |
+| **LLM Token Sharing** | Share your idle LLM API tokens and provide low-cost model access to other users |
+| **GPU Compute Sharing** | Connect idle GPUs to the network, host Ollama local models, and earn rewards |
+| **Real-Time Settlement** | Smart contract-based automatic settlement with real-time earnings dashboard |
+| **Global Network** | Nodes distributed worldwide ensuring low latency and high availability |
 
-### 💰 低价 Token 使用
+### 💰 Low-Cost Token Usage
 
-通过 3 步即可享用低价大模型 API：
+Get started with affordable AI APIs in 3 steps:
 
-1. **注册并获取 API Key** — 创建账户，在控制台一键生成 API Key
-2. **选择模型与充值** — 浏览模型广场，选择 GPT-4o、Claude、Gemini 等主流模型，按需充值
-3. **替换 API 地址调用** — 将 API Base URL 替换为 Teniu.AI 地址，无需修改代码即可无缝切换
+1. **Register & Get API Key** — Create an account and generate an API key from the dashboard
+2. **Choose Models & Top Up** — Browse the model marketplace, pick GPT-4o, Claude, Gemini, etc., and top up as needed
+3. **Swap API Base URL** — Replace your API base URL with Teniu.AI — no code changes required
 
-### 🤖 多供应商聚合网关
+### 🤖 Multi-Provider Gateway
 
-- **40+ AI 供应商** 统一接入，一个 API 地址访问所有模型
-- **格式自动转换** — OpenAI ⇄ Claude Messages ⇄ Google Gemini 格式互转
-- **智能路由** — 渠道加权随机、失败自动重试、用户级模型限流
-- **订阅套餐** — 免费 / 基础 / 专业 / 企业四档共享入驻套餐
+- **40+ AI Providers** unified under a single API endpoint
+- **Auto Format Conversion** — OpenAI ⇄ Claude Messages ⇄ Google Gemini
+- **Smart Routing** — Weighted random channel selection, auto retry on failure, per-user model rate limiting
+- **Subscription Plans** — Free / Basic / Pro / Enterprise tiers
 
-### 🛡️ 安全与管理
+### 🛡️ Security & Management
 
-- **WebAuthn/Passkeys** — 无密码安全登录
-- **OAuth 集成** — GitHub、Discord、LinuxDO、Telegram、OIDC
-- **完整管理后台** — 数据看板、令牌管理、渠道管理、用户管理、计费系统
-- **设备令牌管理** — 集成 Octelium SDK，生成设备 auth-token，支持节点连接
+- **WebAuthn/Passkeys** — Passwordless secure login
+- **OAuth Integration** — GitHub, Discord, LinuxDO, Telegram, OIDC
+- **Admin Dashboard** — Analytics, token management, channel management, user management, billing
+- **Device Token Management** — Octelium SDK integration for device auth-token generation and node connectivity
 
-### 🔄 API 格式支持
+### 🔄 API Format Support
 
 - OpenAI Chat Completions & Responses
-- OpenAI Realtime API（含 Azure）
+- OpenAI Realtime API (including Azure)
 - Claude Messages
 - Google Gemini
-- Rerank 模型（Cohere、Jina）
+- Rerank Models (Cohere, Jina)
 - Midjourney-Proxy / Suno-API
-- 思考模型（Reasoning Effort）支持
+- Reasoning Effort support
 
 ---
 
-## 🖥️ Teniu Link 客户端
+## 🖥️ Teniu Link Client
 
-**Teniu Link** 是节点客户端（Agent GateWay + ChatBox），用于将您的设备连接到 Teniu.AI 网络。
+**Teniu Link** is the desktop node client (Agent Gateway + ChatBox) for connecting your device to the Teniu.AI network.
 
-| 平台 | 下载 |
+| Platform | Download |
 |------|------|
 | **macOS** | [DMG · ARM64](https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-arm64.dmg) · [DMG · x64](https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-x64.dmg) |
 | **Windows** | [Setup · x64](https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-x64-setup.exe) · [Portable · x64](https://github.com/liuyaaixxa/teniulink-node-client/releases/download/v0.1.0/Teniulink-Node-0.1.0-x64-portable.exe) |
@@ -93,47 +176,47 @@
 
 ---
 
-## 🛠️ 技术架构
+## 🛠️ Tech Stack
 
-| 层级 | 技术 |
+| Layer | Technology |
 |------|------|
-| 后端 | Go 1.25+, Gin, GORM v2 |
-| 前端 | React 18, Vite, Semi Design |
-| 数据库 | SQLite / MySQL / PostgreSQL |
-| 缓存 | Redis + 内存缓存 |
-| 认证 | JWT, WebAuthn/Passkeys, OAuth |
-| 设备集成 | Octelium gRPC SDK |
-| 国际化 | go-i18n (后端), i18next (前端) — 中/英/日/法/俄/越 |
+| Backend | Go 1.25+, Gin, GORM v2 |
+| Frontend | React 18, Vite, Semi Design |
+| Database | SQLite / MySQL / PostgreSQL |
+| Cache | Redis + In-Memory Cache |
+| Auth | JWT, WebAuthn/Passkeys, OAuth |
+| Device Integration | Octelium gRPC SDK |
+| i18n | go-i18n (backend), i18next (frontend) — zh/en/ja/fr/ru/vi |
 
 ---
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### Docker Compose（推荐）
+### Docker Compose (Recommended)
 
 ```bash
-# 克隆项目
+# Clone the project
 git clone https://github.com/liuyaaixxa/xnew-api.git
 cd xnew-api
 
-# 启动服务
+# Start services
 docker-compose up -d
 
-# 访问
+# Open in browser
 open http://localhost:3000
 ```
 
-### Docker 命令
+### Docker Run
 
 ```bash
-# 使用 SQLite（默认）
+# Using SQLite (default)
 docker run --name teniu-ai -d --restart always \
   -p 3000:3000 \
   -e TZ=Asia/Shanghai \
   -v ./data:/data \
   calciumion/new-api:latest
 
-# 使用 MySQL
+# Using MySQL
 docker run --name teniu-ai -d --restart always \
   -p 3000:3000 \
   -e SQL_DSN="root:123456@tcp(localhost:3306)/oneapi" \
@@ -142,30 +225,30 @@ docker run --name teniu-ai -d --restart always \
   calciumion/new-api:latest
 ```
 
-### 环境变量
+### Environment Variables
 
-| 变量 | 说明 | 默认值 |
+| Variable | Description | Default |
 |------|------|--------|
-| `SQL_DSN` | 数据库连接字符串 | SQLite |
-| `REDIS_CONN_STRING` | Redis 连接 | - |
-| `SESSION_SECRET` | 会话密钥（多机部署必须） | - |
-| `CRYPTO_SECRET` | 加密密钥（Redis 必须） | - |
-| `OCTELIUM_AUTH_TOKEN` | Octelium 管理员 auth-token | - |
-| `OCTELIUM_DEFAULT_DOMAIN` | Octelium 默认域名 | `teniuapi.cloud` |
+| `SQL_DSN` | Database connection string | SQLite |
+| `REDIS_CONN_STRING` | Redis connection | - |
+| `SESSION_SECRET` | Session secret (required for multi-node deployment) | - |
+| `CRYPTO_SECRET` | Encryption secret (required for Redis) | - |
+| `OCTELIUM_AUTH_TOKEN` | Octelium admin auth-token | - |
+| `OCTELIUM_DEFAULT_DOMAIN` | Octelium default domain | `teniuapi.cloud` |
 
 ---
 
-## 🤖 支持的模型供应商
+## 🤖 Supported Model Providers
 
-OpenAI · Azure OpenAI · Anthropic Claude · Google Gemini · AWS Bedrock · Cohere · Mistral · Moonshot · DeepSeek · 智谱 GLM · 百川 · 通义千问 · 讯飞星火 · 零一万物 · MiniMax · Groq · Ollama · Cloudflare Workers AI · Coze · Midjourney · Suno 等 40+ 供应商
+OpenAI · Azure OpenAI · Anthropic Claude · Google Gemini · AWS Bedrock · Cohere · Mistral · Moonshot · DeepSeek · Zhipu GLM · Baichuan · Tongyi Qianwen · iFlytek Spark · 01.AI · MiniMax · Groq · Ollama · Cloudflare Workers AI · Coze · Midjourney · Suno and 40+ more
 
 ---
 
-## 📜 许可证
+## 📜 License
 
-本项目遵循 [GNU Affero General Public License v3.0 (AGPLv3)](./LICENSE)。
+This project is licensed under the [GNU Affero General Public License v3.0 (AGPLv3)](./LICENSE).
 
-基于 [New API](https://github.com/Calcium-Ion/new-api)（由 [QuantumNous](https://github.com/QuantumNous) 维护）二次开发，原项目基于 [One API](https://github.com/songquanpeng/one-api)（MIT License）。
+Built on [New API](https://github.com/Calcium-Ion/new-api) (maintained by [QuantumNous](https://github.com/QuantumNous)), which was originally based on [One API](https://github.com/songquanpeng/one-api) (MIT License).
 
 ---
 

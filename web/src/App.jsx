@@ -38,6 +38,8 @@ import Token from './pages/Token';
 import Redemption from './pages/Redemption';
 import TopUp from './pages/TopUp';
 import TopUpAdmin from './pages/TopUpAdmin';
+import AdminAffiliate from './pages/AdminAffiliate';
+import AdminModelMarket from './pages/AdminModelMarket';
 import Log from './pages/Log';
 import Chat from './pages/Chat';
 import Chat2Link from './pages/Chat2Link';
@@ -56,6 +58,11 @@ import Setup from './pages/Setup';
 import SetupCheck from './components/layout/SetupCheck';
 
 const Home = lazy(() => import('./pages/Home/index_v2'));
+const Store = lazy(() => import('./pages/Store'));
+const ModelMarket = lazy(() => import('./pages/ModelMarket'));
+const AffiliateLanding = lazy(() => import('./pages/Affiliate/Landing'));
+const AffiliateInvite = lazy(() => import('./pages/Affiliate/Invite'));
+const AffiliateDashboard = lazy(() => import('./pages/Affiliate/Dashboard'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const About = lazy(() => import('./pages/About/LandingAbout'));
 const UserAgreement = lazy(() => import('./pages/UserAgreement'));
@@ -104,7 +111,7 @@ function App() {
           element={
             <HomeRedirect>
               <Suspense fallback={<Loading></Loading>} key={location.pathname}>
-                <Home />
+                <Store />
               </Suspense>
             </HomeRedirect>
           }
@@ -195,6 +202,26 @@ function App() {
           element={
             <AdminRoute>
               <TopUpAdmin />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path='/console/affiliate-admin'
+          element={
+            <AdminRoute>
+              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+                <AdminAffiliate />
+              </Suspense>
+            </AdminRoute>
+          }
+        />
+        <Route
+          path='/console/model-market-admin'
+          element={
+            <AdminRoute>
+              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+                <AdminModelMarket />
+              </Suspense>
             </AdminRoute>
           }
         />
@@ -460,6 +487,56 @@ function App() {
             <PrivateRoute>
               <Suspense fallback={<Loading></Loading>} key={location.pathname}>
                 <Chat2Link />
+              </Suspense>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path='/compute-pool'
+          element={
+            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Home />
+            </Suspense>
+          }
+        />
+        <Route
+          path='/store'
+          element={
+            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Store />
+            </Suspense>
+          }
+        />
+        <Route
+          path='/model-market'
+          element={
+            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <ModelMarket />
+            </Suspense>
+          }
+        />
+        <Route
+          path='/affiliate'
+          element={
+            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <AffiliateLanding />
+            </Suspense>
+          }
+        />
+        <Route
+          path='/invite'
+          element={
+            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <AffiliateInvite />
+            </Suspense>
+          }
+        />
+        <Route
+          path='/console/affiliate'
+          element={
+            <PrivateRoute>
+              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+                <AffiliateDashboard />
               </Suspense>
             </PrivateRoute>
           }
