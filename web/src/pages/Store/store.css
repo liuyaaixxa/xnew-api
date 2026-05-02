@@ -199,7 +199,7 @@ body[theme-mode="dark"] .store-page {
   display: flex; align-items: center; padding: 80px 80px 100px; gap: 80px;
   background: var(--store-bg-hero);
 }
-.store-hero-content { flex: 1; display: flex; flex-direction: column; gap: 28px; }
+.store-hero-content { flex: 4; display: flex; flex-direction: column; gap: 28px; }
 .store-badge {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 8px 18px; border-radius: 100px;
@@ -224,7 +224,7 @@ body[theme-mode="dark"] .store-page {
 .store-btn-outline-lg:hover { border-color: var(--store-accent); color: var(--store-accent); }
 
 .store-hero-visual {
-  flex: 1; max-width: 520px; height: 420px;
+  flex: 6; height: 420px;
   border-radius: 20px; display: flex; align-items: center; justify-content: center;
   position: relative; overflow: hidden;
   background: transparent;

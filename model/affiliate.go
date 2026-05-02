@@ -105,8 +105,8 @@ func SeedAffiliatePromotions() {
 	promotions := []AffiliatePromotion{
 		{Name: "创业黑金", Description: "深色科技风，强调副业创业", TemplateKey: "invite-v1", RoutePath: "/invite/v1", Color: "#0d0d1a", SortOrder: 1, Enabled: true, CreatedTime: now, UpdatedTime: now},
 		{Name: "创意工作室", Description: "温暖柔和风，强调创作搭档", TemplateKey: "invite-v2", RoutePath: "/invite/v2", Color: "#fef9f6", SortOrder: 2, Enabled: true, CreatedTime: now, UpdatedTime: now},
-		{Name: "数据驱动", Description: "清爽商务风，数据说服力", TemplateKey: "invite-v3", RoutePath: "/invite/v3", Color: "#fafaf9", SortOrder: 3, Enabled: true, CreatedTime: now, UpdatedTime: now},
-		{Name: "618新人注册活动", Description: "618限时福利，1000万Token赠送", TemplateKey: "token618", RoutePath: "/affiliate-618", Color: "#0a0a0f", SortOrder: 4, Enabled: true, CreatedTime: now, UpdatedTime: now},
+		{Name: "数据驱动", Description: "清爽商务风，数据说服力", TemplateKey: "invite-v3", RoutePath: "/invite/v3", Color: "#1a365d", SortOrder: 3, Enabled: true, CreatedTime: now, UpdatedTime: now},
+		{Name: "618新人注册活动", Description: "618限时福利，1000万Token赠送", TemplateKey: "token618", RoutePath: "/affiliate-618", Color: "#C41230", SortOrder: 4, Enabled: true, CreatedTime: now, UpdatedTime: now},
 	}
 	for _, p := range promotions {
 		DB.Create(&p)
