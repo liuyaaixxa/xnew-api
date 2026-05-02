@@ -110,6 +110,8 @@ var inviteI18nZhText = map[string]string{
 	"v3_trust_item3_lbl": "开发者",
 	"v3_trust_item4_val": "50M+",
 	"v3_trust_item4_lbl": "日请求量",
+	// token618 (618 promotion page)
+	"c618_page_title": "给您发了1000万Token！",
 }
 
 var inviteI18nZhHTML = map[string]template.HTML{
@@ -123,6 +125,8 @@ var inviteI18nZhHTML = map[string]template.HTML{
 	"v3_subtitle_html": template.HTML(`2,000+开发者的选择 · 99.9% SLA · 50M+ 日请求<br>你的好友<strong style="color:#D97757">{{.InviterName}}</strong>推荐你来体验。`),
 	"v3_testimonial1": template.HTML(`"切换到Tenu.AI将我们的AI成本降低了<span style="color:#D97757;font-weight:600;">60%</span>。"`),
 	"v3_testimonial2": template.HTML(`"自动故障转移在OpenAI宕机时<span style="color:#D97757;font-weight:600;">拯救了我们</span>。"`),
+	// token618
+	"c618_hero_title": template.HTML(`给您发了<br><span class="g">1000万</span>Token`),
 }
 
 // ── English (en) translations ──
@@ -179,6 +183,8 @@ var inviteI18nEnText = map[string]string{
 	"v3_trust_item3_lbl": "Developers",
 	"v3_trust_item4_val": "50M+",
 	"v3_trust_item4_lbl": "Daily Requests",
+	// token618
+	"c618_page_title": "Sent you 10 million tokens!",
 }
 
 var inviteI18nEnHTML = map[string]template.HTML{
@@ -192,6 +198,8 @@ var inviteI18nEnHTML = map[string]template.HTML{
 	"v3_subtitle_html": template.HTML(`2,000+ Developers · 99.9% SLA · 50M+ Daily Requests<br>Your friend <strong style="color:#D97757">{{.InviterName}}</strong> recommends it.`),
 	"v3_testimonial1": template.HTML(`"Switching to Tenu.AI <span style="color:#D97757;font-weight:600;">cut our AI costs by 60%</span>."`),
 	"v3_testimonial2": template.HTML(`"The auto-failover <span style="color:#D97757;font-weight:600;">saved us</span> during the OpenAI outage."`),
+	// token618
+	"c618_hero_title": template.HTML(`Sent you<br><span class="g">10 million</span> Tokens`),
 }
 
 // ─── User endpoints ───
@@ -416,9 +424,12 @@ func GetToken618Page(c *gin.Context) {
 		c.SetCookie("aff_code", affCode, 30*24*60*60, "/", "", false, true)
 	}
 
+	i18nText, i18nHTML := inviteI18n(c)
 	data := InvitePageData{
 		RegisterURL:    registerURL,
 		InviteLinkJSON: template.JS(fmt.Sprintf("`%s`", pageURL)),
+		I18n:           i18nText,
+		I18nHTML:       i18nHTML,
 	}
 
 	tmpl := InviteTemplates.Lookup("token618.html")
