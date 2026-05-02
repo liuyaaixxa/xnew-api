@@ -42,7 +42,7 @@ import { SiTelegram, SiWechat, SiLinux, SiDiscord } from 'react-icons/si';
 import { UserPlus, ShieldCheck } from 'lucide-react';
 import TelegramLoginButton from 'react-telegram-login';
 import { API, showError, showSuccess, onGitHubOAuthClicked, onOIDCClicked, onLinuxDOOAuthClicked, onDiscordOAuthClicked, onCustomOAuthClicked } from '../../../../helpers';
-import { getOAuthProviderIcon } from '../../../../helpers/render';
+import { getOAuthProviderIcon } from '../../../../helpers/render-icons';
 import TwoFASetting from '../components/TwoFASetting';
 
 const AccountManagement = ({

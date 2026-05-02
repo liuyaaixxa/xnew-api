@@ -27,7 +27,8 @@ import {
   Tooltip,
 } from '@douyinfe/semi-ui';
 import { timestamp2string } from '../../../helpers';
-import { getLobeHubIcon, stringToColor } from '../../../helpers/render';
+import { stringToColor } from '../../../helpers/render';
+import { getLobeHubIcon } from '../../../helpers/render-icons';
 import {
   renderLimitedItems,
   renderDescription,

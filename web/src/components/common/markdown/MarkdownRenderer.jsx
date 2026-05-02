@@ -27,21 +27,100 @@ import RehypeKatex from 'rehype-katex';
 import RemarkGfm from 'remark-gfm';
 import RehypeHighlight from 'rehype-highlight';
 import { useRef, useState, useEffect, useMemo } from 'react';
-import mermaid from 'mermaid';
 import React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import clsx from 'clsx';
 import { Button, Tooltip, Toast } from '@douyinfe/semi-ui';
 import { copy } from '../../../helpers';
-import { rehypeSplitWordsIntoSpans } from '../../../helpers/render';
+import { visit } from 'unist-util-visit';
 import { IconCopy } from '@douyinfe/semi-icons';
 import { useTranslation } from 'react-i18next';
 
-mermaid.initialize({
-  startOnLoad: false,
-  theme: 'default',
-  securityLevel: 'loose',
-});
+function rehypeSplitWordsIntoSpans(options = {}) {
+  const { previousContentLength = 0 } = options;
+
+  return (tree) => {
+    let currentCharCount = 0;
+
+    visit(tree, 'element', (node) => {
+      if (
+        ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'strong'].includes(
+          node.tagName,
+        ) &&
+        node.children
+      ) {
+        const newChildren = [];
+        node.children.forEach((child) => {
+          if (child.type === 'text') {
+            try {
+              const segmenter = new Intl.Segmenter('zh', {
+                granularity: 'word',
+              });
+              const segments = segmenter.segment(child.value);
+
+              Array.from(segments)
+                .map((seg) => seg.segment)
+                .filter(Boolean)
+                .forEach((word) => {
+                  const wordStartPos = currentCharCount;
+                  const wordEndPos = currentCharCount + word.length;
+                  const isNewContent = wordStartPos >= previousContentLength;
+
+                  newChildren.push({
+                    type: 'element',
+                    tagName: 'span',
+                    properties: {
+                      className: isNewContent ? ['animate-fade-in'] : [],
+                    },
+                    children: [{ type: 'text', value: word }],
+                  });
+
+                  currentCharCount = wordEndPos;
+                });
+            } catch (_) {
+              const textStartPos = currentCharCount;
+              const isNewContent = textStartPos >= previousContentLength;
+
+              if (isNewContent) {
+                newChildren.push({
+                  type: 'element',
+                  tagName: 'span',
+                  properties: {
+                    className: ['animate-fade-in'],
+                  },
+                  children: [{ type: 'text', value: child.value }],
+                });
+              } else {
+                newChildren.push(child);
+              }
+
+              currentCharCount += child.value.length;
+            }
+          } else {
+            newChildren.push(child);
+          }
+        });
+        node.children = newChildren;
+      }
+    });
+  };
+}
+
+let mermaidInstance = null;
+function getMermaid() {
+  if (!mermaidInstance) {
+    mermaidInstance = import('mermaid').then((m) => {
+      const mermaid = m.default;
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'default',
+        securityLevel: 'loose',
+      });
+      return mermaid;
+    });
+  }
+  return mermaidInstance;
+}
 
 export function Mermaid(props) {
   const ref = useRef(null);
@@ -49,11 +128,13 @@ export function Mermaid(props) {
 
   useEffect(() => {
     if (props.code && ref.current) {
-      mermaid
-        .run({
-          nodes: [ref.current],
-          suppressErrors: true,
-        })
+      getMermaid()
+        .then((mermaid) =>
+          mermaid.run({
+            nodes: [ref.current],
+            suppressErrors: true,
+          }),
+        )
         .catch((e) => {
           setHasError(true);
           console.error('[Mermaid] ', e.message);

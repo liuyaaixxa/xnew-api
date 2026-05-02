@@ -21,7 +21,8 @@ import React from 'react';
 import { Tag, Space, Tooltip } from '@douyinfe/semi-ui';
 import { IconHelpCircle } from '@douyinfe/semi-icons';
 import { calculateModelPrice, getModelPriceItems } from '../../../../../helpers';
-import { renderModelTag, stringToColor, getLobeHubIcon } from '../../../../../helpers/render';
+import { stringToColor } from '../../../../../helpers/render';
+import { renderModelTag, getLobeHubIcon } from '../../../../../helpers/render-icons';
 import {
   renderLimitedItems,
   renderDescription,

@@ -30,7 +30,8 @@ import {
   Typography,
 } from '@douyinfe/semi-ui';
 import { timestamp2string, showSuccess, showError, showInfo } from '../../../helpers';
-import { renderGroup, renderQuota, getChannelIcon, renderQuotaWithAmount } from '../../../helpers/render';
+import { renderGroup, renderQuota, renderQuotaWithAmount } from '../../../helpers/render';
+import { getChannelIcon } from '../../../helpers/render-icons';
 import {
   CHANNEL_OPTIONS,
   MODEL_FETCHABLE_CHANNEL_TYPES,

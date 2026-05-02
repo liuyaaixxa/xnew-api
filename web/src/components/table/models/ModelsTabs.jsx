@@ -21,7 +21,7 @@ import React from 'react';
 import { Tabs, TabPane, Tag, Button, Dropdown, Modal } from '@douyinfe/semi-ui';
 import { IconEdit, IconDelete } from '@douyinfe/semi-icons';
 import { showError, showSuccess } from '../../../helpers';
-import { getLobeHubIcon } from '../../../helpers/render';
+import { getLobeHubIcon } from '../../../helpers/render-icons';
 import { API } from '../../../helpers';
 
 const ModelsTabs = ({

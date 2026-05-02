@@ -19,7 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 
 import React from 'react';
 import SelectableButtonGroup from '../../../common/ui/SelectableButtonGroup';
-import { getLobeHubIcon } from '../../../../helpers/render';
+import { getLobeHubIcon } from '../../../../helpers/render-icons';
 
 /**
  * 供应商筛选组件

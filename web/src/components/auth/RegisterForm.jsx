@@ -20,7 +20,7 @@ For commercial licensing, please contact support@quantumnous.com
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { API, getLogo, showError, showInfo, showSuccess, updateAPI, getSystemName, setUserData, onDiscordOAuthClicked, onCustomOAuthClicked } from '../../helpers';
-import { getOAuthProviderIcon } from '../../helpers/render';
+import { getOAuthProviderIcon } from '../../helpers/render-icons';
 import CaptchaWidget from '../common/CaptchaWidget';
 import {
   Button,

@@ -51,7 +51,7 @@ import {
   Dropdown,
 } from '@douyinfe/semi-ui';
 import { getChannelModels, copy, selectFilter } from '../../../../helpers';
-import { getChannelIcon, getModelCategories } from '../../../../helpers/render';
+import { getChannelIcon, getModelCategories } from '../../../../helpers/render-icons';
 import ModelSelectModal from './ModelSelectModal';
 import SingleModelSelectModal from './SingleModelSelectModal';
 import OllamaModelModal from './OllamaModelModal';

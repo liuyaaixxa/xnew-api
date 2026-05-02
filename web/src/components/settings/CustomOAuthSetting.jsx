@@ -41,7 +41,7 @@ import {
   IconRefresh,
 } from '@douyinfe/semi-icons';
 import { API, showError, showSuccess } from '../../helpers';
-import { getOAuthProviderIcon } from '../../helpers/render';
+import { getOAuthProviderIcon } from '../../helpers/render-icons';
 import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;

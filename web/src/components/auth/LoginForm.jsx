@@ -22,7 +22,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-do
 import { UserContext } from '../../context/User';
 import { StatusContext } from '../../context/Status';
 import { API, getLogo, showError, showInfo, showSuccess, updateAPI, getSystemName, setUserData, onGitHubOAuthClicked, onDiscordOAuthClicked, onOIDCClicked, onLinuxDOOAuthClicked, onCustomOAuthClicked, prepareCredentialRequestOptions, buildAssertionResult, isPasskeySupported } from '../../helpers';
-import { getOAuthProviderIcon } from '../../helpers/render';
+import { getOAuthProviderIcon } from '../../helpers/render-icons';
 import CaptchaWidget from '../common/CaptchaWidget';
 import {
   Button,

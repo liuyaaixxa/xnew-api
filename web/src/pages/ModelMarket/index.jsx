@@ -22,7 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useModelPricingData } from '../../hooks/model-pricing/useModelPricingData';
 import { getSystemName } from '../../helpers';
-import { getLobeHubIcon } from '../../helpers/render';
+import { getLobeHubIcon } from '../../helpers/render-icons';
 import './model-market.css';
 
 const MODELS_PER_PAGE = 9;
