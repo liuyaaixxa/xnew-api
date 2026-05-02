@@ -256,8 +256,16 @@ func getDefaultAffCode() string {
 	return ""
 }
 
+// setNoCacheHeaders prevents browser caching of the response.
+func setNoCacheHeaders(c *gin.Context) {
+	c.Header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+	c.Header("Pragma", "no-cache")
+	c.Header("Expires", "0")
+}
+
 // GetInvitePage renders the invite landing page data.
 func GetInvitePage(c *gin.Context) {
+	setNoCacheHeaders(c)
 	affCode := c.Query("aff")
 	if affCode == "" {
 		affCode = getDefaultAffCode()
@@ -290,6 +298,7 @@ func GetInvitePage(c *gin.Context) {
 
 // GetVersionedInvitePage renders a specific invite page version (v1/v2/v3) as standalone HTML.
 func GetVersionedInvitePage(c *gin.Context) {
+	setNoCacheHeaders(c)
 	version := c.Param("version")
 	if version == "" {
 		version = "v1"
@@ -362,7 +371,6 @@ func GetVersionedInvitePage(c *gin.Context) {
 	}
 
 	c.Header("Content-Type", "text/html; charset=utf-8")
-	c.Header("Cache-Control", "no-cache")
 	if err := tmpl.Execute(c.Writer, data); err != nil {
 		common.SysLog(fmt.Sprintf("invite template error: %v", err))
 	}
@@ -370,6 +378,7 @@ func GetVersionedInvitePage(c *gin.Context) {
 
 // GetDefaultInvitePage redirects /invite to /invite/v1 (or user preference).
 func GetDefaultInvitePage(c *gin.Context) {
+	setNoCacheHeaders(c)
 	affCode := c.Query("aff")
 	if affCode == "" {
 		affCode = getDefaultAffCode()
@@ -383,6 +392,7 @@ func GetDefaultInvitePage(c *gin.Context) {
 
 // GetToken618Page renders the 618 promotion activity page.
 func GetToken618Page(c *gin.Context) {
+	setNoCacheHeaders(c)
 	affCode := c.Query("aff")
 	if affCode == "" {
 		affCode = getDefaultAffCode()
