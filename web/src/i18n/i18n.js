@@ -21,14 +21,26 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-import enTranslation from './locales/en.json';
-import frTranslation from './locales/fr.json';
 import zhCNTranslation from './locales/zh-CN.json';
-import zhTWTranslation from './locales/zh-TW.json';
-import ruTranslation from './locales/ru.json';
-import jaTranslation from './locales/ja.json';
-import viTranslation from './locales/vi.json';
 import { supportedLanguages } from './language';
+
+const loaders = {
+  en: () => import('./locales/en.json'),
+  fr: () => import('./locales/fr.json'),
+  'zh-TW': () => import('./locales/zh-TW.json'),
+  ru: () => import('./locales/ru.json'),
+  ja: () => import('./locales/ja.json'),
+  vi: () => import('./locales/vi.json'),
+};
+
+async function loadLanguageAsync(lng) {
+  const loader = loaders[lng];
+  if (!loader || i18n.hasResourceBundle(lng, 'translation')) return;
+  const res = await loader();
+  const data = res.default || res;
+  const translations = data.translation || data;
+  i18n.addResourceBundle(lng, 'translation', translations, true, true);
+}
 
 i18n
   .use(LanguageDetector)
@@ -37,13 +49,7 @@ i18n
     load: 'currentOnly',
     supportedLngs: supportedLanguages,
     resources: {
-      en: enTranslation,
       'zh-CN': zhCNTranslation,
-      'zh-TW': zhTWTranslation,
-      fr: frTranslation,
-      ru: ruTranslation,
-      ja: jaTranslation,
-      vi: viTranslation,
     },
     fallbackLng: 'zh-CN',
     nsSeparator: false,
@@ -51,6 +57,12 @@ i18n
       escapeValue: false,
     },
   });
+
+i18n.on('languageChanged', loadLanguageAsync);
+
+if (i18n.language && i18n.language !== 'zh-CN') {
+  loadLanguageAsync(i18n.language);
+}
 
 window.__i18n = i18n;
 
