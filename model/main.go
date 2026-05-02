@@ -282,6 +282,7 @@ func migrateDB() error {
 		&UserOAuthBinding{},
 		&DeviceToken{},
 		&UserChannel{},
+		&UserVoucher{},
 		&TreasuryLog{},
 		&SettlementOrder{},
 		&AffiliateRecord{},

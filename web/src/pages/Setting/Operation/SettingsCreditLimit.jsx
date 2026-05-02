@@ -99,11 +99,12 @@ export default function SettingsCreditLimit(props) {
             <Row gutter={16}>
               <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                 <Form.InputNumber
-                  label={t('新用户初始额度')}
+                  label={t('新人见面礼额度券')}
                   field={'QuotaForNewUser'}
                   step={1}
                   min={0}
                   suffix={'Token'}
+                  extraText={t('新用户注册后获得额度券，需在钱包页面签收后到账')}
                   placeholder={''}
                   onChange={(value) =>
                     setInputs({
@@ -132,12 +133,12 @@ export default function SettingsCreditLimit(props) {
               </Col>
               <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                 <Form.InputNumber
-                  label={t('邀请新用户奖励额度')}
+                  label={t('邀请人激励券')}
                   field={'QuotaForInviter'}
                   step={1}
                   min={0}
                   suffix={'Token'}
-                  extraText={''}
+                  extraText={t('邀请成功后发放给邀请人，需在钱包页面签收后到账')}
                   placeholder={t('例如：2000')}
                   onChange={(value) =>
                     setInputs({
@@ -151,12 +152,12 @@ export default function SettingsCreditLimit(props) {
             <Row>
               <Col xs={24} sm={12} md={8} lg={8} xl={6}>
                 <Form.InputNumber
-                  label={t('新用户使用邀请码奖励额度')}
+                  label={t('被邀请人邀请券')}
                   field={'QuotaForInvitee'}
                   step={1}
                   min={0}
                   suffix={'Token'}
-                  extraText={''}
+                  extraText={t('使用邀请码注册的新用户额外获得，需在钱包页面签收后到账')}
                   placeholder={t('例如：1000')}
                   onChange={(value) =>
                     setInputs({

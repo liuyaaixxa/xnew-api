@@ -128,6 +128,11 @@ func SetApiRouter(router *gin.Engine) {
 				selfRoute.GET("/settlement/orders", controller.GetSettlementOrders)
 				selfRoute.DELETE("/settlement/order/:id", controller.DeleteSettlementOrder)
 
+				// Voucher routes
+				selfRoute.GET("/vouchers", controller.GetUserVouchers)
+				selfRoute.GET("/vouchers/unclaimed", controller.GetUnclaimedVouchers)
+				selfRoute.POST("/vouchers/:id/claim", controller.ClaimVoucher)
+
 				// Custom OAuth bindings
 				selfRoute.GET("/oauth/bindings", controller.GetUserOAuthBindings)
 				selfRoute.DELETE("/oauth/bindings/:provider_id", controller.UnbindCustomOAuth)
