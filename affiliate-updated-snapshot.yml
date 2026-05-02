@@ -1,0 +1,271 @@
+- generic [ref=e298]:
+  - generic [ref=e302]:
+    - link "logo Teniu.AI" [ref=e304] [cursor=pointer]:
+      - /url: /
+      - img "logo" [ref=e306]
+      - heading "Teniu.AI" [level=4] [ref=e309]
+    - navigation [ref=e310]:
+      - link "模型市场" [ref=e311] [cursor=pointer]:
+        - /url: /model-market
+        - generic [ref=e312]: 模型市场
+      - link "算力池计划" [ref=e313] [cursor=pointer]:
+        - /url: /compute-pool
+        - generic [ref=e314]: 算力池计划
+      - link "控制台" [ref=e315] [cursor=pointer]:
+        - /url: /console
+        - generic [ref=e316]: 控制台
+      - link "关于" [ref=e317] [cursor=pointer]:
+        - /url: /about
+        - generic [ref=e318]: 关于
+    - generic [ref=e319]:
+      - button "系统公告" [ref=e320] [cursor=pointer]:
+        - img [ref=e322]
+      - button "切换主题" [ref=e325] [cursor=pointer]:
+        - img [ref=e327]
+      - button "common.changeLanguage" [ref=e329] [cursor=pointer]:
+        - img [ref=e331]
+      - button "A admin" [ref=e336] [cursor=pointer]:
+        - generic [ref=e337]:
+          - listitem [ref=e338]:
+            - img "A" [ref=e340]
+          - generic [ref=e341]: admin
+          - img [ref=e342]
+  - generic [ref=e345]:
+    - main [ref=e346]:
+      - generic [ref=e347]:
+        - generic [ref=e350]:
+          - generic [ref=e351]:
+            - generic [ref=e352]: 推广联盟计划 · 终身佣金
+            - heading "分享AI算力 赚取最高终身30%收益" [level=1] [ref=e354]:
+              - text: 分享AI算力
+              - emphasis [ref=e355]: 赚取
+              - text: 最高终身30%
+              - emphasis [ref=e356]: 收益
+            - paragraph [ref=e357]: 邀请一位好友使用Teniu.AI，好友每次购买Token你都能获得佣金回报。建圈子，管收益，轻松拥有被动收入。
+            - generic [ref=e358]:
+              - generic [ref=e359]:
+                - generic [ref=e360]: 👥
+                - generic [ref=e361]:
+                  - generic [ref=e362]: 3,200+
+                  - generic [ref=e363]: 活跃推广者
+              - generic [ref=e364]:
+                - generic [ref=e365]: 💰
+                - generic [ref=e366]:
+                  - generic [ref=e367]: ¥2.4M+
+                  - generic [ref=e368]: 累计分佣
+            - generic [ref=e369]:
+              - link "立即加入推广联盟 →" [ref=e370] [cursor=pointer]:
+                - /url: /console/affiliate
+              - link "了解运作方式" [ref=e371] [cursor=pointer]:
+                - /url: "#flow"
+          - generic [ref=e372]:
+            - generic [ref=e373]: 👤 你 (推广者 A)
+            - generic [ref=e375]: A
+            - generic [ref=e376]: ⬇ 直接邀请的用户
+            - generic [ref=e377]:
+              - generic [ref=e378]: B1
+              - generic [ref=e379]: B2
+              - generic [ref=e380]: B3
+            - generic [ref=e381]: 📊 收益汇总
+            - generic [ref=e382]:
+              - generic [ref=e383]:
+                - generic [ref=e384]: ¥450
+                - generic [ref=e385]: B1 消费¥1,500
+              - generic [ref=e386]:
+                - generic [ref=e387]: ¥180
+                - generic [ref=e388]: B2 消费¥600
+              - generic [ref=e389]:
+                - generic [ref=e390]: ¥90
+                - generic [ref=e391]: B3 消费¥300
+            - generic [ref=e392]: "本月总收益: ¥720"
+        - generic [ref=e394]:
+          - generic [ref=e395]: 推广流程
+          - heading "三分钟建立你的收益管道" [level=2] [ref=e396]
+          - paragraph [ref=e397]: 只需三步，开启终身被动收入。
+          - generic [ref=e398]:
+            - generic [ref=e399]:
+              - generic [ref=e400]: 🔗
+              - heading "获取专属链接" [level=3] [ref=e401]
+              - paragraph [ref=e402]: 注册后在推广中心生成你的专属邀请链接和二维码海报，分享到微信、微博、知乎、GitHub等任何平台。
+            - generic [ref=e403]: →
+            - generic [ref=e404]:
+              - generic [ref=e405]: 👥
+              - heading "好友注册消费" [level=3] [ref=e406]
+              - paragraph [ref=e407]: 好友通过你的链接注册Teniu.AI，开始使用AI模型。我们提供OpenAI、Claude等40+顶级模型服务。
+            - generic [ref=e408]: →
+            - generic [ref=e409]:
+              - generic [ref=e410]: 💎
+              - heading "坐享持续收益" [level=3] [ref=e411]
+              - paragraph [ref=e412]: 好友每次充值购买Token，你自动获得30%佣金。实时到账，随时提现。只要好友持续使用，你就持续赚钱。
+        - generic [ref=e414]:
+          - generic [ref=e415]: 佣金演示
+          - heading "你的佣金比例，越推越高" [level=2] [ref=e416]
+          - paragraph [ref=e417]: 从10%起步，根据邀请人数逐步升级。
+          - generic [ref=e418]:
+            - generic [ref=e419]:
+              - generic [ref=e420]:
+                - generic [ref=e421]: 🥉
+                - generic [ref=e422]: 10%
+                - generic [ref=e423]: 1-50人
+              - generic [ref=e424]: →
+              - generic [ref=e425]:
+                - generic [ref=e426]: 🥈
+                - generic [ref=e427]: 15%
+                - generic [ref=e428]: 51-150人
+              - generic [ref=e429]: →
+              - generic [ref=e430]:
+                - generic [ref=e431]: 🥇
+                - generic [ref=e432]: 20%
+                - generic [ref=e433]: 151-200人
+              - generic [ref=e434]: →
+              - generic [ref=e435]:
+                - generic [ref=e436]: 💎
+                - generic [ref=e437]: 30%
+                - generic [ref=e438]: 200+人
+            - generic [ref=e439]:
+              - generic [ref=e440]: 👤 用户A (推广者)
+              - generic [ref=e441]:
+                - generic [ref=e442]: 邀请
+                - generic [ref=e443]: 分享专属链接
+              - generic [ref=e444]: 👤 用户B (被邀请者)
+            - generic [ref=e445]:
+              - generic [ref=e446]:
+                - text: 用户B 购买了
+                - strong [ref=e447]: ¥1,000
+                - text: 的AI Token
+              - generic [ref=e448]: 根据当前等级比例自动计算佣金
+            - generic [ref=e449]:
+              - generic [ref=e450]:
+                - generic [ref=e451]: 🥉 铜牌
+                - generic [ref=e452]: ¥100
+                - generic [ref=e453]: 10%
+              - generic [ref=e454]:
+                - generic [ref=e455]: 🥈 银牌
+                - generic [ref=e456]: ¥150
+                - generic [ref=e457]: 15%
+              - generic [ref=e458]:
+                - generic [ref=e459]: 🥇 金牌
+                - generic [ref=e460]: ¥200
+                - generic [ref=e461]: 20%
+              - generic [ref=e462]:
+                - generic [ref=e463]: 💎 钻石
+                - generic [ref=e464]: ¥300
+                - generic [ref=e465]: 30%
+            - generic [ref=e466]: 💡 用户B下个月再消费¥1,000 → 用户A 再获得对应佣金 → 终身循环
+        - generic [ref=e468]:
+          - generic [ref=e469]: 为什么选择我们
+          - heading "推广联盟的独特优势" [level=2] [ref=e470]
+          - paragraph [ref=e471]: 不仅佣金高，我们更关注推广者的长期收益和体验。
+          - generic [ref=e472]:
+            - generic [ref=e473]:
+              - generic [ref=e474]: 🔁
+              - heading "终身绑定 · 永久收益" [level=3] [ref=e475]
+              - paragraph [ref=e476]: 邀请关系一旦建立，永久有效。只要被邀请用户持续使用服务，你就持续获得佣金。没有时间限制，真正的"睡后收入"。
+            - generic [ref=e477]:
+              - generic [ref=e478]: 📈
+              - heading "实时数据 · 透明分账" [level=3] [ref=e479]
+              - paragraph [ref=e480]: 推广中心实时展示每位被邀请用户的消费明细和佣金收入。每一笔佣金都可追溯，公开透明，绝不克扣。
+            - generic [ref=e481]:
+              - generic [ref=e482]: 🎯
+              - heading "精准追踪 · 30天归因" [level=3] [ref=e483]
+              - paragraph [ref=e484]: 用户点击推广链接后，30天内注册都算你的邀请。强大的归因系统确保你不会错过任何一次转化。
+            - generic [ref=e485]:
+              - generic [ref=e486]: 💳
+              - heading "灵活提现 · 低门槛" [level=3] [ref=e487]
+              - paragraph [ref=e488]: 收益满¥100即可提现，支持支付宝、微信、银行卡和USDT。资金安全有保障，到账快。
+            - generic [ref=e489]:
+              - generic [ref=e490]: 🎨
+              - heading "推广素材 · 我们提供" [level=3] [ref=e491]
+              - paragraph [ref=e492]: 免费提供海报模板、宣传文案、产品截图、视频素材等全套推广物料。你只需专注推广，其他交给我们。
+            - generic [ref=e493]:
+              - generic [ref=e494]: 🏆
+              - heading "阶梯奖励 · 越推越赚" [level=3] [ref=e495]
+              - paragraph [ref=e496]: 邀请越多活跃用户，佣金比例越高。从10%起步，最高可达30%。还有季度奖励、年度分红等你来拿。
+        - generic [ref=e498]:
+          - generic [ref=e499]: 等级体系
+          - heading "越推广，越赚钱" [level=2] [ref=e500]
+          - paragraph [ref=e501]: 随着你邀请的活跃用户增长，佣金比例和权益同步升级。
+          - table [ref=e503]:
+            - rowgroup [ref=e504]:
+              - row "等级 活跃邀请数 佣金比例 提现方式 额外权益" [ref=e505]:
+                - columnheader "等级" [ref=e506]
+                - columnheader "活跃邀请数" [ref=e507]
+                - columnheader "佣金比例" [ref=e508]
+                - columnheader "提现方式" [ref=e509]
+                - columnheader "额外权益" [ref=e510]
+            - rowgroup [ref=e511]:
+              - row "🥉 铜牌 1 – 50 人 10% 标准提现 (1-3工作日) 实时数据面板" [ref=e512]:
+                - cell "🥉 铜牌" [ref=e513]:
+                  - generic [ref=e514]: 🥉 铜牌
+                - cell "1 – 50 人" [ref=e515]
+                - cell "10%" [ref=e516]:
+                  - strong [ref=e517]: 10%
+                - cell "标准提现 (1-3工作日)" [ref=e518]
+                - cell "实时数据面板" [ref=e519]
+              - row "🥈 银牌 51 – 150 人 15% 快速提现 (24小时内) 优先客服 · 推广素材包" [ref=e520]:
+                - cell "🥈 银牌" [ref=e521]:
+                  - generic [ref=e522]: 🥈 银牌
+                - cell "51 – 150 人" [ref=e523]
+                - cell "15%" [ref=e524]:
+                  - strong [ref=e525]: 15%
+                - cell "快速提现 (24小时内)" [ref=e526]
+                - cell "优先客服 · 推广素材包" [ref=e527]
+              - row "🥇 金牌 151 – 200 人 20% 即时提现 VIP客服 · 联合品牌 · 季度奖励" [ref=e528]:
+                - cell "🥇 金牌" [ref=e529]:
+                  - generic [ref=e530]: 🥇 金牌
+                - cell "151 – 200 人" [ref=e531]
+                - cell "20%" [ref=e532]:
+                  - strong [ref=e533]: 20%
+                - cell "即时提现" [ref=e534]
+                - cell "VIP客服 · 联合品牌 · 季度奖励" [ref=e535]
+              - row "💎 钻石合伙人 200+ 人 30% 即时提现 专属客户经理 · 年度分红 · 二级推广权" [ref=e536]:
+                - cell "💎 钻石合伙人" [ref=e537]:
+                  - generic [ref=e538]: 💎 钻石合伙人
+                - cell "200+ 人" [ref=e539]
+                - cell "30%" [ref=e540]:
+                  - strong [ref=e541]: 30%
+                - cell "即时提现" [ref=e542]
+                - cell "专属客户经理 · 年度分红 · 二级推广权" [ref=e543]
+        - generic [ref=e545]:
+          - generic [ref=e546]: 真实案例
+          - heading "听听推广者怎么说" [level=2] [ref=e547]
+          - paragraph
+          - generic [ref=e548]:
+            - generic [ref=e549]:
+              - generic [ref=e550]: ★★★★★
+              - paragraph [ref=e551]: 在技术群里分享了邀请链接，没想到效果这么好。一个月邀请了30多个开发者，现在每月被动收入三千多。关键是这些用户一直在用，我的收入也跟着涨。
+              - generic [ref=e552]:
+                - generic [ref=e553]: 张
+                - generic [ref=e554]:
+                  - generic [ref=e555]: 张磊
+                  - generic [ref=e556]: 独立开发者 · 铜牌→银牌
+            - generic [ref=e557]:
+              - generic [ref=e558]: ★★★★★
+              - paragraph [ref=e559]: 录了一期AI工具测评视频，挂上了推广链接。视频火了之后转化了200多用户。现在每个月五位数收入，终身30%佣金真的太香了，比我做广告收入还高。
+              - generic [ref=e560]:
+                - generic [ref=e561]: 李
+                - generic [ref=e562]:
+                  - generic [ref=e563]: 李敏华
+                  - generic [ref=e564]: 科技UP主 · 金牌推广者
+            - generic [ref=e565]:
+              - generic [ref=e566]: ★★★★★
+              - paragraph [ref=e567]: 推荐给3个合作公司后，他们团队都在用Teniu.AI。佣金直接覆盖了我们自己团队的API成本，等于免费使用。这模式对企业用户太友好了。
+              - generic [ref=e568]:
+                - generic [ref=e569]: 王
+                - generic [ref=e570]:
+                  - generic [ref=e571]: 王建国
+                  - generic [ref=e572]: 创业公司CTO
+        - generic [ref=e575]:
+          - generic [ref=e576]: 免费加入
+          - heading "开始建立你的AI收益管道" [level=2] [ref=e577]
+          - paragraph [ref=e578]: 已有 3,200+ 推广者通过 Teniu.AI 获得被动收入。零成本加入，最高终身30%佣金。
+          - link "🚀 免费加入推广联盟" [ref=e580] [cursor=pointer]:
+            - /url: /console/affiliate
+          - paragraph [ref=e581]: 无需任何费用 · 3分钟完成设置 · 最高终身30%佣金
+        - generic [ref=e582]: © 2026 Teniu.AI · 推广联盟计划 · 诚信推广，共建生态
+    - generic [ref=e587]:
+      - generic [ref=e589]: © 2026 Teniu. 版权所有
+      - generic [ref=e590]:
+        - generic [ref=e591]: 设计与开发由
+        - link "Teniu" [ref=e592] [cursor=pointer]:
+          - /url: https://github.com/liuyaaixxa/xnew-api

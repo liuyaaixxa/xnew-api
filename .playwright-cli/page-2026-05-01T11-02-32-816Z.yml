@@ -1,0 +1,15 @@
+- generic [ref=e3]:
+  - generic [ref=e7]:
+    - link "logo" [ref=e9] [cursor=pointer]:
+      - /url: /
+      - img "logo" [ref=e12]
+    - navigation [ref=e17]
+    - generic [ref=e30]:
+      - button "系统公告" [ref=e31] [cursor=pointer]:
+        - img [ref=e33]
+      - button "切换主题" [ref=e36] [cursor=pointer]:
+        - img [ref=e38]
+      - button "common.changeLanguage" [ref=e40] [cursor=pointer]:
+        - img [ref=e42]
+  - main [ref=e54]:
+    - img [ref=e58]
