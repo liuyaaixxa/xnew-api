@@ -41,7 +41,6 @@ func SetRouter(router *gin.Engine, buildFS embed.FS, indexPage []byte, inviteAss
 
 // SetAffiliateInviteRouter registers invite page routes. Must be called before SetWebRouter.
 func SetAffiliateInviteRouter(router *gin.Engine, assetFS embed.FS) {
-	// QR code JS asset — served via explicit route to avoid static middleware ordering issues
 	router.GET("/invite/assets/*filepath", func(c *gin.Context) {
 		filepath := c.Param("filepath")
 		if len(filepath) > 0 && filepath[0] == '/' {
@@ -52,8 +51,17 @@ func SetAffiliateInviteRouter(router *gin.Engine, assetFS embed.FS) {
 			c.String(http.StatusNotFound, "not found")
 			return
 		}
+		contentType := "application/octet-stream"
+		switch {
+		case strings.HasSuffix(filepath, ".css"):
+			contentType = "text/css; charset=utf-8"
+		case strings.HasSuffix(filepath, ".js"):
+			contentType = "application/javascript; charset=utf-8"
+		case strings.HasSuffix(filepath, ".woff2"):
+			contentType = "font/woff2"
+		}
 		c.Header("Cache-Control", "public, max-age=86400")
-		c.Data(http.StatusOK, "application/javascript; charset=utf-8", data)
+		c.Data(http.StatusOK, contentType, data)
 	})
 
 	// Versioned invite pages (v1, v2, v3)

@@ -44,7 +44,7 @@ var indexPage []byte
 //go:embed web/templates/*.html
 var inviteTemplateFS embed.FS
 
-//go:embed web/templates/assets/*.js
+//go:embed web/templates/assets/*
 var inviteAssetFS embed.FS
 
 func main() {
