@@ -485,10 +485,14 @@ func GetAffiliateLink(c *gin.Context) {
 
 // ─── Public promotion endpoint ───
 
-// GetPublicPromotions returns enabled promotions (no auth required).
+// GetPublicPromotions returns enabled promotions with the default aff_code (no auth required).
 func GetPublicPromotions(c *gin.Context) {
 	promotions := model.GetEnabledPromotions()
-	common.ApiSuccess(c, promotions)
+	defaultAff := getDefaultAffCode()
+	common.ApiSuccess(c, gin.H{
+		"promotions":       promotions,
+		"default_aff_code": defaultAff,
+	})
 }
 
 // ─── Admin promotion management ───

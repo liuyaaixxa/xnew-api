@@ -25,6 +25,7 @@ const FALLBACK_SLIDES = [
 
 export default function StoreCarousel() {
   const [slides, setSlides] = useState(FALLBACK_SLIDES);
+  const [defaultAff, setDefaultAff] = useState('');
   const navigate = useNavigate();
   const fetched = useRef(false);
 
@@ -34,9 +35,15 @@ export default function StoreCarousel() {
     fetch('/api/affiliate/public-promotions')
       .then((r) => r.json())
       .then((data) => {
-        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
-          const active = data.data.filter((p) => p.enabled);
-          if (active.length > 0) setSlides(active);
+        if (data.success) {
+          if (data.data.default_aff_code) {
+            setDefaultAff(data.data.default_aff_code);
+          }
+          const list = data.data.promotions || data.data;
+          if (Array.isArray(list) && list.length > 0) {
+            const active = list.filter((p) => p.enabled);
+            if (active.length > 0) setSlides(active);
+          }
         }
       })
       .catch(() => {
@@ -46,10 +53,14 @@ export default function StoreCarousel() {
 
   const handleSlideClick = (path) => {
     if (!path) return;
-    if (path.startsWith('http')) {
-      window.open(path, '_blank');
+    let url = path;
+    if (defaultAff && !url.includes('?aff=')) {
+      url += (url.includes('?') ? '&' : '?') + 'aff=' + defaultAff;
+    }
+    if (url.startsWith('http')) {
+      window.open(url, '_blank');
     } else {
-      navigate(path);
+      navigate(url);
     }
   };
 
