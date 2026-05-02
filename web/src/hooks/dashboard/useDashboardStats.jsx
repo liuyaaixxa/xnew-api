@@ -31,7 +31,7 @@ import {
   IconGift,
   IconServer,
 } from '@douyinfe/semi-icons';
-import { renderQuota } from '../../helpers';
+import { renderQuota } from '../../helpers/render';
 import { createSectionTitle } from '../../helpers/dashboard';
 
 export const useDashboardStats = (

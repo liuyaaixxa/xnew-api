@@ -29,7 +29,7 @@ import {
   Badge,
   Tooltip,
 } from '@douyinfe/semi-ui';
-import { renderQuota } from '../../../helpers';
+import { renderQuota } from '../../../helpers/render';
 import { convertUSDToCurrency } from '../../../helpers/render';
 
 const { Text } = Typography;

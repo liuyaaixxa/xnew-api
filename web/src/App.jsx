@@ -20,43 +20,45 @@ For commercial licensing, please contact support@quantumnous.com
 import React, { lazy, Suspense, useContext, useMemo } from 'react';
 import { Route, Routes, useLocation, useParams } from 'react-router-dom';
 import Loading from './components/common/ui/Loading';
-import User from './pages/User';
 import { AuthRedirect, PrivateRoute, AdminRoute, HomeRedirect } from './helpers';
-import RegisterForm from './components/auth/RegisterForm';
-import LoginForm from './components/auth/LoginForm';
-import NotFound from './pages/NotFound';
-import Forbidden from './pages/Forbidden';
-import Setting from './pages/Setting';
 import { StatusContext } from './context/Status';
-
-import PasswordResetForm from './components/auth/PasswordResetForm';
-import PasswordResetConfirm from './components/auth/PasswordResetConfirm';
-import Channel from './pages/Channel';
-import UserChannel from './pages/UserChannel';
-import UserChannelReview from './pages/UserChannelReview';
-import Token from './pages/Token';
-import Redemption from './pages/Redemption';
-import TopUp from './pages/TopUp';
-import TopUpAdmin from './pages/TopUpAdmin';
-import AdminAffiliate from './pages/AdminAffiliate';
-import AdminModelMarket from './pages/AdminModelMarket';
-import Log from './pages/Log';
-import Chat from './pages/Chat';
-import Chat2Link from './pages/Chat2Link';
-import Midjourney from './pages/Midjourney';
-import Pricing from './pages/Pricing';
-import Task from './pages/Task';
-import ModelPage from './pages/Model';
-import ModelDeploymentPage from './pages/ModelDeployment';
-import Playground from './pages/Playground';
-import Subscription from './pages/Subscription';
-import Wallet from './pages/Wallet';
-import Treasury from './pages/Treasury';
-import OAuth2Callback from './components/auth/OAuth2Callback';
-import PersonalSetting from './components/settings/PersonalSetting';
-import Setup from './pages/Setup';
 import SetupCheck from './components/layout/SetupCheck';
 
+// ── Eager: needed for DynamicOAuth2Callback wrapper ──
+import OAuth2Callback from './components/auth/OAuth2Callback';
+
+// ── Lazy: page / feature components ──
+const User = lazy(() => import('./pages/User'));
+const RegisterForm = lazy(() => import('./components/auth/RegisterForm'));
+const LoginForm = lazy(() => import('./components/auth/LoginForm'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const Forbidden = lazy(() => import('./pages/Forbidden'));
+const Setting = lazy(() => import('./pages/Setting'));
+const PasswordResetForm = lazy(() => import('./components/auth/PasswordResetForm'));
+const PasswordResetConfirm = lazy(() => import('./components/auth/PasswordResetConfirm'));
+const Channel = lazy(() => import('./pages/Channel'));
+const UserChannel = lazy(() => import('./pages/UserChannel'));
+const UserChannelReview = lazy(() => import('./pages/UserChannelReview'));
+const Token = lazy(() => import('./pages/Token'));
+const Redemption = lazy(() => import('./pages/Redemption'));
+const TopUp = lazy(() => import('./pages/TopUp'));
+const TopUpAdmin = lazy(() => import('./pages/TopUpAdmin'));
+const AdminAffiliate = lazy(() => import('./pages/AdminAffiliate'));
+const AdminModelMarket = lazy(() => import('./pages/AdminModelMarket'));
+const Log = lazy(() => import('./pages/Log'));
+const Chat = lazy(() => import('./pages/Chat'));
+const Chat2Link = lazy(() => import('./pages/Chat2Link'));
+const Midjourney = lazy(() => import('./pages/Midjourney'));
+const Pricing = lazy(() => import('./pages/Pricing'));
+const Task = lazy(() => import('./pages/Task'));
+const ModelPage = lazy(() => import('./pages/Model'));
+const ModelDeploymentPage = lazy(() => import('./pages/ModelDeployment'));
+const Playground = lazy(() => import('./pages/Playground'));
+const Subscription = lazy(() => import('./pages/Subscription'));
+const Wallet = lazy(() => import('./pages/Wallet'));
+const Treasury = lazy(() => import('./pages/Treasury'));
+const PersonalSetting = lazy(() => import('./components/settings/PersonalSetting'));
+const Setup = lazy(() => import('./pages/Setup'));
 const Home = lazy(() => import('./pages/Home/index_v2'));
 const Store = lazy(() => import('./pages/Store'));
 const ModelMarket = lazy(() => import('./pages/ModelMarket'));
@@ -81,26 +83,21 @@ function App() {
   const location = useLocation();
   const [statusState] = useContext(StatusContext);
 
-  // 获取模型广场权限配置
   const pricingRequireAuth = useMemo(() => {
     const headerNavModulesConfig = statusState?.status?.HeaderNavModules;
     if (headerNavModulesConfig) {
       try {
         const modules = JSON.parse(headerNavModulesConfig);
-
-        // 处理向后兼容性：如果pricing是boolean，默认不需要登录
         if (typeof modules.pricing === 'boolean') {
-          return false; // 默认不需要登录鉴权
+          return false;
         }
-
-        // 如果是对象格式，使用requireAuth配置
         return modules.pricing?.requireAuth === true;
       } catch (error) {
         console.error('解析顶栏模块配置失败:', error);
-        return false; // 默认不需要登录
+        return false;
       }
     }
-    return false; // 默认不需要登录
+    return false;
   }, [statusState?.status?.HeaderNavModules]);
 
   return (
@@ -110,7 +107,7 @@ function App() {
           path='/'
           element={
             <HomeRedirect>
-              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Suspense fallback={<Loading />} key={location.pathname}>
                 <Store />
               </Suspense>
             </HomeRedirect>
@@ -119,17 +116,26 @@ function App() {
         <Route
           path='/setup'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <Setup />
             </Suspense>
           }
         />
-        <Route path='/forbidden' element={<Forbidden />} />
+        <Route
+          path='/forbidden'
+          element={
+            <Suspense fallback={<Loading />}>
+              <Forbidden />
+            </Suspense>
+          }
+        />
         <Route
           path='/console/models'
           element={
             <AdminRoute>
-              <ModelPage />
+              <Suspense fallback={<Loading />}>
+                <ModelPage />
+              </Suspense>
             </AdminRoute>
           }
         />
@@ -137,7 +143,9 @@ function App() {
           path='/console/deployment'
           element={
             <AdminRoute>
-              <ModelDeploymentPage />
+              <Suspense fallback={<Loading />}>
+                <ModelDeploymentPage />
+              </Suspense>
             </AdminRoute>
           }
         />
@@ -145,7 +153,9 @@ function App() {
           path='/console/subscription'
           element={
             <AdminRoute>
-              <Subscription />
+              <Suspense fallback={<Loading />}>
+                <Subscription />
+              </Suspense>
             </AdminRoute>
           }
         />
@@ -153,7 +163,9 @@ function App() {
           path='/console/channel'
           element={
             <AdminRoute>
-              <Channel />
+              <Suspense fallback={<Loading />}>
+                <Channel />
+              </Suspense>
             </AdminRoute>
           }
         />
@@ -161,7 +173,9 @@ function App() {
           path='/console/user-channel'
           element={
             <PrivateRoute>
-              <UserChannel />
+              <Suspense fallback={<Loading />}>
+                <UserChannel />
+              </Suspense>
             </PrivateRoute>
           }
         />
@@ -169,7 +183,9 @@ function App() {
           path='/console/user-channel-review'
           element={
             <AdminRoute>
-              <UserChannelReview />
+              <Suspense fallback={<Loading />}>
+                <UserChannelReview />
+              </Suspense>
             </AdminRoute>
           }
         />
@@ -177,7 +193,9 @@ function App() {
           path='/console/token'
           element={
             <PrivateRoute>
-              <Token />
+              <Suspense fallback={<Loading />}>
+                <Token />
+              </Suspense>
             </PrivateRoute>
           }
         />
@@ -185,7 +203,9 @@ function App() {
           path='/console/playground'
           element={
             <PrivateRoute>
-              <Playground />
+              <Suspense fallback={<Loading />}>
+                <Playground />
+              </Suspense>
             </PrivateRoute>
           }
         />
@@ -193,7 +213,9 @@ function App() {
           path='/console/redemption'
           element={
             <AdminRoute>
-              <Redemption />
+              <Suspense fallback={<Loading />}>
+                <Redemption />
+              </Suspense>
             </AdminRoute>
           }
         />
@@ -201,7 +223,9 @@ function App() {
           path='/console/topup-admin'
           element={
             <AdminRoute>
-              <TopUpAdmin />
+              <Suspense fallback={<Loading />}>
+                <TopUpAdmin />
+              </Suspense>
             </AdminRoute>
           }
         />
@@ -209,7 +233,7 @@ function App() {
           path='/console/affiliate-admin'
           element={
             <AdminRoute>
-              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Suspense fallback={<Loading />} key={location.pathname}>
                 <AdminAffiliate />
               </Suspense>
             </AdminRoute>
@@ -219,7 +243,7 @@ function App() {
           path='/console/model-market-admin'
           element={
             <AdminRoute>
-              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Suspense fallback={<Loading />} key={location.pathname}>
                 <AdminModelMarket />
               </Suspense>
             </AdminRoute>
@@ -229,14 +253,16 @@ function App() {
           path='/console/user'
           element={
             <AdminRoute>
-              <User />
+              <Suspense fallback={<Loading />}>
+                <User />
+              </Suspense>
             </AdminRoute>
           }
         />
         <Route
           path='/user/reset'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <PasswordResetConfirm />
             </Suspense>
           }
@@ -244,7 +270,7 @@ function App() {
         <Route
           path='/login'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <AuthRedirect>
                 <LoginForm />
               </AuthRedirect>
@@ -254,7 +280,7 @@ function App() {
         <Route
           path='/register'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <AuthRedirect>
                 <RegisterForm />
               </AuthRedirect>
@@ -264,7 +290,7 @@ function App() {
         <Route
           path='/reset'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <PasswordResetForm />
             </Suspense>
           }
@@ -272,47 +298,15 @@ function App() {
         <Route
           path='/desktop-auth'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <DesktopAuth />
-            </Suspense>
-          }
-        />
-        <Route
-          path='/oauth/github'
-          element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
-              <OAuth2Callback type='github'></OAuth2Callback>
-            </Suspense>
-          }
-        />
-        <Route
-          path='/oauth/discord'
-          element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
-              <OAuth2Callback type='discord'></OAuth2Callback>
-            </Suspense>
-          }
-        />
-        <Route
-          path='/oauth/oidc'
-          element={
-            <Suspense fallback={<Loading></Loading>}>
-              <OAuth2Callback type='oidc'></OAuth2Callback>
-            </Suspense>
-          }
-        />
-        <Route
-          path='/oauth/linuxdo'
-          element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
-              <OAuth2Callback type='linuxdo'></OAuth2Callback>
             </Suspense>
           }
         />
         <Route
           path='/oauth/:provider'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <DynamicOAuth2Callback />
             </Suspense>
           }
@@ -321,7 +315,7 @@ function App() {
           path='/console/setting'
           element={
             <AdminRoute>
-              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Suspense fallback={<Loading />} key={location.pathname}>
                 <Setting />
               </Suspense>
             </AdminRoute>
@@ -331,7 +325,7 @@ function App() {
           path='/console/personal'
           element={
             <PrivateRoute>
-              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Suspense fallback={<Loading />} key={location.pathname}>
                 <PersonalSetting />
               </Suspense>
             </PrivateRoute>
@@ -341,7 +335,7 @@ function App() {
           path='/console/topup'
           element={
             <PrivateRoute>
-              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Suspense fallback={<Loading />} key={location.pathname}>
                 <TopUp />
               </Suspense>
             </PrivateRoute>
@@ -351,7 +345,7 @@ function App() {
           path='/console/wallet'
           element={
             <PrivateRoute>
-              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Suspense fallback={<Loading />} key={location.pathname}>
                 <Wallet />
               </Suspense>
             </PrivateRoute>
@@ -361,7 +355,7 @@ function App() {
           path='/console/treasury'
           element={
             <AdminRoute>
-              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Suspense fallback={<Loading />} key={location.pathname}>
                 <Treasury />
               </Suspense>
             </AdminRoute>
@@ -371,7 +365,9 @@ function App() {
           path='/console/log'
           element={
             <PrivateRoute>
-              <Log />
+              <Suspense fallback={<Loading />}>
+                <Log />
+              </Suspense>
             </PrivateRoute>
           }
         />
@@ -379,7 +375,7 @@ function App() {
           path='/console'
           element={
             <PrivateRoute>
-              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Suspense fallback={<Loading />} key={location.pathname}>
                 <Dashboard />
               </Suspense>
             </PrivateRoute>
@@ -389,7 +385,7 @@ function App() {
           path='/console/midjourney'
           element={
             <PrivateRoute>
-              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Suspense fallback={<Loading />} key={location.pathname}>
                 <Midjourney />
               </Suspense>
             </PrivateRoute>
@@ -399,7 +395,7 @@ function App() {
           path='/console/task'
           element={
             <PrivateRoute>
-              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Suspense fallback={<Loading />} key={location.pathname}>
                 <Task />
               </Suspense>
             </PrivateRoute>
@@ -410,15 +406,12 @@ function App() {
           element={
             pricingRequireAuth ? (
               <PrivateRoute>
-                <Suspense
-                  fallback={<Loading></Loading>}
-                  key={location.pathname}
-                >
+                <Suspense fallback={<Loading />} key={location.pathname}>
                   <Pricing />
                 </Suspense>
               </PrivateRoute>
             ) : (
-              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Suspense fallback={<Loading />} key={location.pathname}>
                 <Pricing />
               </Suspense>
             )
@@ -427,7 +420,7 @@ function App() {
         <Route
           path='/about'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <About />
             </Suspense>
           }
@@ -435,7 +428,7 @@ function App() {
         <Route
           path='/user-agreement'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <UserAgreement />
             </Suspense>
           }
@@ -443,7 +436,7 @@ function App() {
         <Route
           path='/privacy-policy'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <PrivacyPolicy />
             </Suspense>
           }
@@ -451,7 +444,7 @@ function App() {
         <Route
           path='/privacy'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <LandingPrivacy />
             </Suspense>
           }
@@ -459,7 +452,7 @@ function App() {
         <Route
           path='/tos'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <TermsOfService />
             </Suspense>
           }
@@ -467,7 +460,7 @@ function App() {
         <Route
           path='/docs'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <Docs />
             </Suspense>
           }
@@ -475,17 +468,16 @@ function App() {
         <Route
           path='/console/chat/:id?'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <Chat />
             </Suspense>
           }
         />
-        {/* 方便使用chat2link直接跳转聊天... */}
         <Route
           path='/chat2link'
           element={
             <PrivateRoute>
-              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Suspense fallback={<Loading />} key={location.pathname}>
                 <Chat2Link />
               </Suspense>
             </PrivateRoute>
@@ -494,7 +486,7 @@ function App() {
         <Route
           path='/compute-pool'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <Home />
             </Suspense>
           }
@@ -502,7 +494,7 @@ function App() {
         <Route
           path='/store'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <Store />
             </Suspense>
           }
@@ -510,7 +502,7 @@ function App() {
         <Route
           path='/model-market'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <ModelMarket />
             </Suspense>
           }
@@ -518,7 +510,7 @@ function App() {
         <Route
           path='/affiliate'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <AffiliateLanding />
             </Suspense>
           }
@@ -526,7 +518,7 @@ function App() {
         <Route
           path='/invite'
           element={
-            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+            <Suspense fallback={<Loading />} key={location.pathname}>
               <AffiliateInvite />
             </Suspense>
           }
@@ -535,13 +527,20 @@ function App() {
           path='/console/affiliate'
           element={
             <PrivateRoute>
-              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Suspense fallback={<Loading />} key={location.pathname}>
                 <AffiliateDashboard />
               </Suspense>
             </PrivateRoute>
           }
         />
-        <Route path='*' element={<NotFound />} />
+        <Route
+          path='*'
+          element={
+            <Suspense fallback={<Loading />}>
+              <NotFound />
+            </Suspense>
+          }
+        />
       </Routes>
     </SetupCheck>
   );

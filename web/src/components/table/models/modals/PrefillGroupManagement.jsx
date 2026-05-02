@@ -35,12 +35,8 @@ import {
   IllustrationNoResult,
   IllustrationNoResultDark,
 } from '@douyinfe/semi-illustrations';
-import {
-  API,
-  showError,
-  showSuccess,
-  stringToColor,
-} from '../../../../helpers';
+import { API, showError, showSuccess } from '../../../../helpers';
+import { stringToColor } from '../../../../helpers/render';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '../../../../hooks/common/useIsMobile';
 import CardTable from '../../../common/ui/CardTable';

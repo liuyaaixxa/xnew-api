@@ -18,16 +18,8 @@ For commercial licensing, please contact support@quantumnous.com
 */
 
 import React, { useEffect, useState, useContext, useRef } from 'react';
-import {
-  API,
-  showError,
-  showSuccess,
-  timestamp2string,
-  renderGroupOption,
-  renderQuotaWithPrompt,
-  getModelCategories,
-  selectFilter,
-} from '../../../../helpers';
+import { API, showError, showSuccess, timestamp2string, selectFilter } from '../../../../helpers';
+import { renderGroupOption, getModelCategories, renderQuotaWithPrompt } from '../../../../helpers/render';
 import { useIsMobile } from '../../../../hooks/common/useIsMobile';
 import {
   Button,

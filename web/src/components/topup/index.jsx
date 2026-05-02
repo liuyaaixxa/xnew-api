@@ -19,16 +19,8 @@ For commercial licensing, please contact support@quantumnous.com
 
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import {
-  API,
-  showError,
-  showInfo,
-  showSuccess,
-  renderQuota,
-  renderQuotaWithAmount,
-  copy,
-  getQuotaPerUnit,
-} from '../../helpers';
+import { API, showError, showInfo, showSuccess, copy } from '../../helpers';
+import { renderQuota, renderQuotaWithAmount, getQuotaPerUnit } from '../../helpers/render';
 import { Modal, Toast } from '@douyinfe/semi-ui';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../context/User';

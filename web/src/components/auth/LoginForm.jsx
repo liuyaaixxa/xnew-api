@@ -21,25 +21,8 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { UserContext } from '../../context/User';
 import { StatusContext } from '../../context/Status';
-import {
-  API,
-  getLogo,
-  showError,
-  showInfo,
-  showSuccess,
-  updateAPI,
-  getSystemName,
-  getOAuthProviderIcon,
-  setUserData,
-  onGitHubOAuthClicked,
-  onDiscordOAuthClicked,
-  onOIDCClicked,
-  onLinuxDOOAuthClicked,
-  onCustomOAuthClicked,
-  prepareCredentialRequestOptions,
-  buildAssertionResult,
-  isPasskeySupported,
-} from '../../helpers';
+import { API, getLogo, showError, showInfo, showSuccess, updateAPI, getSystemName, setUserData, onGitHubOAuthClicked, onDiscordOAuthClicked, onOIDCClicked, onLinuxDOOAuthClicked, onCustomOAuthClicked, prepareCredentialRequestOptions, buildAssertionResult, isPasskeySupported } from '../../helpers';
+import { getOAuthProviderIcon } from '../../helpers/render';
 import CaptchaWidget from '../common/CaptchaWidget';
 import {
   Button,
