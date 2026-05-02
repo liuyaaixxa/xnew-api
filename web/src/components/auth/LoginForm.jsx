@@ -42,6 +42,7 @@ import {
   IconMail,
   IconLock,
   IconKey,
+  IconTick,
 } from '@douyinfe/semi-icons';
 import OIDCIcon from '../common/logo/OIDCIcon';
 import WeChatIcon from '../common/logo/WeChatIcon';
@@ -88,6 +89,7 @@ const LoginForm = () => {
   const [passkeySupported, setPasskeySupported] = useState(false);
   const [passkeyLoading, setPasskeyLoading] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
   const [hasUserAgreement, setHasUserAgreement] = useState(false);
   const [hasPrivacyPolicy, setHasPrivacyPolicy] = useState(false);
   const [githubButtonState, setGithubButtonState] = useState('idle');
@@ -797,15 +799,16 @@ const LoginForm = () => {
                   <Button
                     theme='solid'
                     className='w-full !rounded-full'
-                    type='primary'
+                    type={captchaEnabled && captchaVerified ? 'success' : 'primary'}
                     htmlType='submit'
                     onClick={handleSubmit}
                     loading={loginLoading}
                     disabled={
                       (hasUserAgreement || hasPrivacyPolicy) && !agreedToTerms
                     }
+                    icon={captchaEnabled && captchaVerified ? <IconTick /> : null}
                   >
-                    {t('继续')}
+                    {captchaEnabled && captchaVerified ? t('验证通过，继续') : t('继续')}
                   </Button>
 
                   <Button
@@ -963,6 +966,7 @@ const LoginForm = () => {
             ref={captchaRef}
             provider={captchaProvider}
             turnstileSiteKey={turnstileSiteKey}
+            onVerifiedChange={setCaptchaVerified}
           />
         )}
         </div>

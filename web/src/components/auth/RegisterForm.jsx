@@ -39,6 +39,7 @@ import {
   IconUser,
   IconLock,
   IconKey,
+  IconTick,
 } from '@douyinfe/semi-icons';
 import {
   onGitHubOAuthClicked,
@@ -94,6 +95,7 @@ const RegisterForm = () => {
   const [disableButton, setDisableButton] = useState(false);
   const [countdown, setCountdown] = useState(30);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
   const [hasUserAgreement, setHasUserAgreement] = useState(false);
   const [hasPrivacyPolicy, setHasPrivacyPolicy] = useState(false);
   const [githubButtonState, setGithubButtonState] = useState('idle');
@@ -676,15 +678,16 @@ const RegisterForm = () => {
                   <Button
                     theme='solid'
                     className='w-full !rounded-full'
-                    type='primary'
+                    type={captchaEnabled && captchaVerified ? 'success' : 'primary'}
                     htmlType='submit'
                     onClick={handleSubmit}
                     loading={registerLoading}
                     disabled={
                       (hasUserAgreement || hasPrivacyPolicy) && !agreedToTerms
                     }
+                    icon={captchaEnabled && captchaVerified ? <IconTick /> : null}
                   >
-                    {t('注册')}
+                    {captchaEnabled && captchaVerified ? t('验证通过，注册') : t('注册')}
                   </Button>
                 </div>
               </Form>
@@ -791,6 +794,7 @@ const RegisterForm = () => {
             ref={captchaRef}
             provider={captchaProvider}
             turnstileSiteKey={turnstileSiteKey}
+            onVerifiedChange={setCaptchaVerified}
           />
         )}
         </div>

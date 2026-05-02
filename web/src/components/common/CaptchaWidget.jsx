@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useImperativeHandle, forwardRef, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Input, Button, Spin } from '@douyinfe/semi-ui';
-import { IconRefresh } from '@douyinfe/semi-icons';
+import { IconRefresh, IconTick } from '@douyinfe/semi-icons';
 import Turnstile from 'react-turnstile';
 import GoCaptcha from 'go-captcha-react';
 import { API } from '../../helpers';
 
-const CaptchaWidget = forwardRef(({ provider, turnstileSiteKey, onVerify }, ref) => {
+const CaptchaWidget = forwardRef(({ provider, turnstileSiteKey, onVerifiedChange }, ref) => {
   const { t } = useTranslation();
   const [captchaId, setCaptchaId] = useState('');
   const [captchaValue, setCaptchaValue] = useState('');
@@ -15,11 +15,14 @@ const CaptchaWidget = forwardRef(({ provider, turnstileSiteKey, onVerify }, ref)
   const [turnstileToken, setTurnstileToken] = useState('');
   const [slideData, setSlideData] = useState(null);
   const [slidePoint, setSlidePoint] = useState(null);
+  const [verified, setVerified] = useState(false);
   const slideRef = useRef(null);
   const fetchCaptcha = useCallback(async () => {
     setLoading(true);
     setCaptchaValue('');
     setSlidePoint(null);
+    setVerified(false);
+    if (onVerifiedChange) onVerifiedChange(false);
     try {
       const res = await API.get('/api/captcha');
       if (res.data?.success) {
@@ -44,7 +47,7 @@ const CaptchaWidget = forwardRef(({ provider, turnstileSiteKey, onVerify }, ref)
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [onVerifiedChange]);
 
   useEffect(() => {
     if (provider === 'builtin' || provider === 'slide') {
@@ -118,6 +121,16 @@ const CaptchaWidget = forwardRef(({ provider, turnstileSiteKey, onVerify }, ref)
   }
 
   if (provider === 'slide') {
+    if (verified) {
+      return (
+        <div className='flex flex-col items-center mt-4'>
+          <div className='flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-green-500 bg-green-50 dark:bg-green-950'>
+            <IconTick size='large' style={{ color: '#22c55e' }} />
+            <span className='text-green-600 dark:text-green-400 font-semibold text-sm'>{t('验证通过')}</span>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className='flex flex-col items-center mt-4'>
         {loading || !slideData ? (
@@ -130,6 +143,8 @@ const CaptchaWidget = forwardRef(({ provider, turnstileSiteKey, onVerify }, ref)
             events={{
               confirm: (point) => {
                 setSlidePoint(point);
+                setVerified(true);
+                if (onVerifiedChange) onVerifiedChange(true);
               },
               refresh: () => {
                 fetchCaptcha();
@@ -143,13 +158,24 @@ const CaptchaWidget = forwardRef(({ provider, turnstileSiteKey, onVerify }, ref)
 
   // Turnstile mode (explicit "turnstile" or legacy empty with turnstile_check enabled)
   if (provider === 'turnstile' || (!provider && turnstileSiteKey)) {
+    if (verified) {
+      return (
+        <div className='flex justify-center mt-6'>
+          <div className='flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-green-500 bg-green-50 dark:bg-green-950'>
+            <IconTick size='large' style={{ color: '#22c55e' }} />
+            <span className='text-green-600 dark:text-green-400 font-semibold text-sm'>{t('验证通过')}</span>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className='flex justify-center mt-6'>
         <Turnstile
           sitekey={turnstileSiteKey}
           onVerify={(token) => {
             setTurnstileToken(token);
-            if (onVerify) onVerify({ turnstile: token });
+            setVerified(true);
+            if (onVerifiedChange) onVerifiedChange(true);
           }}
         />
       </div>
