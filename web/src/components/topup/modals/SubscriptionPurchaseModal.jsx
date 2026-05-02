@@ -32,7 +32,6 @@ import { Crown, CalendarClock, Package, CreditCard } from 'lucide-react';
 import { SiStripe, SiPaypal, SiAlipay, SiWechat } from 'react-icons/si';
 import { IconCreditCard } from '@douyinfe/semi-icons';
 import { renderQuota } from '../../../helpers';
-import { getCurrencyConfig } from '../../../helpers/render';
 import {
   formatSubscriptionDuration,
   formatSubscriptionResetPeriod,
@@ -72,9 +71,24 @@ const SubscriptionPurchaseModal = ({
 }) => {
   const plan = selectedPlan?.plan;
   const totalAmount = Number(plan?.total_amount || 0);
-  const { symbol, rate } = getCurrencyConfig();
   const price = plan ? Number(plan.price_amount || 0) : 0;
-  const convertedPrice = price * rate;
+
+  // 只有微信/支付宝需要汇率转换为人民币显示，PayPal/Stripe 直接显示 USD
+  const needsRateConversion =
+    selectedPayMethod === 'alipay' || selectedPayMethod === 'wxpay';
+  const cnyRate = (() => {
+    if (!needsRateConversion) return 1;
+    try {
+      const statusStr = localStorage.getItem('status');
+      if (statusStr) {
+        const s = JSON.parse(statusStr);
+        return parseFloat(s?.usd_exchange_rate) || 7;
+      }
+    } catch (e) {}
+    return 7;
+  })();
+  const convertedPrice = needsRateConversion ? price * cnyRate : price;
+  const symbol = needsRateConversion ? '¥' : '$';
   const displayPrice = convertedPrice.toFixed(
     Number.isInteger(convertedPrice) ? 0 : 2,
   );

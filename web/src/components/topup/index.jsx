@@ -77,9 +77,6 @@ const TopUp = () => {
   const [waffoPayMethods, setWaffoPayMethods] = useState([]);
   const [waffoMinTopUp, setWaffoMinTopUp] = useState(1);
 
-  // PayPal 相关状态
-  const [enablePayPalTopUp, setEnablePayPalTopUp] = useState(false);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
   const [payWay, setPayWay] = useState('');
@@ -167,7 +164,7 @@ const TopUp = () => {
         return;
       }
     } else if (payment === 'paypal') {
-      // PayPal 支付直接跳转，不需要确认模态框
+      // PayPal 支付直接跳转到 PayPal 页面，不需要确认模态框
       if (topUpCount < minTopUp) {
         showError(t('充值数量不能小于') + minTopUp);
         return;
@@ -528,10 +525,6 @@ const TopUp = () => {
           setWaffoPayMethods(data.waffo_pay_methods || []);
           setWaffoMinTopUp(data.waffo_min_topup || 1);
 
-          // PayPal 状态
-          const enablePayPalTopUpVal = data.enable_paypal_topup || false;
-          setEnablePayPalTopUp(enablePayPalTopUpVal);
-
           setMinTopUp(minTopUpValue);
           setTopUpCount(minTopUpValue);
 
@@ -658,6 +651,9 @@ const TopUp = () => {
   }, [statusState?.status]);
 
   const renderAmount = () => {
+    if (payWay === 'paypal') {
+      return '$' + (topUpCount || 0).toFixed(2);
+    }
     return amount + ' ' + t('元');
   };
 

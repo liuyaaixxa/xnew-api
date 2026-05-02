@@ -315,7 +315,7 @@ export default function SettingsPaymentGateway(props) {
           <Form.TextArea
             field='PayMethods'
             label={t('充值方式设置')}
-            placeholder={t('为一个 JSON 文本')}
+            placeholder={t('为一个 JSON 文本，支持类型: alipay(支付宝), wxpay(微信), paypal(PayPal), stripe, custom。例如: [{"name":"支付宝","type":"alipay","color":"#1677FF","min_topup":1},{"name":"微信支付","type":"wxpay","color":"#07C160","min_topup":1},{"name":"PayPal","type":"paypal","color":"#003087","min_topup":1}]')}
             autosize
           />
 

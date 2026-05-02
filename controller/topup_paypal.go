@@ -60,25 +60,8 @@ func RequestPayPalPay(c *gin.Context) {
 		return
 	}
 
-	// 计算实际支付金额（考虑分组倍率）
-	group, err := model.GetUserGroup(userId, true)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"message": "获取用户分组失败",
-		})
-		return
-	}
-
-	// 使用与易支付相同的金额计算逻辑
-	payMoney := getPayMoney(int64(req.Amount), group)
-	if payMoney < 0.01 {
-		c.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"message": "充值金额过低",
-		})
-		return
-	}
+	// PayPal 本身就是美元结算，直接使用充值数量作为美元金额，不做汇率转换
+	payMoney := float64(req.Amount)
 
 	// 生成订单号
 	tradeNo := fmt.Sprintf("PP%d%s%d", userId, uuid.New().String()[:8], time.Now().UnixMilli())
@@ -97,8 +80,9 @@ func RequestPayPalPay(c *gin.Context) {
 		Amount:        amount,
 		Money:         payMoney,
 		TradeNo:       tradeNo,
-		PaymentMethod: "paypal",
-		Status:        common.TopUpStatusPending,
+		PaymentMethod:   "paypal",
+		PaymentProvider: model.PaymentProviderPayPal,
+		Status:          common.TopUpStatusPending,
 		CreateTime:    time.Now().Unix(),
 	}
 	if err := topUp.Insert(); err != nil {
@@ -418,7 +402,7 @@ func PayPalReturn(c *gin.Context) {
 			// 订阅订单处理
 			subOrder := model.GetSubscriptionOrderByTradeNo(tradeNo)
 			if subOrder != nil && subOrder.Status == common.TopUpStatusPending {
-				if err := model.CompleteSubscriptionOrder(tradeNo, orderId); err != nil {
+				if err := model.CompleteSubscriptionOrder(tradeNo, orderId, model.PaymentProviderPayPal, ""); err != nil {
 					logger.LogError(c, fmt.Sprintf("PayPal 订阅激活失败: %v", err))
 				}
 			}

@@ -66,7 +66,8 @@ func SubscriptionRequestPayPalPay(c *gin.Context) {
 		PlanId:        plan.Id,
 		Money:         plan.PriceAmount,
 		TradeNo:       tradeNo,
-		PaymentMethod: PaymentMethodPayPal,
+		PaymentMethod:   PaymentMethodPayPal,
+		PaymentProvider: model.PaymentProviderPayPal,
 		CreateTime:    time.Now().Unix(),
 		Status:        common.TopUpStatusPending,
 	}
@@ -149,7 +150,7 @@ func SubscriptionPayPalReturn(c *gin.Context) {
 		subOrder := model.GetSubscriptionOrderByTradeNo(tradeNo)
 		if subOrder != nil && subOrder.Status == common.TopUpStatusPending {
 			// 调用已有的 CompleteSubscriptionOrder 函数
-			if err := model.CompleteSubscriptionOrder(tradeNo, orderId); err != nil {
+			if err := model.CompleteSubscriptionOrder(tradeNo, orderId, model.PaymentProviderPayPal, ""); err != nil {
 				// 记录错误日志但不阻塞用户
 				fmt.Printf("PayPal 订阅激活失败: %v\n", err)
 			}
