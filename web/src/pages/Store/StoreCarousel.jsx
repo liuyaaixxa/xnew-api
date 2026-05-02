@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, EffectFade } from 'swiper/modules';
-import { useNavigate } from 'react-router-dom';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
@@ -26,7 +25,6 @@ const FALLBACK_SLIDES = [
 export default function StoreCarousel() {
   const [slides, setSlides] = useState(FALLBACK_SLIDES);
   const [defaultAff, setDefaultAff] = useState('');
-  const navigate = useNavigate();
   const fetched = useRef(false);
 
   useEffect(() => {
@@ -60,7 +58,7 @@ export default function StoreCarousel() {
     if (url.startsWith('http')) {
       window.open(url, '_blank');
     } else {
-      navigate(url);
+      window.location.href = url;
     }
   };
 

@@ -107,6 +107,14 @@ export default defineConfig({
         target: 'http://localhost:3000',
         changeOrigin: true,
       },
+      '/affiliate-618': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/affiliate': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
     },
   },
 });
