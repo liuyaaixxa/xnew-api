@@ -31,7 +31,8 @@ import {
 import { Crown, CalendarClock, Package, CreditCard } from 'lucide-react';
 import { SiStripe, SiPaypal, SiAlipay, SiWechat } from 'react-icons/si';
 import { IconCreditCard } from '@douyinfe/semi-icons';
-import { renderQuota } from '../../../helpers';
+import { renderQuota } from '../../../helpers/render';
+import { getCurrencyConfig } from '../../../helpers/render';
 import {
   formatSubscriptionDuration,
   formatSubscriptionResetPeriod,

@@ -26,12 +26,8 @@ import {
   Typography,
   Select,
 } from '@douyinfe/semi-ui';
-import {
-  API,
-  showError,
-  getModelCategories,
-  selectFilter,
-} from '../../../helpers';
+import { API, showError, selectFilter } from '../../../helpers';
+import { getModelCategories } from '../../../helpers/render-icons';
 import CardPro from '../../common/ui/CardPro';
 import TokensTable from './TokensTable';
 import TokensActions from './TokensActions';

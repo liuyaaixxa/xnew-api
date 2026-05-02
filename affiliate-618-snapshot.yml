@@ -1,0 +1,192 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]: 618大促 · 限时活动 · 6月30日截止
+        - heading "您的好友给您发了 1000万Token" [level=1] [ref=e9]:
+          - text: 您的好友给您发了
+          - text: 1000万Token
+        - paragraph [ref=e10]:
+          - text: 加入 Teniu.AI，立即获得 500万免费Token。输入邀请码再领 500万。618限时福利，
+          - strong [ref=e11]: 6月30日截止
+          - text: ，错过不再有！
+        - generic [ref=e12]:
+          - generic [ref=e13]: ⏳ 距离活动结束还剩
+          - generic [ref=e14]:
+            - generic [ref=e15]:
+              - generic [ref=e16]: "59"
+              - generic [ref=e17]: 天
+            - generic [ref=e18]: ":"
+            - generic [ref=e19]:
+              - generic [ref=e20]: "16"
+              - generic [ref=e21]: 时
+            - generic [ref=e22]: ":"
+            - generic [ref=e23]:
+              - generic [ref=e24]: "32"
+              - generic [ref=e25]: 分
+            - generic [ref=e26]: ":"
+            - generic [ref=e27]:
+              - generic [ref=e28]: "36"
+              - generic [ref=e29]: 秒
+        - generic [ref=e30]:
+          - generic [ref=e31]:
+            - generic [ref=e32]: 10,000,000
+            - generic [ref=e33]: 免费Token
+          - generic [ref=e34]:
+            - generic [ref=e35]: 40+
+            - generic [ref=e36]: 顶级AI模型
+          - generic [ref=e37]:
+            - generic [ref=e38]: 30s
+            - generic [ref=e39]: 完成注册
+        - navigation [ref=e40]:
+          - link "⚡ 立即注册领取Token" [ref=e41] [cursor=pointer]:
+            - /url: http://localhost:3000/register?aff=qaWo
+          - link "了解更多" [ref=e42] [cursor=pointer]:
+            - /url: "#how"
+      - complementary [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e45]: 🎁 我的Token礼包
+          - generic [ref=e46]: ● 6月30日截止
+        - generic [ref=e47]:
+          - generic [ref=e48]: 10,000,000
+          - generic [ref=e49]: 免费 Token 等你领取
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - generic [ref=e52]: 5,000,000
+            - generic [ref=e53]: 新人见面礼 · 注册即得
+          - generic [ref=e54]:
+            - generic [ref=e55]: 5,000,000
+            - generic [ref=e56]: 邀请码奖励 · 输入即得
+        - generic [ref=e57]: 💡 两步叠加，总共1000万Token到手
+    - generic [ref=e59]:
+      - generic [ref=e60]: 领取流程
+      - heading "三步开启AI之旅" [level=2] [ref=e61]
+      - paragraph [ref=e62]: 设计极简，一分钟完成。然后尽情体验顶级AI模型。
+      - generic [ref=e63]:
+        - article [ref=e64]:
+          - generic [ref=e65]: "1"
+          - heading "点击好友链接注册" [level=3] [ref=e66]
+          - paragraph [ref=e67]: 使用邮箱或手机号注册Tenu.AI账户。30秒完成，无需实名认证，无需绑定支付方式。
+        - article [ref=e68]:
+          - generic [ref=e69]: "2"
+          - heading "500万Token自动到账" [level=3] [ref=e70]
+          - paragraph [ref=e71]: 注册成功后，新人见面礼500万Token即刻发放。在控制台实时查看余额，马上开始使用。
+        - article [ref=e72]:
+          - generic [ref=e73]: "3"
+          - heading "输入邀请码再领500万" [level=3] [ref=e74]
+          - paragraph [ref=e75]: 在控制台或注册页面输入好友邀请码，额外500万Token立即叠加。总共1000万免费Token！
+    - generic [ref=e77]:
+      - generic [ref=e78]: 奖励明细
+      - heading "1000万Token怎么拿？" [level=2] [ref=e79]
+      - paragraph [ref=e80]: 简单两步，总共1000万免费Token到手。零门槛，注册即送。
+      - generic [ref=e81]:
+        - article [ref=e82]:
+          - generic [ref=e83]: 立即到账
+          - generic [ref=e84]: 🎁
+          - generic [ref=e85]: 5,000,000
+          - generic [ref=e86]: Token
+          - paragraph [ref=e87]:
+            - text: 新人专属见面礼
+            - text: 注册成功即刻发放到你的账户
+        - article [ref=e88]:
+          - generic [ref=e89]: 分享即得
+          - generic [ref=e90]: 👥
+          - generic [ref=e91]: 5,000,000
+          - generic [ref=e92]: Token
+          - paragraph [ref=e93]:
+            - text: 输入好友邀请码
+            - text: 额外赠礼自动叠加，无需等待
+    - generic [ref=e95]:
+      - generic [ref=e96]: 1000万Token能做什么
+      - heading "畅享顶级AI模型" [level=2] [ref=e97]
+      - paragraph [ref=e98]: 看看这1000万Token能带给你多少AI体验。
+      - generic [ref=e99]:
+        - generic [ref=e100]:
+          - article [ref=e101]:
+            - generic [ref=e102]: 💬 GPT-5.4 完整对话
+            - generic [ref=e103]: ~5,000次
+          - article [ref=e104]:
+            - generic [ref=e105]: 🎨 高质量AI图像生成
+            - generic [ref=e106]: ~500张
+          - article [ref=e107]:
+            - generic [ref=e108]: 💻 代码生成与审查
+            - generic [ref=e109]: ~2,000次
+          - article [ref=e110]:
+            - generic [ref=e111]: 📊 文档分析与总结
+            - generic [ref=e112]: ~3,000次
+        - generic [ref=e113]:
+          - generic [ref=e114]: 总价值相当于
+          - generic [ref=e115]: 10,000,000
+          - generic [ref=e116]: 免费Token
+          - generic [ref=e117]: 🎉 零成本体验世界顶级AI
+    - generic [ref=e119]:
+      - generic [ref=e120]: 平台优势
+      - heading "不止是免费Token" [level=2] [ref=e121]
+      - paragraph [ref=e122]: 一个账号，统一接入全球40+顶级AI模型。
+      - generic [ref=e123]:
+        - article [ref=e124]:
+          - generic [ref=e125]: 🌐
+          - generic [ref=e126]: 40+
+          - generic [ref=e127]: 顶级AI模型一站式接入
+        - article [ref=e128]:
+          - generic [ref=e129]: ⚡
+          - generic [ref=e130]: 99.9%
+          - generic [ref=e131]: 服务可用性保障
+        - article [ref=e132]:
+          - generic [ref=e133]: 🔒
+          - generic [ref=e134]: TLS 1.3
+          - generic [ref=e135]: 端到端数据加密
+        - article [ref=e136]:
+          - generic [ref=e137]: 🎯
+          - generic [ref=e138]: 邀请
+          - generic [ref=e139]: 推广联盟 · 赚取返利
+    - generic [ref=e141]:
+      - generic [ref=e142]: 常见问题
+      - heading "快速解答你的疑问" [level=2] [ref=e143]
+      - generic [ref=e144]:
+        - article [ref=e145] [cursor=pointer]:
+          - generic [ref=e146]:
+            - generic [ref=e147]: Q
+            - text: 赠送的Token有使用期限吗？
+          - generic [ref=e148]: 新人见面礼500万Token有效期为注册后30天。邀请码奖励500万Token有效期为领取后60天。抓紧时间体验吧！
+        - article [ref=e149] [cursor=pointer]:
+          - generic [ref=e150]:
+            - generic [ref=e151]: Q
+            - text: 领取奖励需要绑定支付方式吗？
+          - generic [ref=e152]: 完全不需要！注册即可领取，无需绑定信用卡或任何支付方式。纯免费体验，零门槛。
+        - article [ref=e153] [cursor=pointer]:
+          - generic [ref=e154]:
+            - generic [ref=e155]: Q
+            - text: 邀请码在哪里获取？
+          - generic [ref=e156]: 你的好友会在Tenu.AI控制台的"推广联盟"页面找到专属邀请码。也可以分享邀请链接，系统会自动识别。
+        - article [ref=e157] [cursor=pointer]:
+          - generic [ref=e158]:
+            - generic [ref=e159]: Q
+            - text: 如果注册时没有输入邀请码，之后还能补吗？
+          - generic [ref=e160]: 可以！注册后7天内在控制台→个人设置→输入邀请码，依然可以领取500万Token奖励。过期后将无法补领。
+        - article [ref=e161] [cursor=pointer]:
+          - generic [ref=e162]:
+            - generic [ref=e163]: Q
+            - text: 我可以邀请我自己的其他账号吗？
+          - generic [ref=e164]: 不可以。我们有完善的反作弊系统，自买自推、虚假注册等行为会被检测并冻结奖励。请诚信参与活动。
+        - article [ref=e165] [cursor=pointer]:
+          - generic [ref=e166]:
+            - generic [ref=e167]: Q
+            - text: 用完之后如何继续使用？
+          - generic [ref=e168]: 免费Token用完后，你可以通过充值继续使用。也可以加入推广联盟，邀请好友注册消费获得佣金返利。
+    - generic [ref=e171]:
+      - generic [ref=e172]: 618限时福利 · 6月30日截止
+      - heading "1000万Token等你来领" [level=2] [ref=e173]
+      - paragraph [ref=e174]:
+        - text: 好友已为你准备好见面礼。注册即得500万，输入邀请码再得500万。
+        - strong [ref=e175]: 618专属福利，6月30日截止
+        - text: ，错过不再有！零成本畅享40+顶级AI模型。
+      - navigation [ref=e176]:
+        - link "⚡ 立即领取免费Token" [ref=e177] [cursor=pointer]:
+          - /url: http://localhost:3000/register?aff=qaWo
+      - paragraph [ref=e178]: 无需绑定支付方式 · 30秒完成注册 · 即刻到账
+  - generic [ref=e179]:
+    - generic [ref=e180]: 📱 扫一扫，分享给好友
+    - img [ref=e183]
+    - generic [ref=e184]: 长按保存图片，分享给好友一起领取
+  - contentinfo [ref=e185]: © 2026 Teniu.AI · 推广联盟计划 · 诚信参与，共建生态

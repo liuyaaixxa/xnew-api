@@ -1,0 +1,93 @@
+- generic [ref=e3]:
+  - generic [ref=e7]:
+    - link "logo Teniu.AI" [ref=e9] [cursor=pointer]:
+      - /url: /
+      - img "logo" [ref=e11]
+      - heading "Teniu.AI" [level=4] [ref=e14]
+    - navigation [ref=e15]:
+      - link "首页" [ref=e16] [cursor=pointer]:
+        - /url: /store
+        - generic [ref=e17]: 首页
+      - link "模型市场" [ref=e18] [cursor=pointer]:
+        - /url: /model-market
+        - generic [ref=e19]: 模型市场
+      - link "算力池计划" [ref=e20] [cursor=pointer]:
+        - /url: /compute-pool
+        - generic [ref=e21]: 算力池计划
+      - link "控制台" [ref=e22] [cursor=pointer]:
+        - /url: /login
+        - generic [ref=e23]: 控制台
+      - link "关于" [ref=e24] [cursor=pointer]:
+        - /url: /about
+        - generic [ref=e25]: 关于
+    - generic [ref=e26]:
+      - button "系统公告" [ref=e27] [cursor=pointer]:
+        - img [ref=e29]
+      - button "切换主题" [ref=e32] [cursor=pointer]:
+        - img [ref=e34]
+      - button "common.changeLanguage" [ref=e36] [cursor=pointer]:
+        - img [ref=e38]
+      - generic [ref=e42]:
+        - link "登录" [ref=e43] [cursor=pointer]:
+          - /url: /login
+          - button "登录" [ref=e44]:
+            - generic [ref=e46]: 登录
+        - link "注册" [ref=e48] [cursor=pointer]:
+          - /url: /register
+          - button "注册" [ref=e49]:
+            - generic [ref=e51]: 注册
+  - generic [ref=e53]:
+    - main [ref=e54]:
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - heading "将闲置 GPU 转化为 稳定收益" [level=1] [ref=e59]:
+            - text: 将闲置 GPU 转化为
+            - text: 稳定收益
+          - paragraph [ref=e60]: Teniu.AI 是一个去中心化 GPU 共享网络，让您将闲置算力变现。支持 Ollama 本地模型和 LLM Token 共享。
+          - generic [ref=e61]:
+            - generic [ref=e62]: GPU 共享
+            - generic [ref=e63]: Ollama
+            - generic [ref=e64]: LLM Token
+            - generic [ref=e65]: 去中心化
+        - generic [ref=e68]:
+          - generic [ref=e69]:
+            - img "Logo" [ref=e70]
+            - heading "Teniu.AI" [level=3] [ref=e71]
+          - generic [ref=e73]:
+            - heading "登 录" [level=3] [ref=e75]
+            - generic [ref=e76]:
+              - generic [ref=e77]:
+                - generic [ref=e78]:
+                  - generic [ref=e80]: 用户名或邮箱
+                  - generic [ref=e82]:
+                    - img "mail" [ref=e84]:
+                      - img [ref=e85]
+                    - textbox "用户名或邮箱" [ref=e87]:
+                      - /placeholder: 请输入您的用户名或邮箱地址
+                      - text: admin
+                - generic [ref=e88]:
+                  - generic [ref=e90]: 密码
+                  - generic [ref=e92]:
+                    - img "lock" [ref=e94]:
+                      - img [ref=e95]
+                    - textbox "密码" [active] [ref=e97]:
+                      - /placeholder: 请输入您的密码
+                      - text: "123456"
+                    - button "Show password" [ref=e98] [cursor=pointer]:
+                      - img "eye_closed_solid" [ref=e99]:
+                        - img [ref=e100]
+                - generic [ref=e103]:
+                  - button "继续" [ref=e104] [cursor=pointer]:
+                    - generic [ref=e105]: 继续
+                  - button "忘记密码？" [ref=e106] [cursor=pointer]:
+                    - generic [ref=e107]: 忘记密码？
+              - generic [ref=e109]:
+                - text: 没有账户？
+                - link "注册" [ref=e110] [cursor=pointer]:
+                  - /url: /register
+    - generic [ref=e115]:
+      - generic [ref=e117]: © 2026 Teniu. 版权所有
+      - generic [ref=e118]:
+        - generic [ref=e119]: 设计与开发由
+        - link "Teniu" [ref=e120] [cursor=pointer]:
+          - /url: https://github.com/liuyaaixxa/xnew-api

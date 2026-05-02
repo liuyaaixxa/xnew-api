@@ -19,12 +19,8 @@ For commercial licensing, please contact support@quantumnous.com
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  API,
-  showError,
-  showSuccess,
-  getOAuthProviderIcon,
-} from '../../../../helpers';
+import { API, showError, showSuccess } from '../../../../helpers';
+import { getOAuthProviderIcon } from '../../../../helpers/render-icons';
 import {
   Modal,
   Spin,

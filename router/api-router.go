@@ -32,6 +32,7 @@ func SetApiRouter(router *gin.Engine) {
 		apiRouter.GET("/about", controller.GetAbout)
 		//apiRouter.GET("/midjourney", controller.GetMidjourney)
 		apiRouter.GET("/home_page_content", controller.GetHomePageContent)
+		apiRouter.GET("/affiliate/public-promotions", controller.GetPublicPromotions)
 	apiRouter.GET("/affiliate/invite", controller.GetInvitePage)
 		apiRouter.GET("/pricing", middleware.TryUserAuth(), controller.GetPricing)
 		apiRouter.GET("/verification", middleware.EmailVerificationRateLimit(), middleware.TurnstileCheck(), controller.SendEmailVerification)
@@ -139,6 +140,11 @@ func SetApiRouter(router *gin.Engine) {
 				selfRoute.GET("/settlement/orders", controller.GetSettlementOrders)
 				selfRoute.DELETE("/settlement/order/:id", controller.DeleteSettlementOrder)
 
+				// Voucher routes
+				selfRoute.GET("/vouchers", controller.GetUserVouchers)
+				selfRoute.GET("/vouchers/unclaimed", controller.GetUnclaimedVouchers)
+				selfRoute.POST("/vouchers/:id/claim", controller.ClaimVoucher)
+
 				// Custom OAuth bindings
 				selfRoute.GET("/oauth/bindings", controller.GetUserOAuthBindings)
 				selfRoute.DELETE("/oauth/bindings/:provider_id", controller.UnbindCustomOAuth)
@@ -170,6 +176,8 @@ func SetApiRouter(router *gin.Engine) {
 				adminRoute.POST("/affiliate/settlement/approve", controller.AdminApproveAffiliateSettlement)
 				adminRoute.POST("/affiliate/settlement/reject", controller.AdminRejectAffiliateSettlement)
 				adminRoute.GET("/affiliate/invited-users", controller.AdminGetAffiliateInvitedUsers)
+				adminRoute.GET("/affiliate-promotions", controller.AdminGetPromotions)
+				adminRoute.PUT("/affiliate-promotions/:id", controller.AdminUpdatePromotion)
 
 				// Admin 2FA routes
 				adminRoute.GET("/2fa/stats", controller.Admin2FAStats)

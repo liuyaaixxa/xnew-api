@@ -30,7 +30,8 @@ import {
   Tooltip,
   Typography,
 } from '@douyinfe/semi-ui';
-import { API, showError, showSuccess, renderQuota } from '../../helpers';
+import { API, showError, showSuccess } from '../../helpers';
+import { renderQuota } from '../../helpers/render';
 import { getCurrencyConfig } from '../../helpers/render';
 import { RefreshCw, Sparkles } from 'lucide-react';
 import { SiPaypal } from 'react-icons/si';

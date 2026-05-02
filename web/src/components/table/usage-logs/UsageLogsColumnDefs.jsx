@@ -26,14 +26,9 @@ import {
   Popover,
   Typography,
 } from '@douyinfe/semi-ui';
-import {
-  renderGroup,
-  renderQuota,
-  stringToColor,
-  getLogOther,
-  renderModelTag,
-  renderModelPriceSimple,
-} from '../../../helpers';
+import { getLogOther } from '../../../helpers';
+import { renderGroup, renderQuota, stringToColor, renderModelPriceSimple } from '../../../helpers/render';
+import { renderModelTag } from '../../../helpers/render-icons';
 import { IconHelpCircle } from '@douyinfe/semi-icons';
 import { Route, Sparkles } from 'lucide-react';
 

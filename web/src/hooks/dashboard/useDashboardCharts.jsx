@@ -19,13 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 
 import { useState, useCallback, useEffect } from 'react';
 import { initVChartSemiTheme } from '@visactor/vchart-semi-theme';
-import {
-  modelColorMap,
-  renderNumber,
-  renderQuota,
-  modelToColor,
-  getQuotaWithUnit,
-} from '../../helpers';
+import { modelColorMap, renderNumber, renderQuota, modelToColor, getQuotaWithUnit } from '../../helpers/render';
 import {
   processRawData,
   calculateTrendData,

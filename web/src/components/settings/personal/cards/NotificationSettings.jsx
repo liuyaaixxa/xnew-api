@@ -34,12 +34,8 @@ import {
 } from '@douyinfe/semi-ui';
 import { IconMail, IconKey, IconBell, IconLink } from '@douyinfe/semi-icons';
 import { ShieldCheck, Bell, DollarSign, Settings } from 'lucide-react';
-import {
-  renderQuotaWithPrompt,
-  API,
-  showSuccess,
-  showError,
-} from '../../../../helpers';
+import { API, showSuccess, showError } from '../../../../helpers';
+import { renderQuotaWithPrompt } from '../../../../helpers/render';
 import CodeViewer from '../../../playground/CodeViewer';
 import { StatusContext } from '../../../../context/Status';
 import { UserContext } from '../../../../context/User';

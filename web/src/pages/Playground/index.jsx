@@ -39,16 +39,8 @@ import {
   MESSAGE_ROLES,
   ERROR_MESSAGES,
 } from '../../constants/playground.constants';
-import {
-  getLogo,
-  stringToColor,
-  buildMessageContent,
-  createMessage,
-  createLoadingAssistantMessage,
-  getTextContent,
-  buildApiPayload,
-  encodeToBase64,
-} from '../../helpers';
+import { getLogo, buildMessageContent, createMessage, createLoadingAssistantMessage, getTextContent, buildApiPayload, encodeToBase64 } from '../../helpers';
+import { stringToColor } from '../../helpers/render';
 
 // Components
 import {

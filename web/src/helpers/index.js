@@ -22,7 +22,6 @@ export * from './auth';
 export * from './utils';
 export * from './base64';
 export * from './api';
-export * from './render';
 export * from './log';
 export * from './data';
 export * from './token';

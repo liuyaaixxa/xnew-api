@@ -37,13 +37,8 @@ import {
   AlertTriangle,
   CheckCircle,
 } from 'lucide-react';
-import {
-  API,
-  showError,
-  showSuccess,
-  showWarning,
-  stringToColor,
-} from '../../../helpers';
+import { API, showError, showSuccess, showWarning } from '../../../helpers';
+import { stringToColor } from '../../../helpers/render';
 import { useIsMobile } from '../../../hooks/common/useIsMobile';
 import { DEFAULT_ENDPOINT } from '../../../constants';
 import { useTranslation } from 'react-i18next';

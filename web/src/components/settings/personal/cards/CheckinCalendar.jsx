@@ -37,7 +37,8 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import CaptchaWidget from '../../../common/CaptchaWidget';
-import { API, showError, showSuccess, renderQuota } from '../../../../helpers';
+import { API, showError, showSuccess } from '../../../../helpers';
+import { renderQuota } from '../../../../helpers/render';
 
 const CheckinCalendar = ({ t, status, captchaProvider, turnstileSiteKey }) => {
   const [loading, setLoading] = useState(false);

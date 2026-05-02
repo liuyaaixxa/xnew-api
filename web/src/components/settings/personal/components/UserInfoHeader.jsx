@@ -26,12 +26,8 @@ import {
   Typography,
   Badge,
 } from '@douyinfe/semi-ui';
-import {
-  isRoot,
-  isAdmin,
-  renderQuota,
-  stringToColor,
-} from '../../../../helpers';
+import { isRoot, isAdmin } from '../../../../helpers';
+import { renderQuota, stringToColor } from '../../../../helpers/render';
 import { Coins, BarChart2, Users } from 'lucide-react';
 
 const UserInfoHeader = ({ t, userState }) => {

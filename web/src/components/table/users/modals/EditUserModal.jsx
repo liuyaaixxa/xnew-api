@@ -19,14 +19,8 @@ For commercial licensing, please contact support@quantumnous.com
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  API,
-  showError,
-  showSuccess,
-  renderQuota,
-  renderQuotaWithPrompt,
-  getCurrencyConfig,
-} from '../../../../helpers';
+import { API, showError, showSuccess } from '../../../../helpers';
+import { renderQuota, getCurrencyConfig, renderQuotaWithPrompt } from '../../../../helpers/render';
 import {
   quotaToDisplayAmount,
   displayAmountToQuota,

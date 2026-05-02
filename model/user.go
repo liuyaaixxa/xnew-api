@@ -387,7 +387,7 @@ func (user *User) Insert(inviterId int) error {
 			return err
 		}
 	}
-	user.Quota = common.QuotaForNewUser
+	user.Quota = 0 // 不再直接给额度，所有额度改为额度券签收制
 	//user.SetAccessToken(common.GetUUID())
 	user.AffCode = common.GetRandomString(4)
 
@@ -418,18 +418,32 @@ func (user *User) Insert(inviterId int) error {
 		}
 	}
 
+	// 1. 新人见面礼额度券
 	if common.QuotaForNewUser > 0 {
-		RecordLog(user.Id, LogTypeSystem, fmt.Sprintf("新用户注册赠送 %s", logger.LogQuota(common.QuotaForNewUser)))
+		_ = CreateVoucher(user.Id, "新人见面礼", common.QuotaForNewUser, "welcome")
+		RecordLog(user.Id, LogTypeSystem, fmt.Sprintf("获得新人见面礼额度券 %s", logger.LogQuota(common.QuotaForNewUser)))
 	}
+
+	// 2. 邀请场景：验证邀请码 + 发放邀请券和激励券
 	if inviterId != 0 {
-		_ = inviteUser(inviterId)
-		if common.QuotaForInvitee > 0 {
-			_ = IncreaseUserQuota(user.Id, common.QuotaForInvitee, true)
-			RecordLog(user.Id, LogTypeSystem, fmt.Sprintf("使用邀请码赠送 %s", logger.LogQuota(common.QuotaForInvitee)))
-		}
-		if common.QuotaForInviter > 0 {
-			//_ = IncreaseUserQuota(inviterId, common.QuotaForInviter)
-			RecordLog(inviterId, LogTypeSystem, fmt.Sprintf("邀请用户赠送 %s", logger.LogQuota(common.QuotaForInviter)))
+		inviter, err := GetUserById(inviterId, true)
+		if err == nil && inviter != nil {
+			// 更新邀请人统计
+			inviter.AffCount++
+			inviter.AffHistoryQuota += common.QuotaForInviter
+			_ = DB.Save(inviter).Error
+
+			// 给被邀请人发"邀请券"
+			if common.QuotaForInvitee > 0 {
+				_ = CreateVoucher(user.Id, "邀请券", common.QuotaForInvitee, "invitee")
+				RecordLog(user.Id, LogTypeSystem, fmt.Sprintf("获得邀请券额度券 %s", logger.LogQuota(common.QuotaForInvitee)))
+			}
+
+			// 给邀请人发"激励券"
+			if common.QuotaForInviter > 0 {
+				_ = CreateVoucher(inviterId, "激励券", common.QuotaForInviter, "inviter")
+				RecordLog(inviterId, LogTypeSystem, fmt.Sprintf("邀请用户 %s 获得激励券 %s", user.Username, logger.LogQuota(common.QuotaForInviter)))
+			}
 		}
 	}
 	return nil
@@ -446,7 +460,7 @@ func (user *User) InsertWithTx(tx *gorm.DB, inviterId int) error {
 			return err
 		}
 	}
-	user.Quota = common.QuotaForNewUser
+	user.Quota = 0 // 不再直接给额度，所有额度改为额度券签收制
 	user.AffCode = common.GetRandomString(4)
 
 	// 初始化用户设置
@@ -479,17 +493,32 @@ func (user *User) FinalizeOAuthUserCreation(inviterId int) {
 		}
 	}
 
+	// 1. 新人见面礼额度券
 	if common.QuotaForNewUser > 0 {
-		RecordLog(user.Id, LogTypeSystem, fmt.Sprintf("新用户注册赠送 %s", logger.LogQuota(common.QuotaForNewUser)))
+		_ = CreateVoucher(user.Id, "新人见面礼", common.QuotaForNewUser, "welcome")
+		RecordLog(user.Id, LogTypeSystem, fmt.Sprintf("获得新人见面礼额度券 %s", logger.LogQuota(common.QuotaForNewUser)))
 	}
+
+	// 2. 邀请场景：验证邀请码 + 发放邀请券和激励券
 	if inviterId != 0 {
-		_ = inviteUser(inviterId)
-		if common.QuotaForInvitee > 0 {
-			_ = IncreaseUserQuota(user.Id, common.QuotaForInvitee, true)
-			RecordLog(user.Id, LogTypeSystem, fmt.Sprintf("使用邀请码赠送 %s", logger.LogQuota(common.QuotaForInvitee)))
-		}
-		if common.QuotaForInviter > 0 {
-			RecordLog(inviterId, LogTypeSystem, fmt.Sprintf("邀请用户赠送 %s", logger.LogQuota(common.QuotaForInviter)))
+		inviter, err := GetUserById(inviterId, true)
+		if err == nil && inviter != nil {
+			// 更新邀请人统计
+			inviter.AffCount++
+			inviter.AffHistoryQuota += common.QuotaForInviter
+			_ = DB.Save(inviter).Error
+
+			// 给被邀请人发"邀请券"
+			if common.QuotaForInvitee > 0 {
+				_ = CreateVoucher(user.Id, "邀请券", common.QuotaForInvitee, "invitee")
+				RecordLog(user.Id, LogTypeSystem, fmt.Sprintf("获得邀请券额度券 %s", logger.LogQuota(common.QuotaForInvitee)))
+			}
+
+			// 给邀请人发"激励券"
+			if common.QuotaForInviter > 0 {
+				_ = CreateVoucher(inviterId, "激励券", common.QuotaForInviter, "inviter")
+				RecordLog(inviterId, LogTypeSystem, fmt.Sprintf("邀请用户 %s 获得激励券 %s", user.Username, logger.LogQuota(common.QuotaForInviter)))
+			}
 		}
 	}
 }

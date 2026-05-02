@@ -19,14 +19,8 @@ For commercial licensing, please contact support@quantumnous.com
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  API,
-  downloadTextAsFile,
-  showError,
-  showSuccess,
-  renderQuota,
-  renderQuotaWithPrompt,
-} from '../../../../helpers';
+import { API, downloadTextAsFile, showError, showSuccess } from '../../../../helpers';
+import { renderQuota, renderQuotaWithPrompt } from '../../../../helpers/render';
 import { useIsMobile } from '../../../../hooks/common/useIsMobile';
 import {
   Button,

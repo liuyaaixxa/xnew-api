@@ -1,0 +1,244 @@
+- generic [ref=e3]:
+  - generic [ref=e7]:
+    - link "logo Teniu.AI" [ref=e62] [cursor=pointer]:
+      - /url: /
+      - img "logo" [ref=e12]
+      - heading "Teniu.AI" [level=4] [ref=e63]
+    - navigation [ref=e17]:
+      - link "首页" [ref=e64] [cursor=pointer]:
+        - /url: /store
+        - generic [ref=e65]: 首页
+      - link "模型市场" [ref=e66] [cursor=pointer]:
+        - /url: /model-market
+        - generic [ref=e67]: 模型市场
+      - link "算力池计划" [ref=e68] [cursor=pointer]:
+        - /url: /compute-pool
+        - generic [ref=e69]: 算力池计划
+      - link "控制台" [ref=e70] [cursor=pointer]:
+        - /url: /login
+        - generic [ref=e71]: 控制台
+      - link "关于" [ref=e72] [cursor=pointer]:
+        - /url: /about
+        - generic [ref=e73]: 关于
+    - generic [ref=e30]:
+      - button "系统公告" [ref=e31] [cursor=pointer]:
+        - img [ref=e33]
+      - button "切换主题" [ref=e36] [cursor=pointer]:
+        - img [ref=e38]
+      - button "common.changeLanguage" [ref=e40] [cursor=pointer]:
+        - img [ref=e42]
+      - generic [ref=e74]:
+        - link "登录" [ref=e75] [cursor=pointer]:
+          - /url: /login
+          - button "登录" [ref=e76]:
+            - generic [ref=e78]: 登录
+        - link "注册" [ref=e80] [cursor=pointer]:
+          - /url: /register
+          - button "注册" [ref=e81]:
+            - generic [ref=e83]: 注册
+  - main [ref=e54]:
+    - generic [ref=e84]:
+      - link "💰 推广联盟 | 邀请好友使用AI，终身赚取30%佣金 立即加入 →" [ref=e85] [cursor=pointer]:
+        - /url: /affiliate
+        - generic [ref=e86]:
+          - generic [ref=e87]:
+            - generic [ref=e88]: 💰
+            - generic [ref=e89]:
+              - strong [ref=e90]: 推广联盟
+              - generic [ref=e91]: "|"
+              - text: 邀请好友使用AI，终身赚取30%佣金
+          - generic [ref=e92]:
+            - text: 立即加入
+            - generic [ref=e93]: →
+      - generic [ref=e94]:
+        - generic [ref=e95]:
+          - generic [ref=e96]: 限时优惠 — 年度计划8折
+          - heading "企业级AI API 像你最爱的SaaS 一样定价" [level=1] [ref=e98]:
+            - text: 企业级AI API
+            - text: 像你最爱的SaaS
+            - emphasis [ref=e99]: 一样定价
+          - paragraph [ref=e100]: 通过一个统一API接入40+AI模型。按量付费，无限扩展，只为实际用量买单。
+          - generic [ref=e101]:
+            - generic [ref=e102]: $0.001
+            - generic [ref=e103]: / 1K tokens
+          - generic [ref=e104]:
+            - generic [ref=e105]: ★
+            - generic [ref=e106]: ★
+            - generic [ref=e107]: ★
+            - generic [ref=e108]: ★
+            - generic [ref=e109]: ★
+            - generic [ref=e110]: 4.8 · 2,000+ 开发者
+          - generic [ref=e111]:
+            - button "免费试用" [ref=e112] [cursor=pointer]
+            - button "查看定价" [ref=e113] [cursor=pointer]
+        - generic [ref=e117]:
+          - generic:
+            - generic:
+              - generic: 推广活动
+              - heading "创业黑金" [level=2]
+              - paragraph: 深色科技风，强调副业创业
+              - button "了解更多 →"
+          - generic:
+            - generic:
+              - generic: 推广活动
+              - heading "创意工作室" [level=2]
+              - paragraph: 温暖柔和风，强调创作搭档
+              - button "了解更多 →"
+          - generic [ref=e271] [cursor=pointer]:
+            - generic [ref=e272]: 推广活动
+            - heading "数据驱动" [level=2] [ref=e273]
+            - paragraph [ref=e274]: 清爽商务风，数据说服力
+            - button "了解更多 →" [ref=e275]
+          - generic:
+            - generic:
+              - generic: 限时活动
+              - heading "618新人注册活动" [level=2]
+              - paragraph: 618限时福利，1000万Token赠送
+              - button "立即领取 →"
+      - generic [ref=e129]:
+        - generic [ref=e130]:
+          - generic [ref=e131]: 40+
+          - generic [ref=e132]: AI模型
+        - generic [ref=e133]:
+          - generic [ref=e134]: 99.9%
+          - generic [ref=e135]: 运行SLA
+        - generic [ref=e136]:
+          - generic [ref=e137]: 2K+
+          - generic [ref=e138]: 开发者
+        - generic [ref=e139]:
+          - generic [ref=e140]: 50M+
+          - generic [ref=e141]: 日请求量
+      - generic [ref=e142]:
+        - generic [ref=e143]:
+          - generic [ref=e144]: 为什么选择Tenu.AI
+          - heading "快速交付AI应用所需的一切" [level=2] [ref=e145]
+          - paragraph [ref=e146]: 一次集成，无限可能。专注构建 — 我们处理其余。
+        - generic [ref=e147]:
+          - generic [ref=e148]:
+            - generic [ref=e150]: 🖥
+            - heading "统一API格式" [level=4] [ref=e151]
+            - paragraph [ref=e152]: 一个兼容OpenAI的API接入40+模型，无需修改代码即可切换供应商。
+          - generic [ref=e153]:
+            - generic [ref=e155]: 🔒
+            - heading "企业级安全" [level=4] [ref=e156]
+            - paragraph [ref=e157]: SOC 2合规，静态和传输加密，细粒度API密钥权限管理。
+          - generic [ref=e158]:
+            - generic [ref=e160]: 📡
+            - heading "自动故障转移" [level=4] [ref=e161]
+            - paragraph [ref=e162]: 智能路由，跨供应商自动重试。零停机，始终可用。
+          - generic [ref=e163]:
+            - generic [ref=e165]: 💰
+            - heading "按量付费" [level=4] [ref=e166]
+            - paragraph [ref=e167]: 仅为实际Token用量付费。无月度承诺，无隐藏费用，透明计费。
+          - generic [ref=e168]:
+            - generic [ref=e170]: 📊
+            - heading "实时监控" [level=4] [ref=e171]
+            - paragraph [ref=e172]: 实时用量仪表盘，成本追踪，速率限制和异常告警。
+          - generic [ref=e173]:
+            - generic [ref=e175]: 🔧
+            - heading "自定义模型配置" [level=4] [ref=e176]
+            - paragraph [ref=e177]: 精细调整模型参数，设置自定义速率限制，配置按模型定价规则。
+      - generic [ref=e178]:
+        - generic [ref=e179]:
+          - generic [ref=e180]: 用户评价
+          - heading "深受全球开发者信赖" [level=2] [ref=e181]
+        - generic [ref=e182]:
+          - generic [ref=e183]:
+            - generic [ref=e184]:
+              - generic [ref=e185]: ★
+              - generic [ref=e186]: ★
+              - generic [ref=e187]: ★
+              - generic [ref=e188]: ★
+              - generic [ref=e189]: ★
+            - paragraph [ref=e190]: "\"切换到Tenu.AI将我们的AI成本降低了60%。统一API意味着我们不再需要为每个模型供应商单独集成。\""
+            - generic [ref=e191]:
+              - generic [ref=e192]: M
+              - generic [ref=e193]:
+                - generic [ref=e194]: Marcus Chen
+                - generic [ref=e195]: CTO, TechVentures
+          - generic [ref=e196]:
+            - generic [ref=e197]:
+              - generic [ref=e198]: ★
+              - generic [ref=e199]: ★
+              - generic [ref=e200]: ★
+              - generic [ref=e201]: ★
+              - generic [ref=e202]: ★
+            - paragraph [ref=e203]: "\"自动故障转移功能在OpenAI宕机时拯救了我们。我们的用户甚至没有察觉。监控面板正是我们需要的。\""
+            - generic [ref=e204]:
+              - generic [ref=e205]: S
+              - generic [ref=e206]:
+                - generic [ref=e207]: Sarah Nakamura
+                - generic [ref=e208]: 首席工程师, DataFlow Inc
+          - generic [ref=e209]:
+            - generic [ref=e210]:
+              - generic [ref=e211]: ★
+              - generic [ref=e212]: ★
+              - generic [ref=e213]: ★
+              - generic [ref=e214]: ★
+              - generic [ref=e215]: ★
+            - paragraph [ref=e216]: "\"我们评估了所有API网关。Tenu.AI的价格透明度和模型覆盖无与伦比。企业支持一流。\""
+            - generic [ref=e217]:
+              - generic [ref=e218]: A
+              - generic [ref=e219]:
+                - generic [ref=e220]: Alex Petrov
+                - generic [ref=e221]: 工程VP, ScaleAI
+      - generic [ref=e222]:
+        - generic [ref=e223]: 立即开始
+        - heading "准备好加速你的AI了吗？" [level=2] [ref=e224]
+        - paragraph [ref=e225]: 已有2,000+开发者在Tenu.AI上构建。免费起步，随时扩展。
+        - generic [ref=e226]:
+          - button "免费开始 — 无需信用卡" [ref=e227] [cursor=pointer]
+          - button "联系销售" [ref=e228] [cursor=pointer]
+        - generic [ref=e229]:
+          - img [ref=e230]
+          - text: 30天退款保证 · 无锁定 · 随时取消
+      - generic [ref=e232]:
+        - generic [ref=e233]:
+          - generic [ref=e234]:
+            - generic [ref=e235]:
+              - generic [ref=e236]: ⚡
+              - generic [ref=e237]: Tenu.AI
+            - paragraph [ref=e238]: 企业级AI API网关 — 一次集成，无限AI可能。
+          - generic [ref=e239]:
+            - generic [ref=e240]: 产品
+            - generic [ref=e241]:
+              - link "模型市场" [ref=e242] [cursor=pointer]:
+                - /url: /model-market
+              - link "API定价" [ref=e243] [cursor=pointer]:
+                - /url: /pricing
+              - link "用户文档" [ref=e244] [cursor=pointer]:
+                - /url: /docs
+              - link "下载客户端" [ref=e245] [cursor=pointer]:
+                - /url: https://github.com/liuyaaixxa/teniulink-node-client/releases
+          - generic [ref=e246]:
+            - generic [ref=e247]: 公司
+            - generic [ref=e248]:
+              - link "关于我们" [ref=e249] [cursor=pointer]:
+                - /url: /about
+              - link "推广联盟" [ref=e250] [cursor=pointer]:
+                - /url: /affiliate
+              - link "联系我们" [ref=e251] [cursor=pointer]:
+                - /url: mailto:support@teniucloud.com
+          - generic [ref=e252]:
+            - generic [ref=e253]: 资源
+            - generic [ref=e254]:
+              - link "GitHub" [ref=e255] [cursor=pointer]:
+                - /url: https://github.com/liuyaaixxa/xnew-api
+              - link "Discord" [ref=e256] [cursor=pointer]:
+                - /url: https://discord.gg/teniuai
+              - link "X (Twitter)" [ref=e257] [cursor=pointer]:
+                - /url: https://x.com/TeniuAI
+          - generic [ref=e258]:
+            - generic [ref=e259]: 法律
+            - generic [ref=e260]:
+              - link "隐私政策" [ref=e261] [cursor=pointer]:
+                - /url: /privacy
+              - link "服务条款" [ref=e262] [cursor=pointer]:
+                - /url: /tos
+        - generic [ref=e263]:
+          - generic [ref=e264]: © 2026 Teniu.AI. 版权所有
+          - generic [ref=e265]:
+            - generic [ref=e266]: VISA
+            - generic [ref=e267]: MASTERCARD
+            - generic [ref=e268]: USDT
+            - generic [ref=e269]: ALIPAY

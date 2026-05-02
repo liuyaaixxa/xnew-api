@@ -33,13 +33,9 @@ import {
   Input,
   Modal,
 } from '@douyinfe/semi-ui';
-import {
-  timestamp2string,
-  renderGroup,
-  renderQuota,
-  getModelCategories,
-  showError,
-} from '../../../helpers';
+import { timestamp2string, showError } from '../../../helpers';
+import { renderGroup, renderQuota } from '../../../helpers/render';
+import { getModelCategories } from '../../../helpers/render-icons';
 import {
   IconTreeTriangleDown,
   IconCopy,

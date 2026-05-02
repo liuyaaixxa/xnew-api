@@ -40,6 +40,7 @@
         "remark-gfm": "^4.0.1",
         "remark-math": "^6.0.0",
         "sse.js": "^2.6.0",
+        "swiper": "^12.1.4",
         "unist-util-visit": "^5.0.0",
         "use-debounce": "^10.0.4",
       },
@@ -1959,6 +1960,8 @@
     "supports-preserve-symlinks-flag": ["supports-preserve-symlinks-flag@1.0.0", "", {}, "sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w=="],
 
     "swc-walk": ["swc-walk@1.0.0", "", { "dependencies": { "acorn-walk": "^8.3.4" } }, "sha512-QnEvBZ/ZRsUrXCz/Z3Kto06xUsoqUTo3doj/UvOD0RfamEgqlhpgpyCykFAwiUcuDrODShzlxuDqDPf2Wc+DvQ=="],
+
+    "swiper": ["swiper@12.1.4", "", {}, "sha512-bihiwoKMOQwW8FfdUbo1DgkVH25E+4ZELIq0oopL1KTKBteLuaTMi/wwFjMxtlhTkk45k3XQ89D1Fvv0spSqBA=="],
 
     "swr": ["swr@2.3.3", "", { "dependencies": { "dequal": "^2.0.3", "use-sync-external-store": "^1.4.0" }, "peerDependencies": { "react": "^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-dshNvs3ExOqtZ6kJBaAsabhPdHyeY4P2cKwRCniDVifBMoG/SVI7tfLWqPXriVspf2Rg4tPzXJTnwaihIeFw2A=="],
 
