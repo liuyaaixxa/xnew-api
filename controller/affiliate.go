@@ -247,9 +247,21 @@ func ApplyAffiliateSettlement(c *gin.Context) {
 	common.ApiSuccess(c, gin.H{"message": "结算申请已提交"})
 }
 
+// getDefaultAffCode returns the root user's aff_code as a fallback.
+func getDefaultAffCode() string {
+	root := model.GetRootUser()
+	if root != nil && root.AffCode != "" {
+		return root.AffCode
+	}
+	return ""
+}
+
 // GetInvitePage renders the invite landing page data.
 func GetInvitePage(c *gin.Context) {
 	affCode := c.Query("aff")
+	if affCode == "" {
+		affCode = getDefaultAffCode()
+	}
 	if affCode == "" {
 		c.JSON(200, gin.H{"success": false, "message": "缺少邀请码"})
 		return
@@ -284,6 +296,9 @@ func GetVersionedInvitePage(c *gin.Context) {
 	}
 
 	affCode := c.Query("aff")
+	if affCode == "" {
+		affCode = getDefaultAffCode()
+	}
 	if affCode == "" {
 		c.String(http.StatusOK, "<h1>缺少邀请码</h1>")
 		return
@@ -357,6 +372,9 @@ func GetVersionedInvitePage(c *gin.Context) {
 func GetDefaultInvitePage(c *gin.Context) {
 	affCode := c.Query("aff")
 	if affCode == "" {
+		affCode = getDefaultAffCode()
+	}
+	if affCode == "" {
 		c.String(http.StatusOK, "<h1>缺少邀请码</h1>")
 		return
 	}
@@ -366,6 +384,9 @@ func GetDefaultInvitePage(c *gin.Context) {
 // GetToken618Page renders the 618 promotion activity page.
 func GetToken618Page(c *gin.Context) {
 	affCode := c.Query("aff")
+	if affCode == "" {
+		affCode = getDefaultAffCode()
+	}
 
 	scheme := "https"
 	if c.Request.TLS == nil && c.GetHeader("X-Forwarded-Proto") != "https" {
