@@ -314,11 +314,62 @@ export const getUsersColumns = ({
     {
       title: 'ID',
       dataIndex: 'id',
+      width: 60,
     },
     {
       title: t('用户名'),
       dataIndex: 'username',
+      width: 120,
       render: (text, record) => renderUsername(text, record),
+    },
+    {
+      title: t('注册时间'),
+      dataIndex: 'created_at',
+      width: 140,
+      render: (text) => {
+        if (!text || text === 0) return <span className='text-gray-400'>-</span>;
+        const d = new Date(text * 1000);
+        return (
+          <span className='text-xs'>
+            {d.getFullYear()}-{String(d.getMonth() + 1).padStart(2, '0')}-{String(d.getDate()).padStart(2, '0')}{' '}
+            {String(d.getHours()).padStart(2, '0')}:{String(d.getMinutes()).padStart(2, '0')}
+          </span>
+        );
+      },
+    },
+    {
+      title: t('注册来源'),
+      dataIndex: 'source',
+      width: 90,
+      render: (text, record) => {
+        const sources = [];
+        if (record.github_id) sources.push({ label: 'GitHub', color: 'purple' });
+        if (record.discord_id) sources.push({ label: 'Discord', color: 'blue' });
+        if (record.wechat_id) sources.push({ label: 'WeChat', color: 'green' });
+        if (record.telegram_id) sources.push({ label: 'Telegram', color: 'light-blue' });
+        if (record.oidc_id) sources.push({ label: 'OIDC', color: 'orange' });
+        if (record.linux_do_id) sources.push({ label: 'LinuxDO', color: 'yellow' });
+        if (record.email) {
+          if (record.password) {
+            sources.push({ label: t('邮箱'), color: 'grey' });
+          } else {
+            sources.push({ label: 'Email', color: 'grey' });
+          }
+        }
+        if (sources.length === 0) {
+          return <Tag color='white' shape='circle' className='text-xs'>{t('未知')}</Tag>;
+        }
+        if (sources.length === 1) {
+          return <Tag color={sources[0].color} shape='circle' className='text-xs'>{sources[0].label}</Tag>;
+        }
+        return (
+          <Space spacing={2}>
+            {sources.map((s) => (
+              <Tag key={s.label} color={s.color} shape='circle' size='small' className='text-xs'>{s.label}</Tag>
+            ))}
+          </Space>
+        );
+      },
     },
     {
       title: t('状态'),
