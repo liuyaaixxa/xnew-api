@@ -46,6 +46,14 @@ export const useRedemptionsData = () => {
   });
   const [showEdit, setShowEdit] = useState(false);
 
+  // Stats state
+  const [stats, setStats] = useState({
+    total_count: 0,
+    total_quota: 0,
+    used_count: 0,
+    used_quota: 0,
+  });
+
   // Form API
   const [formApi, setFormApi] = useState(null);
 
@@ -301,6 +309,10 @@ export const useRedemptionsData = () => {
       .catch((reason) => {
         showError(reason);
       });
+    // Load stats
+    API.get('/api/redemption/stats').then(res => {
+      if (res?.data?.data) setStats(res.data.data);
+    }).catch(() => {});
   }, [pageSize]);
 
   return {
@@ -312,6 +324,7 @@ export const useRedemptionsData = () => {
     pageSize,
     tokenCount,
     selectedKeys,
+    stats,
 
     // Edit state
     editingRedemption,

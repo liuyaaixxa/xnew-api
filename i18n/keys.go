@@ -70,6 +70,17 @@ const (
 	MsgRedemptionExpireTimeInvalid = "redemption.expire_time_invalid"
 )
 
+// Flash sale related messages
+const (
+	MsgFlashSaleGrabSuccess    = "flash_sale.grab_success"
+	MsgFlashSaleActivateSuccess = "flash_sale.activate_success"
+	MsgFlashSaleAlreadyGrabbed  = "flash_sale.already_grabbed"
+	MsgFlashSaleSoldOut         = "flash_sale.sold_out"
+	MsgFlashSaleInvalidStatus   = "flash_sale.invalid_status"
+	MsgFlashSaleNotYours        = "flash_sale.not_yours"
+	MsgFlashSaleExpired         = "flash_sale.expired"
+)
+
 // User related messages
 const (
 	MsgUserPasswordLoginDisabled     = "user.password_login_disabled"

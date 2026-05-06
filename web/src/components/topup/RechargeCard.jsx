@@ -97,6 +97,9 @@ const RechargeCard = ({
   activeSubscriptions = [],
   allSubscriptions = [],
   reloadSubscriptionSelf,
+  grabedCoupons = [],
+  activatingId = null,
+  activateCoupon = () => {},
 }) => {
   const onlineFormApiRef = useRef(null);
   const redeemFormApiRef = useRef(null);
@@ -617,6 +620,45 @@ const RechargeCard = ({
           />
         </Form>
       </Card>
+
+      {/* 待激活卡券 */}
+      {grabedCoupons.length > 0 && (
+        <Card
+          className='!rounded-xl w-full'
+          title={
+            <Text type='tertiary' strong>
+              {t('待激活卡券')}
+            </Text>
+          }
+        >
+          <div className='flex flex-col gap-3'>
+            {grabedCoupons.map((coupon) => (
+              <div
+                key={coupon.id}
+                className='flex items-center justify-between p-4 rounded-xl border border-orange-200 bg-orange-50 dark:bg-orange-950/30'
+              >
+                <div className='flex flex-col gap-1'>
+                  <span className='font-semibold text-sm'>{coupon.name}</span>
+                  <span className='text-xs text-gray-500'>
+                    {t('额度')}: {coupon.quota.toLocaleString()} Token
+                    {coupon.grabed_time > 0 && (
+                      <> · {t('抢到时间')}: {new Date(coupon.grabed_time * 1000).toLocaleString()}</>
+                    )}
+                  </span>
+                </div>
+                <Button
+                  type='primary'
+                  size='small'
+                  loading={activatingId === coupon.id}
+                  onClick={() => activateCoupon(coupon.id)}
+                >
+                  {t('点击激活')}
+                </Button>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
     </Space>
   );
 

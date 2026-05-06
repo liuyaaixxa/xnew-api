@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 
 import React from 'react';
+import { Typography } from '@douyinfe/semi-ui';
 import CardPro from '../../common/ui/CardPro';
 import RedemptionsTable from './RedemptionsTable';
 import RedemptionsActions from './RedemptionsActions';
@@ -27,6 +28,9 @@ import EditRedemptionModal from './modals/EditRedemptionModal';
 import { useRedemptionsData } from '../../../hooks/redemptions/useRedemptionsData';
 import { useIsMobile } from '../../../hooks/common/useIsMobile';
 import { createCardProPagination } from '../../../helpers/utils';
+import { renderQuota } from '../../../helpers/render';
+
+const { Text } = Typography;
 
 const RedemptionsPage = () => {
   const redemptionsData = useRedemptionsData();
@@ -52,6 +56,9 @@ const RedemptionsPage = () => {
     searchRedemptions,
     loading,
     searching,
+
+    // Stats
+    stats,
 
     // UI state
     compactMode,
@@ -113,6 +120,25 @@ const RedemptionsPage = () => {
         })}
         t={redemptionsData.t}
       >
+        {/* Stats Cards */}
+        <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-4'>
+          <div className='p-4 rounded-xl bg-blue-50 border border-blue-200'>
+            <Text type='tertiary' className='text-xs'>{t('总卡数')}</Text>
+            <div className='text-xl font-bold text-blue-700'>{stats.total_count?.toLocaleString() || 0}</div>
+          </div>
+          <div className='p-4 rounded-xl bg-green-50 border border-green-200'>
+            <Text type='tertiary' className='text-xs'>{t('总额度')}</Text>
+            <div className='text-xl font-bold text-green-700'>{renderQuota(stats.total_quota || 0)}</div>
+          </div>
+          <div className='p-4 rounded-xl bg-orange-50 border border-orange-200'>
+            <Text type='tertiary' className='text-xs'>{t('已兑换卡数')}</Text>
+            <div className='text-xl font-bold text-orange-700'>{stats.used_count?.toLocaleString() || 0}</div>
+          </div>
+          <div className='p-4 rounded-xl bg-purple-50 border border-purple-200'>
+            <Text type='tertiary' className='text-xs'>{t('已兑换额度')}</Text>
+            <div className='text-xl font-bold text-purple-700'>{renderQuota(stats.used_quota || 0)}</div>
+          </div>
+        </div>
         <RedemptionsTable {...redemptionsData} />
       </CardPro>
     </>

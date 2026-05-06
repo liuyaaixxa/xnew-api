@@ -266,3 +266,102 @@ body[theme-mode="dark"] .mm-page {
   .mm-compare-bar { padding: 14px 16px; flex-direction: column; gap: 12px; }
   .mm-compare-items { flex-wrap: wrap; }
 }
+
+/* ========== Flash Sale Banner ========== */
+.mm-flash-sale-banner {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.mm-flash-sale-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 30%, #ef4444 70%, #dc2626 100%);
+}
+.mm-flash-sale-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.mm-flash-sale-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.mm-flash-sale-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.mm-flash-sale-icon svg {
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.15));
+}
+.mm-flash-sale-title {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -.3px;
+  text-shadow: 0 2px 8px rgba(0,0,0,.12);
+}
+.mm-flash-sale-sub {
+  color: rgba(255,255,255,.85);
+  font-size: 13px;
+  margin-top: 2px;
+}
+.mm-flash-sale-sub strong {
+  color: #fff;
+  font-size: 15px;
+}
+.mm-flash-sale-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.mm-flash-sale-btn {
+  padding: 12px 32px;
+  border-radius: 12px;
+  border: none;
+  background: #fff;
+  color: #ea580c;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  box-shadow: 0 4px 14px rgba(0,0,0,.15);
+  white-space: nowrap;
+}
+.mm-flash-sale-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.2);
+}
+.mm-flash-sale-btn:disabled {
+  opacity: .7;
+  cursor: not-allowed;
+}
+.mm-flash-sale-btn.grabbed {
+  background: rgba(255,255,255,.15);
+  color: #fff;
+  border: 2px solid rgba(255,255,255,.4);
+}
+.mm-flash-sale-btn.grabbed:hover {
+  background: rgba(255,255,255,.25);
+}
+.mm-flash-sale-msg {
+  color: rgba(255,255,255,.8);
+  font-size: 12px;
+  text-align: right;
+}

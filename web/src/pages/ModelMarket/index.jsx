@@ -21,7 +21,7 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useModelPricingData } from '../../hooks/model-pricing/useModelPricingData';
-import { getSystemName } from '../../helpers';
+import { API, getSystemName } from '../../helpers';
 import { getLobeHubIcon } from '../../helpers/render-icons';
 import './model-market.css';
 
@@ -33,6 +33,100 @@ function SearchIcon() {
       <circle cx="11" cy="11" r="8" />
       <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
+  );
+}
+
+function FlashIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M13 2L4.5 14H11L9 22L19.5 10H13L15 2Z" />
+    </svg>
+  );
+}
+
+function FlashSaleBanner({ t, userState, navigate }) {
+  const [info, setInfo] = useState(null);
+  const [grabbing, setGrabbing] = useState(false);
+  const [grabbed, setGrabbed] = useState(false);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    API.get('/api/flash-sale').then(res => {
+      if (res?.data?.data) setInfo(res.data.data);
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!userState?.user) return;
+    API.get('/api/user/flash-sale/my').then(res => {
+      if (res?.data?.data?.length > 0) {
+        setGrabbed(true);
+      }
+    }).catch(() => {});
+  }, [userState?.user]);
+
+  const handleGrab = async () => {
+    if (!userState?.user) {
+      navigate('/login');
+      return;
+    }
+    setGrabbing(true);
+    setMessage('');
+    try {
+      const res = await API.post('/api/user/flash-sale/grab');
+      if (res?.data?.success) {
+        setGrabbed(true);
+        setInfo(prev => prev ? { ...prev, count: Math.max(0, prev.count - 1) } : prev);
+      } else {
+        setMessage(res?.data?.message || t('抢券失败'));
+      }
+    } catch {
+      setMessage(t('网络错误'));
+    } finally {
+      setGrabbing(false);
+    }
+  };
+
+  if (!info || info.count === 0) return null;
+
+  const isLoggedIn = !!userState?.user;
+
+  return (
+    <div className="mm-flash-sale-banner">
+      <div className="mm-flash-sale-bg" />
+      <div className="mm-flash-sale-content">
+        <div className="mm-flash-sale-left">
+          <div className="mm-flash-sale-icon">
+            <FlashIcon />
+          </div>
+          <div className="mm-flash-sale-text">
+            <div className="mm-flash-sale-title">{t('Token兑换券')}</div>
+            <div className="mm-flash-sale-sub">
+              {t('每张')} {info.quota.toLocaleString()} Token · {t('剩余')} <strong>{info.count}</strong> {t('张')}
+            </div>
+          </div>
+        </div>
+        <div className="mm-flash-sale-right">
+          {grabbed ? (
+            <button
+              className="mm-flash-sale-btn grabbed"
+              onClick={() => navigate('/console/topup')}
+            >
+              {t('已抢到，去激活')} &rarr;
+            </button>
+          ) : (
+            <button
+              className="mm-flash-sale-btn"
+              onClick={handleGrab}
+              disabled={grabbing}
+            >
+              {grabbing ? t('抢购中...') : isLoggedIn ? t('立即抢购') : t('登录后抢购')}
+            </button>
+          )}
+          {message && <div className="mm-flash-sale-msg">{message}</div>}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -410,6 +504,8 @@ export default function ModelMarket() {
           <div className="mm-breadcrumb">
             <span>{t('首页')}</span> <span className="mm-breadcrumb-sep">/</span> <span>{t('模型市场')}</span>
           </div>
+
+          <FlashSaleBanner t={t} userState={userState} navigate={navigate} />
 
           <div className="mm-top-bar">
             <div className="mm-top-bar-left">

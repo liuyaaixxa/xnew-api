@@ -22,5 +22,14 @@ var (
 // Redemption errors
 var ErrRedeemFailed = errors.New("redeem.failed")
 
+// Flash sale errors
+var (
+	ErrFlashSaleAlreadyGrabed = errors.New("flash_sale.already_grabbed")
+	ErrFlashSaleSoldOut       = errors.New("flash_sale.sold_out")
+	ErrFlashSaleInvalidStatus = errors.New("flash_sale.invalid_status")
+	ErrFlashSaleNotYours      = errors.New("flash_sale.not_yours")
+	ErrFlashSaleExpired       = errors.New("flash_sale.expired")
+)
+
 // 2FA errors
 var ErrTwoFANotEnabled = errors.New("2fa not enabled")

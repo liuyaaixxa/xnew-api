@@ -88,6 +88,10 @@ const TopUp = () => {
   // 账单Modal状态
   const [openHistory, setOpenHistory] = useState(false);
 
+  // Flash sale grabbed coupons
+  const [grabedCoupons, setGrabedCoupons] = useState([]);
+  const [activatingId, setActivatingId] = useState(null);
+
   // 订阅相关
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
   const [subscriptionLoading, setSubscriptionLoading] = useState(true);
@@ -139,6 +143,34 @@ const TopUp = () => {
       showError(t('请求失败'));
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const fetchGrabedCoupons = async () => {
+    try {
+      const res = await API.get('/api/user/flash-sale/my');
+      if (res?.data?.data) setGrabedCoupons(res.data.data);
+    } catch {
+      // ignore
+    }
+  };
+
+  const activateCoupon = async (id) => {
+    setActivatingId(id);
+    try {
+      const res = await API.post('/api/user/flash-sale/activate', { id });
+      const { success, message, data } = res.data;
+      if (success) {
+        showSuccess(t('激活成功！已到账：') + renderQuota(data));
+        setGrabedCoupons(prev => prev.filter(c => c.id !== id));
+        getUserQuota();
+      } else {
+        showError(message);
+      }
+    } catch {
+      showError(t('激活失败'));
+    } finally {
+      setActivatingId(null);
     }
   };
 
@@ -616,6 +648,7 @@ const TopUp = () => {
     // 始终获取最新用户数据，确保余额等统计信息准确
     getUserQuota().then();
     setTransferAmount(getQuotaPerUnit());
+    fetchGrabedCoupons();
   }, []);
 
   useEffect(() => {
@@ -865,6 +898,9 @@ const TopUp = () => {
           activeSubscriptions={activeSubscriptions}
           allSubscriptions={allSubscriptions}
           reloadSubscriptionSelf={getSubscriptionSelf}
+          grabedCoupons={grabedCoupons}
+          activatingId={activatingId}
+          activateCoupon={activateCoupon}
         />
         <InvitationCard
           t={t}

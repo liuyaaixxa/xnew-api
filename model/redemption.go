@@ -22,6 +22,8 @@ type Redemption struct {
 	RedeemedTime int64          `json:"redeemed_time" gorm:"bigint"`
 	Count        int            `json:"count" gorm:"-:all"` // only for api request
 	UsedUserId   int            `json:"used_user_id"`
+	GrabedUserId int            `json:"grabed_user_id"`
+	GrabedTime   int64          `json:"grabed_time" gorm:"bigint"`
 	DeletedAt    gorm.DeletedAt `gorm:"index"`
 	ExpiredTime  int64          `json:"expired_time" gorm:"bigint"` // 过期时间，0 表示不过期
 }
@@ -163,7 +165,7 @@ func (redemption *Redemption) Insert() error {
 
 func (redemption *Redemption) SelectUpdate() error {
 	// This can update zero values
-	return DB.Model(redemption).Select("redeemed_time", "status").Updates(redemption).Error
+	return DB.Model(redemption).Select("redeemed_time", "status", "grabed_user_id", "grabed_time").Updates(redemption).Error
 }
 
 // Update Make sure your token's fields is completed, because this will update non-zero values
@@ -193,6 +195,114 @@ func DeleteRedemptionById(id int) (err error) {
 
 func DeleteInvalidRedemptions() (int64, error) {
 	now := common.GetTimestamp()
-	result := DB.Where("status IN ? OR (status = ? AND expired_time != 0 AND expired_time < ?)", []int{common.RedemptionCodeStatusUsed, common.RedemptionCodeStatusDisabled}, common.RedemptionCodeStatusEnabled, now).Delete(&Redemption{})
+	result := DB.Where("status IN ? OR (status = ? AND expired_time != 0 AND expired_time < ?)", []int{common.RedemptionCodeStatusUsed, common.RedemptionCodeStatusDisabled, common.RedemptionCodeStatusGrabbed}, common.RedemptionCodeStatusEnabled, now).Delete(&Redemption{})
 	return result.RowsAffected, result.Error
+}
+
+// GetFlashSaleInfo returns the count and quota of available flash sale codes
+func GetFlashSaleInfo() (count int64, quota int, err error) {
+	err = DB.Model(&Redemption{}).
+		Where("status = ?", common.RedemptionCodeStatusEnabled).
+		Select("COUNT(*) as count, COALESCE(MAX(quota), 0) as quota").
+		Row().Scan(&count, &quota)
+	return
+}
+
+// GetFlashSaleStats returns admin statistics for redemption codes
+func GetFlashSaleStats() (totalCount int64, totalQuota int64, usedCount int64, usedQuota int64, err error) {
+	type stats struct {
+		TotalCount int64
+		TotalQuota int64
+		UsedCount  int64
+		UsedQuota  int64
+	}
+	s := stats{}
+	err = DB.Model(&Redemption{}).
+		Select("COUNT(*) as total_count, COALESCE(SUM(quota), 0) as total_quota, COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0) as used_count, COALESCE(SUM(CASE WHEN status = ? THEN quota ELSE 0 END), 0) as used_quota", common.RedemptionCodeStatusUsed, common.RedemptionCodeStatusUsed).
+		Row().Scan(&s.TotalCount, &s.TotalQuota, &s.UsedCount, &s.UsedQuota)
+	return s.TotalCount, s.TotalQuota, s.UsedCount, s.UsedQuota, err
+}
+
+// GrabFlashSaleCode assigns an available code to a user. One per user.
+func GrabFlashSaleCode(userId int) (*Redemption, error) {
+	if userId == 0 {
+		return nil, errors.New("无效的用户ID")
+	}
+	redemption := &Redemption{}
+	err := DB.Transaction(func(tx *gorm.DB) error {
+		// Check if user already grabbed one
+		var existingCount int64
+		if err := tx.Model(&Redemption{}).Where("grabed_user_id = ? AND status = ?", userId, common.RedemptionCodeStatusGrabbed).Count(&existingCount).Error; err != nil {
+			return err
+		}
+		if existingCount > 0 {
+			return ErrFlashSaleAlreadyGrabed
+		}
+		// Find and lock an available code
+		err := tx.Where("status = ?", common.RedemptionCodeStatusEnabled).
+			Order("id ASC").
+			Limit(1).
+			Set("gorm:query_option", "FOR UPDATE").
+			First(redemption).Error
+		if err != nil {
+			return ErrFlashSaleSoldOut
+		}
+		// Mark as grabbed
+		redemption.Status = common.RedemptionCodeStatusGrabbed
+		redemption.GrabedUserId = userId
+		redemption.GrabedTime = common.GetTimestamp()
+		return tx.Save(redemption).Error
+	})
+	if err != nil {
+		return nil, err
+	}
+	RecordLog(userId, LogTypeTopup, fmt.Sprintf("抢到兑换券 %s，额度 %s", redemption.Name, logger.LogQuota(redemption.Quota)))
+	return redemption, nil
+}
+
+// GetUserGrabedRedemptions returns user's grabbed but not yet activated codes
+func GetUserGrabedRedemptions(userId int) ([]*Redemption, error) {
+	var redemptions []*Redemption
+	err := DB.Where("grabed_user_id = ? AND status = ?", userId, common.RedemptionCodeStatusGrabbed).
+		Order("id DESC").
+		Find(&redemptions).Error
+	return redemptions, err
+}
+
+// ActivateGrabedRedemption activates a grabbed code and adds quota to user
+func ActivateGrabedRedemption(id int, userId int) (int, error) {
+	if userId == 0 {
+		return 0, errors.New("无效的用户ID")
+	}
+	quota := 0
+	err := DB.Transaction(func(tx *gorm.DB) error {
+		redemption := &Redemption{}
+		if err := tx.Where("id = ?", id).First(redemption).Error; err != nil {
+			return ErrFlashSaleSoldOut
+		}
+		if redemption.Status != common.RedemptionCodeStatusGrabbed {
+			return ErrFlashSaleInvalidStatus
+		}
+		if redemption.GrabedUserId != userId {
+			return ErrFlashSaleNotYours
+		}
+		if redemption.ExpiredTime != 0 && redemption.ExpiredTime < common.GetTimestamp() {
+			return ErrFlashSaleExpired
+		}
+		// Add quota to user
+		if err := tx.Model(&User{}).Where("id = ?", userId).Update("quota", gorm.Expr("quota + ?", redemption.Quota)).Error; err != nil {
+			return err
+		}
+		quota = redemption.Quota
+		redemption.Status = common.RedemptionCodeStatusUsed
+		redemption.RedeemedTime = common.GetTimestamp()
+		redemption.UsedUserId = userId
+		return tx.Save(redemption).Error
+	})
+	if err != nil {
+		common.SysError("activate grabbed redemption failed: " + err.Error())
+		return 0, err
+	}
+	RecordLog(userId, LogTypeTopup, fmt.Sprintf("激活兑换券 %d，额度 %s", id, logger.LogQuota(quota)))
+	return quota, nil
 }
