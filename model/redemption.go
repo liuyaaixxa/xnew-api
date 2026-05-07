@@ -230,9 +230,10 @@ func GrabFlashSaleCode(userId int) (*Redemption, error) {
 	}
 	redemption := &Redemption{}
 	err := DB.Transaction(func(tx *gorm.DB) error {
-		// Check if user already grabbed one
+		// Check if user already grabbed one today
+		todayStart := common.GetDayStartTimestamp()
 		var existingCount int64
-		if err := tx.Model(&Redemption{}).Where("grabed_user_id = ? AND status = ?", userId, common.RedemptionCodeStatusGrabbed).Count(&existingCount).Error; err != nil {
+		if err := tx.Model(&Redemption{}).Where("grabed_user_id = ? AND grabed_time >= ?", userId, todayStart).Count(&existingCount).Error; err != nil {
 			return err
 		}
 		if existingCount > 0 {
