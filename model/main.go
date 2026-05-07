@@ -247,6 +247,59 @@ func InitLogDB() (err error) {
 	return err
 }
 
+// ensureUniqueIndexes works around a GORM v1.25.7 MySQL bug where AutoMigrate
+// uses DROP FOREIGN KEY instead of DROP INDEX for unique constraints, causing
+// Error 1091 on every startup.
+//
+// Strategy: drop old GORM-managed unique indexes (both idx_* and uni_* naming)
+// using proper DROP INDEX, then recreate them. GORM recreates regular indexes
+// via AutoMigrate (since models use `index` not `uniqueIndex`), and we add
+// the unique constraint via raw SQL. This way GORM never tries to manage
+// unique constraints on MySQL.
+func ensureUniqueIndexes() {
+	if !common.UsingMySQL {
+		return
+	}
+	// Tables/columns that need unique indexes, with their desired unique index names.
+	// We use uq_ prefix (not uni_ or idx_) to avoid GORM's naming strategy.
+	type uniqueIndex struct {
+		table   string
+		col     string // MySQL-quoted column
+		uqName  string // our unique index name
+	}
+	indexes := []uniqueIndex{
+		{"tokens", "`key`", "uq_tokens_key"},
+		{"redemptions", "`key`", "uq_redemptions_key"},
+		{"users", "`access_token`", "uq_users_access_token"},
+		{"users", "`aff_code`", "uq_users_aff_code"},
+		{"passkey_credentials", "`user_id`", "uq_passkey_user_id"},
+		{"passkey_credentials", "`credential_id`", "uq_passkey_credential_id"},
+		{"subscription_pre_consume_records", "`request_id`", "uq_sub_pre_consume_request_id"},
+		{"settlement_orders", "`order_no`", "uq_settlement_orders_order_no"},
+		{"model_tags", "`name`", "uq_model_tags_name"},
+	}
+	for _, idx := range indexes {
+		colName := strings.Trim(idx.col, "`")
+		// Drop both old (idx_) and new (uni_) GORM naming variants first
+		for _, prefix := range []string{"idx", "uni"} {
+			oldName := prefix + "_" + idx.table + "_" + colName
+			sql := "ALTER TABLE " + idx.table + " DROP INDEX `" + oldName + "`"
+			if err := DB.Exec(sql).Error; err != nil {
+				if !strings.Contains(err.Error(), "check that column/key exists") {
+					common.SysLog("unexpected error dropping index " + oldName + ": " + err.Error())
+				}
+			}
+		}
+		// Create our unique index
+		sql := "CREATE UNIQUE INDEX " + idx.uqName + " ON " + idx.table + " (" + idx.col + ")"
+		if err := DB.Exec(sql).Error; err != nil {
+			if !strings.Contains(err.Error(), "Duplicate key name") {
+				common.SysLog("failed to create unique index " + idx.uqName + ": " + err.Error())
+			}
+		}
+	}
+}
+
 func migrateDB() error {
 	// Migrate price_amount column from float/double to decimal for existing tables
 	migrateSubscriptionPlanPriceAmount()
@@ -254,6 +307,9 @@ func migrateDB() error {
 	if err := migrateTokenModelLimitsToText(); err != nil {
 		return err
 	}
+
+	// Ensure unique indexes exist (managed outside GORM to avoid v1.25.7 MySQL DROP FOREIGN KEY bug)
+	ensureUniqueIndexes()
 
 	err := DB.AutoMigrate(
 		&Channel{},
