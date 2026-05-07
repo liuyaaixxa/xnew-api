@@ -59,6 +59,13 @@ redemption.expired: "該兌換碼已過期"
 redemption.failed: "兌換失敗，請稍後重試"
 redemption.not_provided: "未提供兌換碼"
 redemption.expire_time_invalid: "過期時間不能早於當前時間"
+flash_sale.grab_success: "搶券成功！請到錢包激活使用"
+flash_sale.activate_success: "兌換券已激活，額度已到賬"
+flash_sale.already_grabbed: "今天已經搶過了，明天再來吧"
+flash_sale.sold_out: "券已被搶光，明天再來吧"
+flash_sale.invalid_status: "該兌換券無法激活"
+flash_sale.not_yours: "這不是你的兌換券"
+flash_sale.expired: "該兌換券已過期"
 
 # User messages
 user.password_login_disabled: "管理員關閉了密碼登錄"

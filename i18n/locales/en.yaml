@@ -58,6 +58,13 @@ redemption.expired: "This redemption code has expired"
 redemption.failed: "Redemption failed, please try again later"
 redemption.not_provided: "Redemption code not provided"
 redemption.expire_time_invalid: "Expiration time cannot be earlier than current time"
+flash_sale.grab_success: "Grabbed successfully! Go to wallet to activate"
+flash_sale.activate_success: "Coupon activated, quota added to your account"
+flash_sale.already_grabbed: "You have already grabbed a coupon today, come back tomorrow"
+flash_sale.sold_out: "All coupons have been grabbed, come back tomorrow"
+flash_sale.invalid_status: "This coupon cannot be activated"
+flash_sale.not_yours: "This is not your coupon"
+flash_sale.expired: "This coupon has expired"
 
 # User messages
 user.password_login_disabled: "Password login has been disabled by administrator"
