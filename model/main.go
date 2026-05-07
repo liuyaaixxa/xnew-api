@@ -261,30 +261,64 @@ func ensureUniqueIndexes() {
 	if !common.UsingMySQL {
 		return
 	}
-	// Drop unique indexes matching GORM naming patterns from tables that have
-	// unnamed uniqueIndex tags (which GORM names idx_* or uni_* automatically).
-	// Named uniqueIndex tags like "ux_user_provider" are left alone.
-	dropPatterns := []struct {
-		table string
-		col   string // unquoted column name
-	}{
-		{"tokens", "key"},
-		{"redemptions", "key"},
-		{"users", "access_token"},
-		{"users", "aff_code"},
-		{"passkey_credentials", "user_id"},
-		{"passkey_credentials", "credential_id"},
-		{"subscription_pre_consume_records", "request_id"},
-		{"settlement_orders", "order_no"},
-		{"model_tags", "name"},
+	// Each entry maps a table name to every possible unique index name that
+	// GORM v1.25.7 might try to DROP FOREIGN KEY on during AutoMigrate.
+	// We cover: GORM NamingStrategy names (uni_<table>_<col>), older GORM
+	// defaults (idx_<table>_<col>), and explicit tag names from the model.
+	drops := map[string][]string{
+		"tokens": {
+			"idx_tokens_key", "uni_tokens_key",
+		},
+		"redemptions": {
+			"idx_redemptions_key", "uni_redemptions_key",
+		},
+		"users": {
+			"idx_users_access_token", "uni_users_access_token",
+			"idx_users_aff_code", "uni_users_aff_code",
+		},
+		"passkey_credentials": {
+			"idx_passkey_credentials_user_id", "uni_passkey_credentials_user_id",
+			"idx_passkey_credentials_credential_id", "uni_passkey_credentials_credential_id",
+		},
+		"subscription_pre_consume_records": {
+			"idx_subscription_pre_consume_records_request_id", "uni_subscription_pre_consume_records_request_id",
+		},
+		"settlement_orders": {
+			"idx_settlement_orders_order_no", "uni_settlement_orders_order_no",
+		},
+		"model_tags": {
+			"idx_model_tags_name", "uni_model_tags_name",
+		},
+		"model_tag_relations": {
+			"uk_model_tag", "uni_model_tag_relations_model_id", "uni_model_tag_relations_tag_id",
+		},
+		"custom_oauth_providers": {
+			"idx_custom_oauth_providers_slug", "uni_custom_oauth_providers_slug",
+		},
+		"prefill_groups": {
+			"uk_prefill_name", "uni_prefill_groups_name", "idx_prefill_groups_name",
+		},
+		"checkins": {
+			"idx_user_checkin_date", "uni_checkins_user_id", "uni_checkins_checkin_date",
+		},
+		"user_oauth_bindings": {
+			"ux_user_provider", "ux_provider_userid",
+			"uni_user_oauth_bindings_user_id", "uni_user_oauth_bindings_provider_id",
+			"uni_user_oauth_bindings_provider_user_id",
+		},
+		"models": {
+			"uk_model_name_delete_at", "uni_models_model_name", "uni_models_deleted_at",
+		},
+		"vendors": {
+			"uk_vendor_name_delete_at", "uni_vendors_name", "uni_vendors_deleted_at",
+		},
 	}
-	for _, p := range dropPatterns {
-		for _, prefix := range []string{"idx", "uni"} {
-			idxName := prefix + "_" + p.table + "_" + p.col
-			sql := "ALTER TABLE " + p.table + " DROP INDEX `" + idxName + "`"
+	for table, names := range drops {
+		for _, name := range names {
+			sql := "ALTER TABLE `" + table + "` DROP INDEX `" + name + "`"
 			if err := DB.Exec(sql).Error; err != nil {
 				if !strings.Contains(err.Error(), "check that column/key exists") {
-					common.SysLog("unexpected error dropping index " + idxName + ": " + err.Error())
+					common.SysLog("error dropping index " + name + " on " + table + ": " + err.Error())
 				}
 			}
 		}
