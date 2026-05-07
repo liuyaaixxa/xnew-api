@@ -4917,5 +4917,17 @@
     "默认测试模型": "Mô hình kiểm tra mặc định",
     "默认用户消息": "Xin chào",
     "默认补全倍率": "Tỷ lệ hoàn thành mặc định"
-  }
+  },
+  "Token兑换券": "Phiếu Token",
+  "每张": "Mỗi phiếu:",
+  "剩余": "Còn lại:",
+  "已抢到，去激活": "Đã nhận — Kích hoạt",
+  "抢购中...": "Đang nhận...",
+  "立即抢购": "Nhận ngay",
+  "登录后抢购": "Đăng nhập để nhận",
+  "抢券失败": "Nhận thất bại",
+  "待激活卡券": "Chờ kích hoạt",
+  "额度": "Hạn mức",
+  "抢到时间": "Đã nhận lúc",
+  "点击激活": "Kích hoạt"
 }

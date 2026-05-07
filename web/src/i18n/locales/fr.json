@@ -4398,5 +4398,17 @@
     "默认测试模型": "Modèle de test par défaut",
     "默认用户消息": "Bonjour",
     "默认补全倍率": "Taux de complétion par défaut"
-  }
+  },
+  "Token兑换券": "Bon Token",
+  "每张": "Chaque:",
+  "剩余": "Restant:",
+  "已抢到，去激活": "Récupéré — Activer",
+  "抢购中...": "Récupération...",
+  "立即抢购": "Obtenir",
+  "登录后抢购": "Connectez-vous pour obtenir",
+  "抢券失败": "Échec de la récupération",
+  "待激活卡券": "En attente d'activation",
+  "额度": "Quota",
+  "抢到时间": "Récupéré le",
+  "点击激活": "Activer"
 }
