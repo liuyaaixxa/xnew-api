@@ -148,6 +148,12 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Determine version
+        id: version
+        run: |
+          VERSION="latest-$(date +'%Y%m%d')-$(git rev-parse --short HEAD)"
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Copy alloy config to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -156,6 +162,52 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "deploy/alloy-config.alloy"
           target: "/home/${{ secrets.EC2_USER }}/xnew-api/"
+
+      - name: Backup MySQL database
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: VERSION
+          script: |
+            set -euo pipefail
+
+            BACKUP_DIR="/opt/mysqlback"
+            TIMESTAMP="$(date +'%Y%m%d-%H%M%S')"
+            BACKUP_FILE="${BACKUP_DIR}/xnew-api-${TIMESTAMP}-${VERSION}.sql.gz"
+            RETENTION_DAYS=14
+
+            echo "==> Ensuring backup dir exists at ${BACKUP_DIR}..."
+            sudo mkdir -p "${BACKUP_DIR}"
+            sudo chown "$(id -u):$(id -g)" "${BACKUP_DIR}"
+
+            echo "==> Dumping MySQL database 'xnew-api' to ${BACKUP_FILE}..."
+            mysqldump \
+              --host=127.0.0.1 \
+              --port=3306 \
+              --user=root \
+              --password='teniuapi!666' \
+              --single-transaction \
+              --quick \
+              --routines \
+              --triggers \
+              --events \
+              --set-gtid-purged=OFF \
+              --column-statistics=0 \
+              --no-tablespaces \
+              xnew-api | gzip -c > "${BACKUP_FILE}"
+
+            BACKUP_SIZE=$(ls -lh "${BACKUP_FILE}" | awk '{print $5}')
+            echo "==> Backup complete: ${BACKUP_FILE} (${BACKUP_SIZE})"
+
+            echo "==> Cleaning backups older than ${RETENTION_DAYS} days..."
+            find "${BACKUP_DIR}" -maxdepth 1 -type f -name 'xnew-api-*.sql.gz' -mtime +${RETENTION_DAYS} -print -delete || true
+
+            echo "==> Current backups:"
+            ls -lh "${BACKUP_DIR}" | tail -n +2
+        env:
+          VERSION: ${{ steps.version.outputs.value }}
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
