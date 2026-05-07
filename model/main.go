@@ -255,14 +255,6 @@ func migrateDB() error {
 		return err
 	}
 
-	// GORM v1.25.7 changed unique index naming convention: old version created
-	// idx_<table>_<col> while new version expects uni_<table>_<col>. AutoMigrate
-	// mistakenly uses DROP FOREIGN KEY on the new name which doesn't exist yet.
-	// Rename any old-style unique indexes to the new convention on MySQL.
-	if common.UsingMySQL {
-		migrateUniqueIndexNaming()
-	}
-
 	err := DB.AutoMigrate(
 		&Channel{},
 		&Token{},
@@ -315,31 +307,6 @@ func migrateDB() error {
 		}
 	}
 	return nil
-}
-
-// migrateUniqueIndexNaming renames old-style GORM unique indexes (idx_<table>_<col>)
-// to the new naming convention (uni_<table>_<col>) expected by GORM v1.25.7+.
-// GORM AutoMigrate would otherwise try DROP FOREIGN KEY on the new name, which fails
-// because (a) the index doesn't exist under that name yet and (b) it's an INDEX, not a FK.
-func migrateUniqueIndexNaming() {
-	renames := []struct{ table, oldName, newName, col string }{
-		{"tokens", "idx_tokens_key", "uni_tokens_key", "`key`"},
-		{"redemptions", "idx_redemptions_key", "uni_redemptions_key", "`key`"},
-	}
-	for _, r := range renames {
-		var cnt int64
-		DB.Raw("SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ?", r.table, r.oldName).Scan(&cnt)
-		if cnt > 0 {
-			// drop old index; ignore error on ALTER (it could fail for various reasons)
-			DB.Exec(fmt.Sprintf("ALTER TABLE %s DROP INDEX %s", r.table, r.oldName))
-		}
-		// only create if the new index doesn't already exist
-		var newCnt int64
-		DB.Raw("SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ?", r.table, r.newName).Scan(&newCnt)
-		if newCnt == 0 {
-			DB.Exec(fmt.Sprintf("CREATE UNIQUE INDEX %s ON %s (%s)", r.newName, r.table, r.col))
-		}
-	}
 }
 
 func migrateDBFast() error {

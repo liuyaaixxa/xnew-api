@@ -14,7 +14,7 @@ import (
 type Token struct {
 	Id                 int            `json:"id"`
 	UserId             int            `json:"user_id" gorm:"index"`
-	Key                string         `json:"key" gorm:"type:char(48);uniqueIndex"`
+	Key                string         `json:"key" gorm:"type:char(48);uniqueIndex:idx_tokens_key"`
 	Status             int            `json:"status" gorm:"default:1"`
 	Name               string         `json:"name" gorm:"index" `
 	CreatedTime        int64          `json:"created_time" gorm:"bigint"`
