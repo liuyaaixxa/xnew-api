@@ -27,6 +27,7 @@ func SetApiRouter(router *gin.Engine) {
 		apiRouter.GET("/notice", controller.GetNotice)
 		apiRouter.GET("/download/:platform", controller.DownloadRedirect)
 		apiRouter.GET("/captcha", middleware.CriticalRateLimit(), controller.GetCaptcha)
+		apiRouter.GET("/captcha/verify", middleware.CriticalRateLimit(), controller.VerifyCaptchaPreview)
 		apiRouter.GET("/user-agreement", controller.GetUserAgreement)
 		apiRouter.GET("/privacy-policy", controller.GetPrivacyPolicy)
 		apiRouter.GET("/about", controller.GetAbout)

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useImperativeHandle, forwardRef, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Input, Button, Spin } from '@douyinfe/semi-ui';
+import { Input, Button, Spin, Toast } from '@douyinfe/semi-ui';
 import { IconRefresh, IconTick } from '@douyinfe/semi-icons';
 import Turnstile from 'react-turnstile';
 import GoCaptcha from 'go-captcha-react';
@@ -141,10 +141,29 @@ const CaptchaWidget = forwardRef(({ provider, turnstileSiteKey, onVerifiedChange
             data={slideData}
             config={{ showTheme: false }}
             events={{
-              confirm: (point) => {
-                setSlidePoint(point);
-                setVerified(true);
-                if (onVerifiedChange) onVerifiedChange(true);
+              confirm: async (point) => {
+                try {
+                  const res = await API.get('/api/captcha/verify', {
+                    params: {
+                      captcha_id: captchaId,
+                      point_x: point?.x ?? 0,
+                      point_y: point?.y ?? 0,
+                    },
+                  });
+                  if (res.data?.success) {
+                    setSlidePoint(point);
+                    setVerified(true);
+                    if (onVerifiedChange) onVerifiedChange(true);
+                  } else {
+                    Toast.error(res.data?.message || t('滑块验证失败，请重试'));
+                    if (slideRef.current?.reset) slideRef.current.reset();
+                    fetchCaptcha();
+                  }
+                } catch (e) {
+                  Toast.error(t('网络异常，请重试'));
+                  if (slideRef.current?.reset) slideRef.current.reset();
+                  fetchCaptcha();
+                }
               },
               refresh: () => {
                 fetchCaptcha();

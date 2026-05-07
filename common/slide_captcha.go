@@ -114,3 +114,29 @@ func VerifySlideCaptcha(id string, pointX, pointY int) (bool, string) {
 
 	return true, ""
 }
+
+// VerifySlideCaptchaPreview validates the slide coordinates WITHOUT consuming
+// the captcha entry, so the same captcha id can later be used by login/register
+// to perform the authoritative one-shot verification. Used by /api/captcha/verify
+// to give immediate feedback after the user releases the slider.
+func VerifySlideCaptchaPreview(id string, pointX, pointY int) (bool, string) {
+	if id == "" {
+		return false, "请完成人机校验"
+	}
+
+	stored, _ := captchaStore.Get(id, false)
+	if stored == "" {
+		return false, "验证码已过期，请刷新"
+	}
+
+	var targetX, targetY int
+	if _, err := fmt.Sscanf(stored, "%d,%d", &targetX, &targetY); err != nil {
+		return false, "验证码数据异常"
+	}
+
+	if !slide.Validate(pointX, pointY, targetX, targetY, 5) {
+		return false, "滑块验证失败，请重试"
+	}
+
+	return true, ""
+}
