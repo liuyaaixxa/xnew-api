@@ -93,7 +93,7 @@ const LandingAbout = () => {
         <h2>{t('联系我们')}</h2>
         <p>{t('如有任何问题或合作意向，欢迎联系我们')}</p>
         <p>
-          <a href='mailto:support@teniucloud.com'>support@teniucloud.com</a>
+          <a href='mailto:support@teniuapi.online'>support@teniuapi.online</a>
         </p>
       </div>
     </LegalPageLayout>
