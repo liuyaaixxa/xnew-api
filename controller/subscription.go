@@ -38,6 +38,58 @@ func GetSubscriptionPlans(c *gin.Context) {
 	common.ApiSuccess(c, result)
 }
 
+// PublicSubscriptionPlanDTO is the publicly-visible subset of a SubscriptionPlan.
+// Sensitive fields (stripe price ids, creem product ids, internal sort orders)
+// are stripped so this DTO can be served from an unauthenticated endpoint.
+type PublicSubscriptionPlanDTO struct {
+	Id                      int     `json:"id"`
+	Title                   string  `json:"title"`
+	Subtitle                string  `json:"subtitle"`
+	PriceAmount             float64 `json:"price_amount"`
+	Currency                string  `json:"currency"`
+	DurationUnit            string  `json:"duration_unit"`
+	DurationValue           int     `json:"duration_value"`
+	CustomSeconds           int64   `json:"custom_seconds"`
+	UpgradeGroup            string  `json:"upgrade_group"`
+	TotalAmount             int64   `json:"total_amount"`
+	MaxPurchasePerUser      int     `json:"max_purchase_per_user"`
+	QuotaResetPeriod        string  `json:"quota_reset_period"`
+	QuotaResetCustomSeconds int64   `json:"quota_reset_custom_seconds"`
+}
+
+// GetPublicSubscriptionPlans returns the enabled subscription plans for public,
+// unauthenticated browsing on the model market page. Sensitive payment provider
+// identifiers are not included.
+func GetPublicSubscriptionPlans(c *gin.Context) {
+	var plans []model.SubscriptionPlan
+	if err := model.DB.
+		Where("enabled = ?", true).
+		Order("sort_order desc, id desc").
+		Find(&plans).Error; err != nil {
+		common.ApiError(c, err)
+		return
+	}
+	result := make([]PublicSubscriptionPlanDTO, 0, len(plans))
+	for _, p := range plans {
+		result = append(result, PublicSubscriptionPlanDTO{
+			Id:                      p.Id,
+			Title:                   p.Title,
+			Subtitle:                p.Subtitle,
+			PriceAmount:             p.PriceAmount,
+			Currency:                p.Currency,
+			DurationUnit:            p.DurationUnit,
+			DurationValue:           p.DurationValue,
+			CustomSeconds:           p.CustomSeconds,
+			UpgradeGroup:            p.UpgradeGroup,
+			TotalAmount:             p.TotalAmount,
+			MaxPurchasePerUser:      p.MaxPurchasePerUser,
+			QuotaResetPeriod:        p.QuotaResetPeriod,
+			QuotaResetCustomSeconds: p.QuotaResetCustomSeconds,
+		})
+	}
+	common.ApiSuccess(c, result)
+}
+
 func GetSubscriptionSelf(c *gin.Context) {
 	userId := c.GetInt("id")
 	settingMap, _ := model.GetUserSetting(userId, false)

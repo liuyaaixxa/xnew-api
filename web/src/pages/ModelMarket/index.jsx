@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { useModelPricingData } from '../../hooks/model-pricing/useModelPricingData';
 import { API, getSystemName } from '../../helpers';
 import { getLobeHubIcon } from '../../helpers/render-icons';
+import SubscriptionFloor from './components/SubscriptionFloor';
 import './model-market.css';
 
 const MODELS_PER_PAGE = 9;
@@ -608,6 +609,15 @@ export default function ModelMarket() {
               {renderPagination()}
             </>
           )}
+
+          <SubscriptionFloor
+            models={models}
+            onSubscribe={(plan) => {
+              // Logged-in users go to the topup/subscription console where the
+              // existing SubscriptionPurchaseModal handles payment selection.
+              navigate(`/console/topup?subscribe=${plan?.id || ''}`);
+            }}
+          />
         </main>
       </div>
 
