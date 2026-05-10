@@ -107,7 +107,7 @@ const PageLayout = () => {
     loadStatus().catch(console.error);
     let systemName = getSystemName();
     if (systemName) {
-      document.title = systemName;
+      document.title = systemName + ' | AI大模型API网关 - DeepSeek Claude Opus GLM5 模型聚合';
     }
     let logo = getLogo();
     if (logo) {
